@@ -232,7 +232,7 @@ class numeros_exteriores:
         icon_path = ':/plugins/numeros_exteriores/icon.png'
         self.add_action(
             icon_path,
-            text=self.tr(u'num_ext'),
+            text=self.tr(u'Números Exteriores'),
             callback=self.run,
             parent=self.iface.mainWindow())
 
@@ -327,13 +327,10 @@ class numeros_exteriores:
             self.iface.addDockWidget(Qt.RightDockWidgetArea, self.dockwidget)
             self.dockwidget.show()
 
-
-            entidades = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32]
             if self.dockwidget.cveEntidad.count() == 0 :
 
-                for entidad in entidades:
-                    item = str(entidad).zfill(2)
-                    self.dockwidget.cveEntidad.addItem(item)
+                for entidad in range(1,33):
+                    self.dockwidget.cveEntidad.addItem(str(entidad).zfill(2))
 
                     #self.iface.messageBar().pushMessage("Datos entidad  ", str(entidad))
                     #mun_num = str(row[0]) + " : " + row[1]
@@ -390,14 +387,14 @@ class numeros_exteriores:
             # # the string is empty
 
             #self.iface.messageBar().pushMessage("Mensaje", "Introduce el usuario")
-            QMessageBox.warning(self.iface.mainWindow(), "Aviso", "No se pudo ingresar a la base, revise sus credenciales")
+            QMessageBox.warning(self.iface.mainWindow(), "Aviso", "No fue posible ingresar a la base, revise sus credenciales")
             return None     #Realmente sale de la funcion
             
         if pwd is NULL or pwd == "" or pwd.isspace():
             # # the string is empty
 
             #self.iface.messageBar().pushMessage("Mensaje", "Introduce la clave")
-            QMessageBox.warning(self.iface.mainWindow(), "Aviso", "No se pudo ingresar a la base, revise sus credenciales")
+            QMessageBox.warning(self.iface.mainWindow(), "Aviso", "No fue posible ingresar a la base, revise sus credenciales")
             return None
         
         # if len(usr) == 0:
@@ -537,8 +534,8 @@ class numeros_exteriores:
             #print ("I was able to connect to the database")
             return None
         except:
-            self.iface.messageBar().pushMessage("Mensaje", "No se logro ingresar a la Base")
-            QMessageBox.warning(self.iface.mainWindow(), "Aviso", "No se pudo ingresar a la base, revise los datos, el estado de la red o sus credenciales")
+            self.iface.messageBar().pushMessage("Mensaje", "No se logró ingresar a la Base")
+            QMessageBox.warning(self.iface.mainWindow(), "Aviso", "No fue posible ingresar a la base, revise los datos, su conexión de red o sus credenciales")
             #print ("I am unable to connect to the database")
             #self.dockwidget.txtUsuario.setText("")    
             #self.dockwidget.txtClave.setText("")
@@ -719,7 +716,7 @@ class numeros_exteriores:
 
         except:
             
-            QMessageBox.warning(self.iface.mainWindow(), "Aviso", "No se logro obtener los datos de las secciones, de acuerdo al municipio seleccionado, revise sus credenciales o revise su conexion a internet")
+            QMessageBox.warning(self.iface.mainWindow(), "Aviso", "No se logró obtener los datos de las secciones de acuerdo con el municipio seleccionado, revise sus credenciales o su conexión a internet")
             #print ("I am unable to connect to the database")
             #self.dockwidget.txtUsuario.setText("")    
             #self.dockwidget.txtClave.setText("")
@@ -1023,11 +1020,11 @@ class numeros_exteriores:
             self.dockwidget.idVialidad_original.setText("")    
             #self.dockwidget.idVialidad.setText("")
 
-            QMessageBox.warning(self.iface.mainWindow(), "Aviso", "Finalizo la carga del area")
+            QMessageBox.warning(self.iface.mainWindow(), "Aviso", "Se cargaron las capas del área de trabajo exitosamente")
 
         except:
 
-            QMessageBox.warning(self.iface.mainWindow(), "Aviso", "No se logro cargar las capas de forma adecuada, revise su conexion a internet")
+            QMessageBox.warning(self.iface.mainWindow(), "Aviso", "No se logró cargar las capas adecuadamente, revise su conexión a internet")
 
 
             return None
@@ -1223,7 +1220,7 @@ class numeros_exteriores:
 
     
     def btnRecomendaciones_accion(self):
-        QMessageBox.warning(self.iface.mainWindow(), "Aviso", "Para una adecuada visualización se recomienda utilzar cualquier resolución de pantalla, de las mostradas a continuación: 1920 X 1080, 2048 X 1152 y 2560 X 1600")
+        QMessageBox.warning(self.iface.mainWindow(), "Aviso", "Para una adecuada visualización se recomienda utilzar cualquiera de las siguientes resoluciones de pantalla: 1920 x 1080, 2048 x 1152 o 2560 x 1600")
         return
 
         
@@ -1560,7 +1557,7 @@ class numeros_exteriores:
             if IdNumeroManzana == "":
                 if (Id_manzana_actual and not Id_manzana_actual.isspace()) and not Id_manzana_actual == "None":
                     # the string is non-empty
-                    QMessageBox.warning(self.iface.mainWindow(), "Aviso","No se actualizó el dato de Id manzana corregido, se dejara el actual: " + Id_manzana_actual)
+                    QMessageBox.warning(self.iface.mainWindow(), "Aviso","No se actualizó el dato de Id manzana corregido, se conserva el actual: " + Id_manzana_actual)
                     IdNumeroManzana = Id_manzana_actual
                 else:
                     # the string is empty
@@ -1570,11 +1567,11 @@ class numeros_exteriores:
             if IdNumeroVialidad == "":
                 if (Id_vialidad_actual and not Id_vialidad_actual.isspace()) and not Id_vialidad_actual == "None":
                     # the string is non-empty
-                    QMessageBox.warning(self.iface.mainWindow(), "Aviso","No se actualizó el dato de Identificador de Vialidad mas cercano, se dejara el actual: " + Id_vialidad_actual)
+                    QMessageBox.warning(self.iface.mainWindow(), "Aviso","No se actualizó el dato de Identificador de Vialidad más cercano, se conserva el actual: " + Id_vialidad_actual)
                     IdNumeroVialidad = Id_vialidad_actual
                 else:
                     # the string is empty
-                    QMessageBox.warning(self.iface.mainWindow(), "Aviso","Debe ingresar el dato de Identificador de Vialidad mas cercano para guardar los cambios")
+                    QMessageBox.warning(self.iface.mainWindow(), "Aviso","Debe ingresar el dato de Identificador de Vialidad más cercano para guardar los cambios")
                     return
             
 
@@ -1635,7 +1632,7 @@ class numeros_exteriores:
 
         except:
 
-            QMessageBox.warning(self.iface.mainWindow(), "Aviso", "No se logro guardar la informacion, revise los datos capturados, sus credenciales o su conexion a internet")
+            QMessageBox.warning(self.iface.mainWindow(), "Aviso", "No se logró guardar la información, revise los datos capturados, sus credenciales o su conexión a internet")
             return None
 
         
@@ -1911,7 +1908,7 @@ class numeros_exteriores:
                             #QMessageBox.warning(self.iface.mainWindow(), "Aviso","Se llega aqui con un sector " + self.dockwidget.cveSector.currentText())
 
         if (self.SectorNombre[0] == "" and self.SectorNombre[1] == "" and self.SectorNombre[2] == ""):
-            QMessageBox.warning(self.iface.mainWindow(), "Aviso","No se a capturado ningun sector, por favor capture al menos uno")
+            QMessageBox.warning(self.iface.mainWindow(), "Aviso","No se ha capturado ningún sector, por favor capture al menos uno")
                             
 
         
