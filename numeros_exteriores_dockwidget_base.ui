@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>552</width>
+    <width>579</width>
     <height>542</height>
    </rect>
   </property>
@@ -25,12 +25,12 @@
    </font>
   </property>
   <property name="windowTitle">
-   <string>Plugin Numeros exteriores</string>
+   <string>Plugin de Números Exteriores - INE</string>
   </property>
   <widget class="QWidget" name="dockWidgetContents">
    <layout class="QGridLayout" name="gridLayout">
     <item row="0" column="0">
-     <widget class="QTabWidget" name="tabWidget">
+     <widget class="QTabWidget" name="TabGeneral">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
         <horstretch>0</horstretch>
@@ -41,19 +41,21 @@
        <font>
         <family>Arial</family>
         <pointsize>12</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
        </font>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
-      <widget class="QWidget" name="tab_1">
+      <widget class="QWidget" name="Acceso">
        <attribute name="title">
         <string>Acceso</string>
        </attribute>
        <widget class="QPushButton" name="btnDesconectar">
         <property name="geometry">
          <rect>
-          <x>300</x>
+          <x>310</x>
           <y>250</y>
           <width>111</width>
           <height>41</height>
@@ -69,6 +71,8 @@
          <font>
           <family>Arial</family>
           <pointsize>12</pointsize>
+          <weight>50</weight>
+          <bold>false</bold>
          </font>
         </property>
         <property name="text">
@@ -78,15 +82,18 @@
        <widget class="QLineEdit" name="txtClave">
         <property name="geometry">
          <rect>
-          <x>180</x>
+          <x>160</x>
           <y>180</y>
-          <width>241</width>
+          <width>261</width>
           <height>31</height>
          </rect>
         </property>
         <property name="font">
          <font>
+          <family>Arial</family>
           <pointsize>12</pointsize>
+          <weight>50</weight>
+          <bold>false</bold>
          </font>
         </property>
         <property name="inputMask">
@@ -99,15 +106,18 @@
        <widget class="QLineEdit" name="txtUsuario">
         <property name="geometry">
          <rect>
-          <x>180</x>
+          <x>160</x>
           <y>130</y>
-          <width>241</width>
+          <width>261</width>
           <height>31</height>
          </rect>
         </property>
         <property name="font">
          <font>
+          <family>Arial</family>
           <pointsize>12</pointsize>
+          <weight>50</weight>
+          <bold>false</bold>
          </font>
         </property>
         <property name="text">
@@ -117,7 +127,7 @@
        <widget class="QPushButton" name="btnConectar">
         <property name="geometry">
          <rect>
-          <x>130</x>
+          <x>160</x>
           <y>250</y>
           <width>111</width>
           <height>41</height>
@@ -133,6 +143,8 @@
          <font>
           <family>Arial</family>
           <pointsize>12</pointsize>
+          <weight>50</weight>
+          <bold>false</bold>
          </font>
         </property>
         <property name="text">
@@ -158,6 +170,8 @@
          <font>
           <family>Arial</family>
           <pointsize>12</pointsize>
+          <weight>50</weight>
+          <bold>false</bold>
          </font>
         </property>
         <property name="text">
@@ -186,6 +200,8 @@
          <font>
           <family>Arial</family>
           <pointsize>12</pointsize>
+          <weight>50</weight>
+          <bold>false</bold>
          </font>
         </property>
         <property name="text">
@@ -198,15 +214,18 @@
        <widget class="QLineEdit" name="txtServidor">
         <property name="geometry">
          <rect>
-          <x>180</x>
+          <x>160</x>
           <y>30</y>
-          <width>241</width>
+          <width>261</width>
           <height>31</height>
          </rect>
         </property>
         <property name="font">
          <font>
+          <family>Arial</family>
           <pointsize>12</pointsize>
+          <weight>50</weight>
+          <bold>false</bold>
          </font>
         </property>
         <property name="text">
@@ -232,6 +251,8 @@
          <font>
           <family>Arial</family>
           <pointsize>12</pointsize>
+          <weight>50</weight>
+          <bold>false</bold>
          </font>
         </property>
         <property name="text">
@@ -260,6 +281,8 @@
          <font>
           <family>Arial</family>
           <pointsize>12</pointsize>
+          <weight>50</weight>
+          <bold>false</bold>
          </font>
         </property>
         <property name="text">
@@ -275,15 +298,18 @@
         </property>
         <property name="geometry">
          <rect>
-          <x>180</x>
+          <x>160</x>
           <y>80</y>
-          <width>241</width>
+          <width>261</width>
           <height>30</height>
          </rect>
         </property>
         <property name="font">
          <font>
+          <family>Arial</family>
           <pointsize>12</pointsize>
+          <weight>50</weight>
+          <bold>false</bold>
          </font>
         </property>
         <property name="editable">
@@ -296,9 +322,9 @@
        <widget class="QPushButton" name="btnRecomendaciones">
         <property name="geometry">
          <rect>
-          <x>270</x>
-          <y>410</y>
-          <width>251</width>
+          <x>160</x>
+          <y>320</y>
+          <width>261</width>
           <height>41</height>
          </rect>
         </property>
@@ -312,14 +338,16 @@
          <font>
           <family>Arial</family>
           <pointsize>12</pointsize>
+          <weight>50</weight>
+          <bold>false</bold>
          </font>
         </property>
         <property name="text">
-         <string notr="true">Recomendaciones para el plugin</string>
+         <string notr="true">Recomendaciones de Visualización</string>
         </property>
        </widget>
       </widget>
-      <widget class="QWidget" name="tab_2">
+      <widget class="QWidget" name="Seccion">
        <attribute name="title">
         <string>Sección</string>
        </attribute>
@@ -336,10 +364,12 @@
          <font>
           <family>Arial</family>
           <pointsize>12</pointsize>
+          <weight>50</weight>
+          <bold>false</bold>
          </font>
         </property>
         <property name="text">
-         <string>Obtener area de trabajo</string>
+         <string>Obtener área de trabajo</string>
         </property>
        </widget>
        <widget class="QLabel" name="label_10">
@@ -347,7 +377,7 @@
          <rect>
           <x>5</x>
           <y>42</y>
-          <width>251</width>
+          <width>241</width>
           <height>16</height>
          </rect>
         </property>
@@ -361,6 +391,8 @@
          <font>
           <family>Arial</family>
           <pointsize>12</pointsize>
+          <weight>50</weight>
+          <bold>false</bold>
          </font>
         </property>
         <property name="text">
@@ -381,7 +413,10 @@
         </property>
         <property name="font">
          <font>
+          <family>Arial</family>
           <pointsize>12</pointsize>
+          <weight>50</weight>
+          <bold>false</bold>
          </font>
         </property>
         <property name="editable">
@@ -402,7 +437,10 @@
         </property>
         <property name="font">
          <font>
+          <family>Arial</family>
           <pointsize>12</pointsize>
+          <weight>50</weight>
+          <bold>false</bold>
          </font>
         </property>
         <property name="editable">
@@ -417,7 +455,7 @@
          <rect>
           <x>0</x>
           <y>100</y>
-          <width>191</width>
+          <width>181</width>
           <height>16</height>
          </rect>
         </property>
@@ -431,6 +469,8 @@
          <font>
           <family>Arial</family>
           <pointsize>12</pointsize>
+          <weight>50</weight>
+          <bold>false</bold>
          </font>
         </property>
         <property name="text">
@@ -441,7 +481,7 @@
         </property>
        </widget>
       </widget>
-      <widget class="QWidget" name="tab_3">
+      <widget class="QWidget" name="Edicion">
        <attribute name="title">
         <string>Edición</string>
        </attribute>
@@ -450,7 +490,7 @@
          <rect>
           <x>450</x>
           <y>40</y>
-          <width>75</width>
+          <width>81</width>
           <height>31</height>
          </rect>
         </property>
@@ -464,6 +504,8 @@
          <font>
           <family>Arial</family>
           <pointsize>12</pointsize>
+          <weight>50</weight>
+          <bold>false</bold>
          </font>
         </property>
         <property name="text">
@@ -475,7 +517,7 @@
          <rect>
           <x>450</x>
           <y>130</y>
-          <width>75</width>
+          <width>81</width>
           <height>23</height>
          </rect>
         </property>
@@ -489,19 +531,21 @@
          <font>
           <family>Arial</family>
           <pointsize>12</pointsize>
+          <weight>50</weight>
+          <bold>false</bold>
          </font>
         </property>
         <property name="text">
-         <string>Font Med</string>
+         <string>A</string>
         </property>
        </widget>
        <widget class="QPushButton" name="tmaxFont">
         <property name="geometry">
          <rect>
           <x>450</x>
-          <y>100</y>
-          <width>75</width>
-          <height>23</height>
+          <y>92</y>
+          <width>81</width>
+          <height>31</height>
          </rect>
         </property>
         <property name="sizePolicy">
@@ -513,11 +557,13 @@
         <property name="font">
          <font>
           <family>Arial</family>
-          <pointsize>12</pointsize>
+          <pointsize>18</pointsize>
+          <weight>50</weight>
+          <bold>false</bold>
          </font>
         </property>
         <property name="text">
-         <string>Font Max</string>
+         <string>A+</string>
         </property>
        </widget>
        <widget class="QPushButton" name="tminFont">
@@ -525,7 +571,7 @@
          <rect>
           <x>450</x>
           <y>160</y>
-          <width>75</width>
+          <width>81</width>
           <height>23</height>
          </rect>
         </property>
@@ -538,11 +584,13 @@
         <property name="font">
          <font>
           <family>Arial</family>
-          <pointsize>12</pointsize>
+          <pointsize>8</pointsize>
+          <weight>50</weight>
+          <bold>false</bold>
          </font>
         </property>
         <property name="text">
-         <string>Font Min</string>
+         <string>A-</string>
         </property>
        </widget>
        <widget class="QTextEdit" name="textEdit">
@@ -556,7 +604,10 @@
         </property>
         <property name="font">
          <font>
+          <family>Arial</family>
           <pointsize>12</pointsize>
+          <weight>50</weight>
+          <bold>false</bold>
          </font>
         </property>
         <property name="verticalScrollBarPolicy">
@@ -577,6 +628,7 @@
         </property>
         <property name="font">
          <font>
+          <family>Arial</family>
           <pointsize>12</pointsize>
           <weight>75</weight>
           <bold>true</bold>
@@ -589,7 +641,7 @@
          <set>Qt::AlignCenter</set>
         </property>
        </widget>
-       <widget class="QTabWidget" name="tabWidget_2">
+       <widget class="QTabWidget" name="TabFuncionlidades">
         <property name="enabled">
          <bool>true</bool>
         </property>
@@ -597,24 +649,24 @@
          <rect>
           <x>10</x>
           <y>270</y>
-          <width>511</width>
+          <width>541</width>
           <height>191</height>
          </rect>
         </property>
         <property name="currentIndex">
          <number>0</number>
         </property>
-        <widget class="QWidget" name="tab_4">
+        <widget class="QWidget" name="IdentificacionSimple">
          <attribute name="title">
-          <string>Identificación simple</string>
+          <string>Identificación Simple</string>
          </attribute>
          <widget class="QPushButton" name="btnIdentificar10">
           <property name="geometry">
            <rect>
             <x>10</x>
             <y>50</y>
-            <width>151</width>
-            <height>31</height>
+            <width>171</width>
+            <height>41</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -625,22 +677,23 @@
           </property>
           <property name="font">
            <font>
+            <family>Arial</family>
             <pointsize>12</pointsize>
             <weight>75</weight>
             <bold>true</bold>
            </font>
           </property>
           <property name="text">
-           <string>Identificar en 20m</string>
+           <string>Vialidad a 20m</string>
           </property>
          </widget>
          <widget class="QPushButton" name="btnIdentificar20">
           <property name="geometry">
            <rect>
-            <x>170</x>
+            <x>190</x>
             <y>50</y>
-            <width>151</width>
-            <height>31</height>
+            <width>161</width>
+            <height>41</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -651,13 +704,14 @@
           </property>
           <property name="font">
            <font>
+            <family>Arial</family>
             <pointsize>12</pointsize>
             <weight>75</weight>
             <bold>true</bold>
            </font>
           </property>
           <property name="text">
-           <string>Identificar en 60m</string>
+           <string>Vialidad a 60m</string>
           </property>
          </widget>
          <widget class="QComboBox" name="idVialidad">
@@ -665,13 +719,16 @@
            <rect>
             <x>9</x>
             <y>115</y>
-            <width>491</width>
+            <width>511</width>
             <height>30</height>
            </rect>
           </property>
           <property name="font">
            <font>
+            <family>Arial</family>
             <pointsize>12</pointsize>
+            <weight>50</weight>
+            <bold>false</bold>
            </font>
           </property>
           <property name="editable">
@@ -684,15 +741,18 @@
          <widget class="QLineEdit" name="idManzana">
           <property name="geometry">
            <rect>
-            <x>330</x>
-            <y>72</y>
-            <width>171</width>
+            <x>360</x>
+            <y>70</y>
+            <width>161</width>
             <height>31</height>
            </rect>
           </property>
           <property name="font">
            <font>
+            <family>Arial</family>
             <pointsize>12</pointsize>
+            <weight>50</weight>
+            <bold>false</bold>
            </font>
           </property>
           <property name="text">
@@ -718,10 +778,12 @@
            <font>
             <family>Arial</family>
             <pointsize>12</pointsize>
+            <weight>50</weight>
+            <bold>false</bold>
            </font>
           </property>
           <property name="text">
-           <string>Identificador de Vialidad mas cercano:</string>
+           <string>Identificador de Vialidad Más Cercana:</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
@@ -730,64 +792,8 @@
          <widget class="QLabel" name="label_4">
           <property name="geometry">
            <rect>
-            <x>332</x>
+            <x>362</x>
             <y>50</y>
-            <width>171</width>
-            <height>20</height>
-           </rect>
-          </property>
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="font">
-           <font>
-            <family>Arial</family>
-            <pointsize>12</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Id Manzana corregido:</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-         <widget class="QLabel" name="label_12">
-          <property name="geometry">
-           <rect>
-            <x>250</x>
-            <y>10</y>
-            <width>141</width>
-            <height>20</height>
-           </rect>
-          </property>
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="font">
-           <font>
-            <family>Arial</family>
-            <pointsize>12</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Id Manzana actual:</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-         <widget class="QLabel" name="label_13">
-          <property name="geometry">
-           <rect>
-            <x>-10</x>
-            <y>10</y>
             <width>161</width>
             <height>20</height>
            </rect>
@@ -802,10 +808,72 @@
            <font>
             <family>Arial</family>
             <pointsize>12</pointsize>
+            <weight>50</weight>
+            <bold>false</bold>
            </font>
           </property>
           <property name="text">
-           <string>Id Vialidad actual:</string>
+           <string>Id Manzana Corregido:</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+         <widget class="QLabel" name="label_12">
+          <property name="geometry">
+           <rect>
+            <x>260</x>
+            <y>10</y>
+            <width>141</width>
+            <height>31</height>
+           </rect>
+          </property>
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="font">
+           <font>
+            <family>Arial</family>
+            <pointsize>12</pointsize>
+            <weight>50</weight>
+            <bold>false</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>Id Manzana Actual:</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+         <widget class="QLabel" name="label_13">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>10</y>
+            <width>141</width>
+            <height>31</height>
+           </rect>
+          </property>
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="font">
+           <font>
+            <family>Arial</family>
+            <pointsize>12</pointsize>
+            <weight>50</weight>
+            <bold>false</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>Id Vialidad Actual</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
@@ -825,7 +893,10 @@
           </property>
           <property name="font">
            <font>
+            <family>Arial</family>
             <pointsize>12</pointsize>
+            <weight>50</weight>
+            <bold>false</bold>
            </font>
           </property>
           <property name="text">
@@ -838,15 +909,18 @@
           </property>
           <property name="geometry">
            <rect>
-            <x>390</x>
+            <x>400</x>
             <y>10</y>
-            <width>111</width>
+            <width>121</width>
             <height>31</height>
            </rect>
           </property>
           <property name="font">
            <font>
+            <family>Arial</family>
             <pointsize>12</pointsize>
+            <weight>50</weight>
+            <bold>false</bold>
            </font>
           </property>
           <property name="text">
@@ -854,9 +928,9 @@
           </property>
          </widget>
         </widget>
-        <widget class="QWidget" name="tab_5">
+        <widget class="QWidget" name="IdentificacionMultiple">
          <attribute name="title">
-          <string>Identificación múltiple</string>
+          <string>Identificación Múltiple</string>
          </attribute>
          <widget class="QLabel" name="label_16">
           <property name="geometry">
@@ -877,14 +951,16 @@
            <font>
             <family>Arial</family>
             <pointsize>12</pointsize>
+            <weight>50</weight>
+            <bold>false</bold>
            </font>
           </property>
           <property name="text">
-           <string>Por favor omitir esta seccion, ya que se encuentra bajo desarrollo</string>
+           <string>Sección en desarrollo...</string>
           </property>
          </widget>
         </widget>
-        <widget class="QWidget" name="tab_4">
+        <widget class="QWidget" name="Cadena">
          <attribute name="title">
           <string>Cadena</string>
          </attribute>
@@ -892,9 +968,9 @@
           <property name="geometry">
            <rect>
             <x>180</x>
-            <y>20</y>
+            <y>12</y>
             <width>47</width>
-            <height>13</height>
+            <height>16</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -907,6 +983,8 @@
            <font>
             <family>Arial</family>
             <pointsize>12</pointsize>
+            <weight>50</weight>
+            <bold>false</bold>
            </font>
           </property>
           <property name="text">
@@ -933,13 +1011,14 @@
           </property>
           <property name="font">
            <font>
+            <family>Arial</family>
             <pointsize>10</pointsize>
             <weight>75</weight>
             <bold>true</bold>
            </font>
           </property>
           <property name="text">
-           <string>Cadena por rango:</string>
+           <string>Cadena por Rango:</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
@@ -949,9 +1028,9 @@
           <property name="geometry">
            <rect>
             <x>330</x>
-            <y>20</y>
+            <y>12</y>
             <width>47</width>
-            <height>13</height>
+            <height>16</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -964,6 +1043,8 @@
            <font>
             <family>Arial</family>
             <pointsize>12</pointsize>
+            <weight>50</weight>
+            <bold>false</bold>
            </font>
           </property>
           <property name="text">
@@ -984,7 +1065,10 @@
           </property>
           <property name="font">
            <font>
+            <family>Arial</family>
             <pointsize>12</pointsize>
+            <weight>50</weight>
+            <bold>false</bold>
            </font>
           </property>
           <property name="text">
@@ -1008,13 +1092,14 @@
           </property>
           <property name="font">
            <font>
+            <family>Arial</family>
             <pointsize>12</pointsize>
             <weight>75</weight>
             <bold>true</bold>
            </font>
           </property>
           <property name="text">
-           <string>Crear cadena</string>
+           <string>Crear Cadena</string>
           </property>
          </widget>
          <widget class="QLineEdit" name="txtRfinal">
@@ -1028,7 +1113,10 @@
           </property>
           <property name="font">
            <font>
+            <family>Arial</family>
             <pointsize>12</pointsize>
+            <weight>50</weight>
+            <bold>false</bold>
            </font>
           </property>
           <property name="text">
@@ -1040,13 +1128,16 @@
            <rect>
             <x>430</x>
             <y>40</y>
-            <width>71</width>
+            <width>91</width>
             <height>31</height>
            </rect>
           </property>
           <property name="font">
            <font>
+            <family>Arial</family>
             <pointsize>12</pointsize>
+            <weight>50</weight>
+            <bold>false</bold>
            </font>
           </property>
           <property name="text">
@@ -1056,10 +1147,10 @@
          <widget class="QLabel" name="label_5">
           <property name="geometry">
            <rect>
-            <x>430</x>
-            <y>20</y>
-            <width>71</width>
-            <height>16</height>
+            <x>440</x>
+            <y>10</y>
+            <width>81</width>
+            <height>21</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -1072,6 +1163,8 @@
            <font>
             <family>Arial</family>
             <pointsize>12</pointsize>
+            <weight>50</weight>
+            <bold>false</bold>
            </font>
           </property>
           <property name="text">
@@ -1100,14 +1193,16 @@
            <font>
             <family>Arial</family>
             <pointsize>12</pointsize>
+            <weight>50</weight>
+            <bold>false</bold>
            </font>
           </property>
           <property name="text">
-           <string>Invertir cadena</string>
+           <string>Invertir Cadena</string>
           </property>
          </widget>
         </widget>
-        <widget class="QWidget" name="tab">
+        <widget class="QWidget" name="CadenaUH">
          <attribute name="title">
           <string>Cadena UH</string>
          </attribute>
@@ -1122,7 +1217,10 @@
           </property>
           <property name="font">
            <font>
+            <family>Arial</family>
             <pointsize>12</pointsize>
+            <weight>50</weight>
+            <bold>false</bold>
            </font>
           </property>
           <property name="text">
@@ -1132,9 +1230,9 @@
          <widget class="QPushButton" name="btnCrearCadena_2">
           <property name="geometry">
            <rect>
-            <x>380</x>
+            <x>390</x>
             <y>110</y>
-            <width>121</width>
+            <width>131</width>
             <height>31</height>
            </rect>
           </property>
@@ -1146,13 +1244,14 @@
           </property>
           <property name="font">
            <font>
+            <family>Arial</family>
             <pointsize>12</pointsize>
             <weight>75</weight>
             <bold>true</bold>
            </font>
           </property>
           <property name="text">
-           <string>Crear cadena</string>
+           <string>Crear Cadena</string>
           </property>
          </widget>
          <widget class="QLabel" name="label_18">
@@ -1172,13 +1271,14 @@
           </property>
           <property name="font">
            <font>
+            <family>Arial</family>
             <pointsize>10</pointsize>
             <weight>75</weight>
             <bold>true</bold>
            </font>
           </property>
           <property name="text">
-           <string>Cadena por sectores:</string>
+           <string>Cadena por Sectores:</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
@@ -1189,13 +1289,16 @@
            <rect>
             <x>300</x>
             <y>110</y>
-            <width>71</width>
+            <width>81</width>
             <height>31</height>
            </rect>
           </property>
           <property name="font">
            <font>
+            <family>Arial</family>
             <pointsize>12</pointsize>
+            <weight>50</weight>
+            <bold>false</bold>
            </font>
           </property>
           <property name="text">
@@ -1213,7 +1316,10 @@
           </property>
           <property name="font">
            <font>
+            <family>Arial</family>
             <pointsize>12</pointsize>
+            <weight>50</weight>
+            <bold>false</bold>
            </font>
           </property>
           <property name="text">
@@ -1224,9 +1330,9 @@
           <property name="geometry">
            <rect>
             <x>200</x>
-            <y>90</y>
+            <y>83</y>
             <width>47</width>
-            <height>13</height>
+            <height>20</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -1239,6 +1345,8 @@
            <font>
             <family>Arial</family>
             <pointsize>12</pointsize>
+            <weight>50</weight>
+            <bold>false</bold>
            </font>
           </property>
           <property name="text">
@@ -1252,9 +1360,9 @@
           <property name="geometry">
            <rect>
             <x>50</x>
-            <y>90</y>
+            <y>83</y>
             <width>47</width>
-            <height>13</height>
+            <height>20</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -1267,6 +1375,8 @@
            <font>
             <family>Arial</family>
             <pointsize>12</pointsize>
+            <weight>50</weight>
+            <bold>false</bold>
            </font>
           </property>
           <property name="text">
@@ -1280,9 +1390,9 @@
           <property name="geometry">
            <rect>
             <x>300</x>
-            <y>90</y>
-            <width>71</width>
-            <height>16</height>
+            <y>80</y>
+            <width>81</width>
+            <height>31</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -1295,6 +1405,8 @@
            <font>
             <family>Arial</family>
             <pointsize>12</pointsize>
+            <weight>50</weight>
+            <bold>false</bold>
            </font>
           </property>
           <property name="text">
@@ -1318,7 +1430,10 @@
           </property>
           <property name="font">
            <font>
+            <family>Arial</family>
             <pointsize>12</pointsize>
+            <weight>50</weight>
+            <bold>false</bold>
            </font>
           </property>
           <property name="editable">
@@ -1332,9 +1447,9 @@
           <property name="geometry">
            <rect>
             <x>4</x>
-            <y>60</y>
+            <y>49</y>
             <width>61</width>
-            <height>20</height>
+            <height>31</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -1347,6 +1462,8 @@
            <font>
             <family>Arial</family>
             <pointsize>12</pointsize>
+            <weight>50</weight>
+            <bold>false</bold>
            </font>
           </property>
           <property name="text">
@@ -1361,7 +1478,7 @@
            <rect>
             <x>230</x>
             <y>30</y>
-            <width>81</width>
+            <width>111</width>
             <height>20</height>
            </rect>
           </property>
@@ -1375,6 +1492,8 @@
            <font>
             <family>Arial</family>
             <pointsize>12</pointsize>
+            <weight>50</weight>
+            <bold>false</bold>
            </font>
           </property>
           <property name="text">
@@ -1389,13 +1508,16 @@
            <rect>
             <x>204</x>
             <y>50</y>
-            <width>131</width>
+            <width>151</width>
             <height>31</height>
            </rect>
           </property>
           <property name="font">
            <font>
+            <family>Arial</family>
             <pointsize>12</pointsize>
+            <weight>50</weight>
+            <bold>false</bold>
            </font>
           </property>
           <property name="text">
@@ -1405,7 +1527,7 @@
          <widget class="QPushButton" name="btnAsignarSector">
           <property name="geometry">
            <rect>
-            <x>350</x>
+            <x>370</x>
             <y>50</y>
             <width>71</width>
             <height>31</height>
@@ -1419,6 +1541,7 @@
           </property>
           <property name="font">
            <font>
+            <family>Arial</family>
             <pointsize>12</pointsize>
             <weight>50</weight>
             <bold>false</bold>
@@ -1431,7 +1554,7 @@
          <widget class="QPushButton" name="btnEliminarSector">
           <property name="geometry">
            <rect>
-            <x>430</x>
+            <x>450</x>
             <y>50</y>
             <width>71</width>
             <height>31</height>
@@ -1445,13 +1568,14 @@
           </property>
           <property name="font">
            <font>
+            <family>Arial</family>
             <pointsize>12</pointsize>
             <weight>50</weight>
             <bold>false</bold>
            </font>
           </property>
           <property name="text">
-           <string>Eliminar</string>
+           <string>Limpiar</string>
           </property>
          </widget>
         </widget>
@@ -1461,7 +1585,7 @@
          <rect>
           <x>450</x>
           <y>210</y>
-          <width>71</width>
+          <width>81</width>
           <height>31</height>
          </rect>
         </property>
@@ -1475,6 +1599,8 @@
          <font>
           <family>Arial</family>
           <pointsize>12</pointsize>
+          <weight>50</weight>
+          <bold>false</bold>
          </font>
         </property>
         <property name="text">
