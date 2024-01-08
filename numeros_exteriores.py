@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+1# -*- coding: utf-8 -*-
 """
 /***************************************************************************
  numeros_exteriores
@@ -867,11 +867,11 @@ class numeros_exteriores:
 
 
                 SE_layer = QgsPalLayerSettings()
-                SE_layer.fieldName = 'seccion'
-                #SE_layer.fieldName = '\'Seccion \' || seccion'
-                #'Id Via '  || "id"
+                #SE_layer.fieldName = 'seccion'
+                SE_layer.fieldName = '\'Sección: \' || "seccion"'
+                SE_layer.isExpression = True
                 SE_layer.enabled = True
-                SE_layer.placement = QgsPalLayerSettings.Free
+                SE_layer.placement = QgsPalLayerSettings.OverPoint
                 SElabels = QgsVectorLayerSimpleLabeling(SE_layer)
                 SElabels.drawLabels = True
                 vlayerSEC.setLabeling(SElabels)
@@ -882,7 +882,7 @@ class numeros_exteriores:
 
 
                 #layer_base = iface.activeLayer()
-                mySymbol1 = QgsFillSymbol.createSimple({'color':'red', 'color_border':'red', 'width_border':'0.3', 'style':'no'})
+                mySymbol1 = QgsFillSymbol.createSimple({'color':'red', 'color_border':'red', 'width_border':'0.4', 'style':'no'})
                 myRenderer = vlayerSEC.renderer()
                 myRenderer.setSymbol(mySymbol1)
                 vlayerSEC.triggerRepaint()
@@ -906,10 +906,10 @@ class numeros_exteriores:
                 QgsProject.instance().addMapLayer(vlayerM)
 
                 MZ_layer = QgsPalLayerSettings()
-                MZ_layer.fieldName = 'id'
-                #MZ_layer.fieldName = '\'Id_Mz: \' || id || \' Mz: \' || manzana'
+                MZ_layer.fieldName = '\'ID Mza: \' || "id"'
+                MZ_layer.isExpression = True
                 MZ_layer.enabled = True
-                MZ_layer.placement = QgsPalLayerSettings.Free
+                MZ_layer.placement = QgsPalLayerSettings.AroundPoint
                 MZlabels = QgsVectorLayerSimpleLabeling(MZ_layer)
                 MZlabels.drawLabels = True
                 vlayerM.setLabeling(MZlabels)
@@ -925,7 +925,7 @@ class numeros_exteriores:
                 #vlayerM.triggerRepaint()
 
                 #layer_base = iface.activeLayer()
-                mySymbol1 = QgsFillSymbol.createSimple({'color':'#289e26', 'color_border':'#289e26', 'width_border':'0.3', 'style':'no'})
+                mySymbol1 = QgsFillSymbol.createSimple({'color':'#289E26', 'color_border':'#237E21', 'width_border':'0.3', 'style':'dense6'})
                 myRenderer = vlayerM.renderer()
                 myRenderer.setSymbol(mySymbol1)
                 vlayerM.triggerRepaint()
@@ -941,10 +941,10 @@ class numeros_exteriores:
                 QgsProject.instance().addMapLayer(vlayerV)
 
                 V_layer = QgsPalLayerSettings()
-                V_layer.fieldName = 'id'
-                #V_layer.fieldName = '\'Id Via \' || id'
+                V_layer.fieldName = '\'ID Via: \' || "id"'
+                V_layer.isExpression = True
                 V_layer.enabled = True
-                V_layer.placement = QgsPalLayerSettings.Free
+                V_layer.placement = QgsPalLayerSettings.Curved
                 Vlabels = QgsVectorLayerSimpleLabeling(V_layer)
                 Vlabels.drawLabels = True
                 vlayerV.setLabeling(Vlabels)
@@ -1000,7 +1000,7 @@ class numeros_exteriores:
 
                 #layer = iface.activeLayer()
                 renderer = vlayerNE.renderer()
-                symbol1 = QgsLineSymbol.createSimple({'color':'gray', 'width':'.3'})
+                symbol1 = QgsLineSymbol.createSimple({'color':'#289e26', 'width':'0.3'})
                 renderer.setSymbol(symbol1) 
                 vlayerNE.triggerRepaint()
                 #iface.QgsLegendInterface().refreshLayerSymbology(layer)
