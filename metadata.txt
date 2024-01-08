@@ -3,14 +3,14 @@
 # This file should be included when you package your plugin.# Mandatory items:
 
 [general]
-name=numeros_exteriores
+name=Números Exteriores - INE
 qgisMinimumVersion=3.0
-description=Este plugin otorga herramientas para los trabajos del area de cartografia referente a los numeros exteriores
-version=2.0
-author=INE, Direccion de Cartografia Electoral, Saul Valencia
-email=luissaul.valencia@ine.mx
+description=Este Plugin otorga herramientas para el procesamiento, depuración y actualización de los números exteriores pertenecientes a la cartografía electoral generada para la Dirección de Cartografía Electoral del Instituto Nacional Electoral (INE).
+version=2.1
+author=INE, Dirección de Cartografía Electoral, Saul Valencia, Luis Enrique Cortés
+email=luissaul.valencia@ine.mx,enrique.cortes@ine.mx
 
-about=El plugin ofrece herramientas para agilizar el trabajo relacionado con los numeros exteriores de la cartografia del INE.
+about=Ofrece herramientas para agilizar el flujo de trabajo relacionado con los números exteriores de la cartografia electoral del INE.
 
 tracker=http://bugs
 repository=http://repo
