@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>579</width>
-    <height>542</height>
+    <width>590</width>
+    <height>575</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -55,9 +55,9 @@
        <widget class="QPushButton" name="btnDesconectar">
         <property name="geometry">
          <rect>
-          <x>310</x>
+          <x>320</x>
           <y>250</y>
-          <width>111</width>
+          <width>121</width>
           <height>41</height>
          </rect>
         </property>
@@ -84,7 +84,7 @@
          <rect>
           <x>160</x>
           <y>180</y>
-          <width>261</width>
+          <width>281</width>
           <height>31</height>
          </rect>
         </property>
@@ -108,7 +108,7 @@
          <rect>
           <x>160</x>
           <y>130</y>
-          <width>261</width>
+          <width>281</width>
           <height>31</height>
          </rect>
         </property>
@@ -216,7 +216,7 @@
          <rect>
           <x>160</x>
           <y>30</y>
-          <width>261</width>
+          <width>281</width>
           <height>31</height>
          </rect>
         </property>
@@ -300,7 +300,7 @@
          <rect>
           <x>160</x>
           <y>80</y>
-          <width>261</width>
+          <width>281</width>
           <height>30</height>
          </rect>
         </property>
@@ -324,7 +324,7 @@
          <rect>
           <x>160</x>
           <y>320</y>
-          <width>261</width>
+          <width>281</width>
           <height>41</height>
          </rect>
         </property>
@@ -354,9 +354,9 @@
        <widget class="QPushButton" name="btnObtenerArea">
         <property name="geometry">
          <rect>
-          <x>330</x>
+          <x>320</x>
           <y>170</y>
-          <width>191</width>
+          <width>201</width>
           <height>41</height>
          </rect>
         </property>
@@ -369,7 +369,7 @@
          </font>
         </property>
         <property name="text">
-         <string>Obtener área de trabajo</string>
+         <string>Cargar Capas Vectoriales</string>
         </property>
        </widget>
        <widget class="QLabel" name="label_10">
@@ -516,9 +516,9 @@
         <property name="geometry">
          <rect>
           <x>450</x>
-          <y>130</y>
+          <y>140</y>
           <width>81</width>
-          <height>23</height>
+          <height>31</height>
          </rect>
         </property>
         <property name="sizePolicy">
@@ -543,7 +543,7 @@
         <property name="geometry">
          <rect>
           <x>450</x>
-          <y>92</y>
+          <y>100</y>
           <width>81</width>
           <height>31</height>
          </rect>
@@ -563,16 +563,16 @@
          </font>
         </property>
         <property name="text">
-         <string>A+</string>
+         <string>A</string>
         </property>
        </widget>
        <widget class="QPushButton" name="tminFont">
         <property name="geometry">
          <rect>
           <x>450</x>
-          <y>160</y>
+          <y>180</y>
           <width>81</width>
-          <height>23</height>
+          <height>31</height>
          </rect>
         </property>
         <property name="sizePolicy">
@@ -590,7 +590,7 @@
          </font>
         </property>
         <property name="text">
-         <string>A-</string>
+         <string>A</string>
         </property>
        </widget>
        <widget class="QTextEdit" name="textEdit">
@@ -649,24 +649,24 @@
          <rect>
           <x>10</x>
           <y>270</y>
-          <width>541</width>
-          <height>191</height>
+          <width>551</width>
+          <height>221</height>
          </rect>
         </property>
         <property name="currentIndex">
-         <number>1</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="IdentificacionSimple">
          <attribute name="title">
-          <string>Identificación Simple</string>
+          <string>Identificación de Vialidad</string>
          </attribute>
          <widget class="QPushButton" name="btnIdentificar10">
           <property name="geometry">
            <rect>
             <x>10</x>
-            <y>50</y>
+            <y>80</y>
             <width>171</width>
-            <height>41</height>
+            <height>31</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -691,9 +691,9 @@
           <property name="geometry">
            <rect>
             <x>190</x>
-            <y>50</y>
+            <y>80</y>
             <width>161</width>
-            <height>41</height>
+            <height>31</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -717,10 +717,10 @@
          <widget class="QComboBox" name="idVialidad">
           <property name="geometry">
            <rect>
-            <x>9</x>
-            <y>115</y>
+            <x>10</x>
+            <y>150</y>
             <width>511</width>
-            <height>30</height>
+            <height>31</height>
            </rect>
           </property>
           <property name="font">
@@ -742,7 +742,7 @@
           <property name="geometry">
            <rect>
             <x>360</x>
-            <y>70</y>
+            <y>80</y>
             <width>161</width>
             <height>31</height>
            </rect>
@@ -762,10 +762,10 @@
          <widget class="QLabel" name="label_3">
           <property name="geometry">
            <rect>
-            <x>4</x>
-            <y>97</y>
-            <width>281</width>
-            <height>16</height>
+            <x>10</x>
+            <y>120</y>
+            <width>511</width>
+            <height>31</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -783,7 +783,7 @@
            </font>
           </property>
           <property name="text">
-           <string>Identificador de Vialidad Más Cercana:</string>
+           <string>Vialidadades Identificadas</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
@@ -927,6 +927,36 @@
            <string/>
           </property>
          </widget>
+         <widget class="QLabel" name="label_16">
+          <property name="geometry">
+           <rect>
+            <x>10</x>
+            <y>50</y>
+            <width>341</width>
+            <height>20</height>
+           </rect>
+          </property>
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="font">
+           <font>
+            <family>Arial</family>
+            <pointsize>12</pointsize>
+            <weight>50</weight>
+            <bold>false</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>Identificar Vialidad Más Cercana</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
         </widget>
         <widget class="QWidget" name="Cadena">
          <attribute name="title">
@@ -935,10 +965,10 @@
          <widget class="QLabel" name="label_6">
           <property name="geometry">
            <rect>
-            <x>180</x>
-            <y>12</y>
-            <width>47</width>
-            <height>16</height>
+            <x>16</x>
+            <y>40</y>
+            <width>101</width>
+            <height>20</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -995,10 +1025,10 @@
          <widget class="QLabel" name="label_7">
           <property name="geometry">
            <rect>
-            <x>330</x>
-            <y>12</y>
-            <width>47</width>
-            <height>16</height>
+            <x>146</x>
+            <y>40</y>
+            <width>101</width>
+            <height>21</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -1025,9 +1055,9 @@
          <widget class="QLineEdit" name="txtRinicial">
           <property name="geometry">
            <rect>
-            <x>140</x>
-            <y>40</y>
-            <width>131</width>
+            <x>10</x>
+            <y>60</y>
+            <width>111</width>
             <height>31</height>
            </rect>
           </property>
@@ -1046,8 +1076,8 @@
          <widget class="QPushButton" name="btnCrearCadena">
           <property name="geometry">
            <rect>
-            <x>10</x>
-            <y>40</y>
+            <x>400</x>
+            <y>60</y>
             <width>121</width>
             <height>31</height>
            </rect>
@@ -1073,9 +1103,9 @@
          <widget class="QLineEdit" name="txtRfinal">
           <property name="geometry">
            <rect>
-            <x>280</x>
-            <y>40</y>
-            <width>141</width>
+            <x>140</x>
+            <y>60</y>
+            <width>111</width>
             <height>31</height>
            </rect>
           </property>
@@ -1094,9 +1124,9 @@
          <widget class="QLineEdit" name="txtRIntervalo">
           <property name="geometry">
            <rect>
-            <x>430</x>
-            <y>40</y>
-            <width>91</width>
+            <x>270</x>
+            <y>60</y>
+            <width>111</width>
             <height>31</height>
            </rect>
           </property>
@@ -1115,9 +1145,9 @@
          <widget class="QLabel" name="label_5">
           <property name="geometry">
            <rect>
-            <x>440</x>
-            <y>10</y>
-            <width>81</width>
+            <x>270</x>
+            <y>40</y>
+            <width>111</width>
             <height>21</height>
            </rect>
           </property>
@@ -1145,7 +1175,7 @@
          <widget class="QPushButton" name="btnInvertir">
           <property name="geometry">
            <rect>
-            <x>10</x>
+            <x>400</x>
             <y>100</y>
             <width>121</width>
             <height>31</height>
@@ -1179,7 +1209,7 @@
            <rect>
             <x>10</x>
             <y>110</y>
-            <width>131</width>
+            <width>101</width>
             <height>31</height>
            </rect>
           </property>
@@ -1198,8 +1228,8 @@
          <widget class="QPushButton" name="btnCrearCadena_2">
           <property name="geometry">
            <rect>
-            <x>390</x>
-            <y>110</y>
+            <x>10</x>
+            <y>150</y>
             <width>131</width>
             <height>31</height>
            </rect>
@@ -1255,9 +1285,9 @@
          <widget class="QLineEdit" name="txtRIntervalo_2">
           <property name="geometry">
            <rect>
-            <x>300</x>
+            <x>250</x>
             <y>110</y>
-            <width>81</width>
+            <width>111</width>
             <height>31</height>
            </rect>
           </property>
@@ -1276,9 +1306,9 @@
          <widget class="QLineEdit" name="txtRfinal_2">
           <property name="geometry">
            <rect>
-            <x>150</x>
+            <x>130</x>
             <y>110</y>
-            <width>141</width>
+            <width>101</width>
             <height>31</height>
            </rect>
           </property>
@@ -1297,9 +1327,9 @@
          <widget class="QLabel" name="label_20">
           <property name="geometry">
            <rect>
-            <x>200</x>
-            <y>83</y>
-            <width>47</width>
+            <x>130</x>
+            <y>90</y>
+            <width>101</width>
             <height>20</height>
            </rect>
           </property>
@@ -1327,10 +1357,10 @@
          <widget class="QLabel" name="label_19">
           <property name="geometry">
            <rect>
-            <x>50</x>
-            <y>83</y>
-            <width>47</width>
-            <height>20</height>
+            <x>10</x>
+            <y>90</y>
+            <width>101</width>
+            <height>21</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -1357,10 +1387,10 @@
          <widget class="QLabel" name="label_17">
           <property name="geometry">
            <rect>
-            <x>300</x>
-            <y>80</y>
-            <width>81</width>
-            <height>31</height>
+            <x>250</x>
+            <y>90</y>
+            <width>111</width>
+            <height>21</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -1392,7 +1422,7 @@
            <rect>
             <x>74</x>
             <y>50</y>
-            <width>111</width>
+            <width>91</width>
             <height>30</height>
            </rect>
           </property>
@@ -1444,9 +1474,9 @@
          <widget class="QLabel" name="label_22">
           <property name="geometry">
            <rect>
-            <x>230</x>
+            <x>180</x>
             <y>30</y>
-            <width>111</width>
+            <width>341</width>
             <height>20</height>
            </rect>
           </property>
@@ -1465,7 +1495,7 @@
            </font>
           </property>
           <property name="text">
-           <string>Nombre:</string>
+           <string>Nombre de Sector:</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
@@ -1474,9 +1504,9 @@
          <widget class="QLineEdit" name="txtNombreSector">
           <property name="geometry">
            <rect>
-            <x>204</x>
+            <x>180</x>
             <y>50</y>
-            <width>151</width>
+            <width>341</width>
             <height>31</height>
            </rect>
           </property>
@@ -1495,9 +1525,9 @@
          <widget class="QPushButton" name="btnAsignarSector">
           <property name="geometry">
            <rect>
-            <x>370</x>
-            <y>50</y>
-            <width>71</width>
+            <x>380</x>
+            <y>110</y>
+            <width>141</width>
             <height>31</height>
            </rect>
           </property>
@@ -1516,14 +1546,14 @@
            </font>
           </property>
           <property name="text">
-           <string>Asignar</string>
+           <string>Asignar Intervalo</string>
           </property>
          </widget>
          <widget class="QPushButton" name="btnEliminarSector">
           <property name="geometry">
            <rect>
             <x>450</x>
-            <y>50</y>
+            <y>150</y>
             <width>71</width>
             <height>31</height>
            </rect>
@@ -1552,7 +1582,7 @@
         <property name="geometry">
          <rect>
           <x>450</x>
-          <y>210</y>
+          <y>220</y>
           <width>81</width>
           <height>31</height>
          </rect>
@@ -1573,6 +1603,36 @@
         </property>
         <property name="text">
          <string>Guardar</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_23">
+        <property name="geometry">
+         <rect>
+          <x>450</x>
+          <y>70</y>
+          <width>81</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="font">
+         <font>
+          <family>Arial</family>
+          <pointsize>12</pointsize>
+          <weight>50</weight>
+          <bold>false</bold>
+         </font>
+        </property>
+        <property name="text">
+         <string>Fuente</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
         </property>
        </widget>
       </widget>
