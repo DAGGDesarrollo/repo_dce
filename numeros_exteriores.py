@@ -261,6 +261,7 @@ class numeros_exteriores:
         self.dockwidget.btnInvertir.clicked.connect(self.btnInvertir)
         self.dockwidget.btnCrearCadena.clicked.connect(self.btnCrearCadena)
         self.dockwidget.btnGuardar.clicked.connect(self.btnGuardar)
+        self.dockwidget.btnLimpiarIntervalo.clicked.connect(self.btnLimpiarIntervalo)
         
         self.dockwidget.btnIdentificar10.clicked.connect(self.btnIdentificar10_accion)
         self.dockwidget.btnIdentificar20.clicked.connect(self.btnIdentificar20_accion)
@@ -1655,7 +1656,12 @@ class numeros_exteriores:
             self.dockwidget.textEdit.setText(intervalos)
         else:
             self.dockwidget.textEdit.setText(cadena1 + "," + intervalos)
-        
+
+    def btnLimpiarIntervalo(self):
+
+        self.dockwidget.txtRinicial.setText("")
+        self.dockwidget.txtRfinal.setText("")
+        self.dockwidget.txtRIntervalo.setText("")       
        
     def btnIdentificar10_accion(self):
         
