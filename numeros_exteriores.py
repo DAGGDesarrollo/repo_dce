@@ -10,8 +10,10 @@ Números Exteriores - INE
                               -------------------
         begin                : 2023-04-25
         git sha              : $Format:%H$
-        copyright            : (C) 2023 by INE, Direccion de Cartografia Electoral, Saul Valencia
-        email                : luissaul.valencia@ine.mx
+        copyright            : (C) 2023 by INE, Direccion de Cartografia Electoral, 
+                                Saul Valencia, Luis Enrique Cortés
+        email                : luissaul.valencia@ine.mx, enrique.cortes@ine.mx
+        version              : 2.1
  ***************************************************************************/
 
 /***************************************************************************
@@ -844,11 +846,6 @@ class numeros_exteriores:
             #se elimina capa de la unica seccion solo se agrego para emular zoom, ya no se elimina se usa como transparencia
             #QgsProject.instance().removeMapLayer(vlayer1SEC)
             QtTest.QTest.qWait(200)
-
-
-
-
-
 
             #Estas capas se cargan una sola vez, Seccion, Manzana, Vialidad, Num Ext
             if vlayer_count == 0:
