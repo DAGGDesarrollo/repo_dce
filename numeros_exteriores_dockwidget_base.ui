@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>590</width>
-    <height>575</height>
+    <width>592</width>
+    <height>606</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -489,7 +489,7 @@
         <property name="geometry">
          <rect>
           <x>450</x>
-          <y>40</y>
+          <y>30</y>
           <width>81</width>
           <height>31</height>
          </rect>
@@ -620,9 +620,9 @@
        <widget class="QLabel" name="label_9">
         <property name="geometry">
          <rect>
-          <x>150</x>
+          <x>10</x>
           <y>8</y>
-          <width>181</width>
+          <width>431</width>
           <height>20</height>
          </rect>
         </property>
@@ -650,7 +650,7 @@
           <x>10</x>
           <y>270</y>
           <width>551</width>
-          <height>221</height>
+          <height>251</height>
          </rect>
         </property>
         <property name="currentIndex">
@@ -663,9 +663,9 @@
          <widget class="QPushButton" name="btnIdentificar10">
           <property name="geometry">
            <rect>
-            <x>10</x>
-            <y>80</y>
-            <width>171</width>
+            <x>180</x>
+            <y>40</y>
+            <width>161</width>
             <height>31</height>
            </rect>
           </property>
@@ -690,8 +690,8 @@
          <widget class="QPushButton" name="btnIdentificar20">
           <property name="geometry">
            <rect>
-            <x>190</x>
-            <y>80</y>
+            <x>360</x>
+            <y>40</y>
             <width>161</width>
             <height>31</height>
            </rect>
@@ -718,7 +718,7 @@
           <property name="geometry">
            <rect>
             <x>10</x>
-            <y>150</y>
+            <y>110</y>
             <width>511</width>
             <height>31</height>
            </rect>
@@ -738,34 +738,13 @@
            <string/>
           </property>
          </widget>
-         <widget class="QLineEdit" name="idManzana">
-          <property name="geometry">
-           <rect>
-            <x>360</x>
-            <y>80</y>
-            <width>161</width>
-            <height>31</height>
-           </rect>
-          </property>
-          <property name="font">
-           <font>
-            <family>Arial</family>
-            <pointsize>12</pointsize>
-            <weight>50</weight>
-            <bold>false</bold>
-           </font>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
          <widget class="QLabel" name="label_3">
           <property name="geometry">
            <rect>
             <x>10</x>
-            <y>120</y>
+            <y>70</y>
             <width>511</width>
-            <height>31</height>
+            <height>41</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -783,67 +762,7 @@
            </font>
           </property>
           <property name="text">
-           <string>Vialidadades Identificadas</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-         <widget class="QLabel" name="label_4">
-          <property name="geometry">
-           <rect>
-            <x>362</x>
-            <y>50</y>
-            <width>161</width>
-            <height>20</height>
-           </rect>
-          </property>
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="font">
-           <font>
-            <family>Arial</family>
-            <pointsize>12</pointsize>
-            <weight>50</weight>
-            <bold>false</bold>
-           </font>
-          </property>
-          <property name="text">
-           <string>Id Manzana Corregido:</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-         <widget class="QLabel" name="label_12">
-          <property name="geometry">
-           <rect>
-            <x>260</x>
-            <y>10</y>
-            <width>141</width>
-            <height>31</height>
-           </rect>
-          </property>
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="font">
-           <font>
-            <family>Arial</family>
-            <pointsize>12</pointsize>
-            <weight>50</weight>
-            <bold>false</bold>
-           </font>
-          </property>
-          <property name="text">
-           <string>Id Manzana Actual:</string>
+           <string>Seleccione Id de Vialidad Corregida</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
@@ -852,9 +771,9 @@
          <widget class="QLabel" name="label_13">
           <property name="geometry">
            <rect>
-            <x>0</x>
+            <x>10</x>
             <y>10</y>
-            <width>141</width>
+            <width>151</width>
             <height>31</height>
            </rect>
           </property>
@@ -885,33 +804,9 @@
           </property>
           <property name="geometry">
            <rect>
-            <x>140</x>
-            <y>10</y>
-            <width>111</width>
-            <height>31</height>
-           </rect>
-          </property>
-          <property name="font">
-           <font>
-            <family>Arial</family>
-            <pointsize>12</pointsize>
-            <weight>50</weight>
-            <bold>false</bold>
-           </font>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-         <widget class="QLineEdit" name="idManzana_original">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="geometry">
-           <rect>
-            <x>400</x>
-            <y>10</y>
-            <width>121</width>
+            <x>10</x>
+            <y>40</y>
+            <width>151</width>
             <height>31</height>
            </rect>
           </property>
@@ -930,10 +825,10 @@
          <widget class="QLabel" name="label_16">
           <property name="geometry">
            <rect>
-            <x>10</x>
-            <y>50</y>
+            <x>180</x>
+            <y>10</y>
             <width>341</width>
-            <height>20</height>
+            <height>31</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -955,6 +850,111 @@
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+         <widget class="QLabel" name="label_4">
+          <property name="geometry">
+           <rect>
+            <x>280</x>
+            <y>150</y>
+            <width>241</width>
+            <height>31</height>
+           </rect>
+          </property>
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="font">
+           <font>
+            <family>Arial</family>
+            <pointsize>12</pointsize>
+            <weight>50</weight>
+            <bold>false</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>Id Manzana Corregido:</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+         <widget class="QLineEdit" name="idManzana">
+          <property name="geometry">
+           <rect>
+            <x>280</x>
+            <y>180</y>
+            <width>241</width>
+            <height>31</height>
+           </rect>
+          </property>
+          <property name="font">
+           <font>
+            <family>Arial</family>
+            <pointsize>12</pointsize>
+            <weight>50</weight>
+            <bold>false</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+         <widget class="QLabel" name="label_12">
+          <property name="geometry">
+           <rect>
+            <x>10</x>
+            <y>150</y>
+            <width>251</width>
+            <height>31</height>
+           </rect>
+          </property>
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="font">
+           <font>
+            <family>Arial</family>
+            <pointsize>12</pointsize>
+            <weight>50</weight>
+            <bold>false</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>Id Manzana Actual:</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+         <widget class="QLineEdit" name="idManzana_original">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="geometry">
+           <rect>
+            <x>10</x>
+            <y>180</y>
+            <width>251</width>
+            <height>31</height>
+           </rect>
+          </property>
+          <property name="font">
+           <font>
+            <family>Arial</family>
+            <pointsize>12</pointsize>
+            <weight>50</weight>
+            <bold>false</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string/>
           </property>
          </widget>
         </widget>
@@ -1630,9 +1630,9 @@
         <property name="geometry">
          <rect>
           <x>450</x>
-          <y>70</y>
+          <y>60</y>
           <width>81</width>
-          <height>31</height>
+          <height>41</height>
          </rect>
         </property>
         <property name="sizePolicy">
