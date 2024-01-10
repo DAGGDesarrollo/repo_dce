@@ -28,6 +28,7 @@ Números Exteriores - INE
 #from PyQt5.QtCore import QSettings, QTranslator, qVersion, Qt, QCoreApplication, QVariant
 from qgis.PyQt.QtCore import QSettings, QTranslator,qVersion, Qt, QCoreApplication, QVariant
 from qgis.PyQt.QtGui import QIcon
+from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtWidgets import QAction, QMessageBox, QProgressBar, QSizePolicy, QWidget, QApplication
 #from PyQt5.QtWidgets import QAction, QMessageBox, QProgressBar
 from qgis.core import *
@@ -533,7 +534,7 @@ class numeros_exteriores:
             self.dockwidget.txtClave.setEnabled(False)
             #self.dockwidget.btnConectar.setEnabled(False)
 
-            QMessageBox.warning(self.iface.mainWindow(), "Aviso", "Se realizó la conexión con éxito\nServidor: " + self.servidor + "\nBase de datos: " + self.baseDatos )
+            QMessageBox.information(self.iface.mainWindow(), "Aviso", "Se realizó la conexión con éxito\nServidor: " + self.servidor + "\nBase de datos: " + self.baseDatos )
             
 
             #print ("I was able to connect to the database")
@@ -605,7 +606,7 @@ class numeros_exteriores:
 
             self.conectado = False
 
-        QMessageBox.warning(self.iface.mainWindow(), "Aviso", "Conexión terminada.")
+        QMessageBox.information(self.iface.mainWindow(), "Aviso", "Conexión terminada.")
 
     def on_cveMunicipio_changed(self, value):
     
@@ -867,10 +868,16 @@ class numeros_exteriores:
                 QgsProject.instance().addMapLayer(vlayerSEC)
                 #self.iface.messageBar().pushMessage("Mensaje", "Se hizo consulta en Seccion con mun = : " + numeroMunicipio)
 
-
+                #Se configura el formato de las etiquetas
                 SE_layer = QgsPalLayerSettings()
-                #SE_layer.fieldName = 'seccion'
-                SE_layer.fieldName = '\'Sección: \' || "seccion"'
+                textFormat = QgsTextFormat()
+                textFormat.setColor(QColor('#FFFFFF'))
+                textFormat.setSize(14)
+                textFormat.buffer().setEnabled(True)
+                textFormat.buffer().setSize(0.7)
+                textFormat.buffer().setColor(Qt.darkRed)
+                SE_layer.setFormat(textFormat)
+                SE_layer.fieldName = '\'Sección: \' || lpad(to_string("seccion"),4,\'0\')' #Sección a cuatro digitos, del tipo 0000
                 SE_layer.isExpression = True
                 SE_layer.enabled = True
                 SE_layer.placement = QgsPalLayerSettings.OverPoint
@@ -878,7 +885,7 @@ class numeros_exteriores:
                 SElabels.drawLabels = True
                 vlayerSEC.setLabeling(SElabels)
                 vlayerSEC.setLabelsEnabled(True)
-                vlayerSEC.setCustomProperty("labeling/drawLabels",  "True")
+                vlayerSEC.setCustomProperty("labeling/drawLabels",  "True") 
                 vlayerSEC.triggerRepaint()
                 QtTest.QTest.qWait(200)
 
@@ -908,7 +915,14 @@ class numeros_exteriores:
                 QgsProject.instance().addMapLayer(vlayerM)
 
                 MZ_layer = QgsPalLayerSettings()
-                MZ_layer.fieldName = '\'ID Mza: \' || "id"'
+                textFormat = QgsTextFormat()
+                textFormat.setColor(QColor('#FFFFFF')) 
+                textFormat.setSize(10) 
+                textFormat.buffer().setEnabled(True)
+                textFormat.buffer().setColor(QColor('#464646'))
+                textFormat.buffer().setSize(0.7)
+                MZ_layer.setFormat(textFormat)
+                MZ_layer.fieldName = '\'Mza: \' || "id"'
                 MZ_layer.isExpression = True
                 MZ_layer.enabled = True
                 MZ_layer.placement = QgsPalLayerSettings.AroundPoint
@@ -943,7 +957,14 @@ class numeros_exteriores:
                 QgsProject.instance().addMapLayer(vlayerV)
 
                 V_layer = QgsPalLayerSettings()
-                V_layer.fieldName = '\'ID Via: \' || "id"'
+                textFormat = QgsTextFormat()
+                textFormat.setColor(QColor('#FFFFFF')) 
+                textFormat.setSize(10) 
+                textFormat.buffer().setEnabled(True)
+                textFormat.buffer().setColor(QColor('#22243B'))
+                textFormat.buffer().setSize(0.7)
+                V_layer.setFormat(textFormat)
+                V_layer.fieldName = '\'Via: \' || "id"'
                 V_layer.isExpression = True
                 V_layer.enabled = True
                 V_layer.placement = QgsPalLayerSettings.Curved
@@ -1022,7 +1043,7 @@ class numeros_exteriores:
             self.dockwidget.idVialidad_original.setText("")    
             #self.dockwidget.idVialidad.setText("")
 
-            QMessageBox.warning(self.iface.mainWindow(), "Aviso", "Se cargaron las capas del área de trabajo exitosamente.")
+            QMessageBox.information(self.iface.mainWindow(), "Aviso", "Se cargaron las capas del área de trabajo exitosamente.")
 
         except:
 
@@ -1222,7 +1243,7 @@ class numeros_exteriores:
 
     
     def btnRecomendaciones_accion(self):
-        QMessageBox.warning(self.iface.mainWindow(), "Aviso", "Para visualizar adecuadamente este Plugin en su pantalla se recomienda utilzar cualquiera de las siguientes resoluciones de pantalla:\n \n-1920 x 1080 \n-2048 x 1152 \n-2560 x 1600.")
+        QMessageBox.information(self.iface.mainWindow(), "Aviso", "Para visualizar adecuadamente este Plugin en su pantalla se recomienda utilzar cualquiera de las siguientes resoluciones de pantalla:\n \n-1920 x 1080 \n-2048 x 1152 \n-2560 x 1600.")
         return
 
         
@@ -1619,7 +1640,7 @@ class numeros_exteriores:
             #Confirmar
             #QMessageBox.information(self.iface.mainWindow(), "Captura","Captura Actualizada...")
 
-            QMessageBox.warning(self.iface.mainWindow(), "Aviso","Se guardaron los cambios")
+            QMessageBox.information(self.iface.mainWindow(), "Aviso","Se guardaron los cambios")
         
             #cadena = self.dockwidget.textEdit.toPlainText()
             #invertida = ','.join((cadena.split(",")[::-1]))
