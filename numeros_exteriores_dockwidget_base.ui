@@ -658,7 +658,7 @@
         </property>
         <widget class="QWidget" name="IdentificacionSimple">
          <attribute name="title">
-          <string>Identificación de Vialidad</string>
+          <string>Validación</string>
          </attribute>
          <widget class="QPushButton" name="btnIdentificar10">
           <property name="geometry">
