@@ -964,7 +964,7 @@ class numeros_exteriores:
                 textFormat.buffer().setColor(QColor('#22243B'))
                 textFormat.buffer().setSize(0.7)
                 V_layer.setFormat(textFormat)
-                V_layer.fieldName = '\'Via: \' || "id"'
+                V_layer.fieldName = '\'Vía: \' || "id"'
                 V_layer.isExpression = True
                 V_layer.enabled = True
                 V_layer.placement = QgsPalLayerSettings.Curved
