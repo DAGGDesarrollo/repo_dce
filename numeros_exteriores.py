@@ -941,7 +941,7 @@ class numeros_exteriores:
                 #vlayerM.triggerRepaint()
 
                 #layer_base = iface.activeLayer()
-                mySymbol1 = QgsFillSymbol.createSimple({'color':'#289E26', 'color_border':'#237E21', 'width_border':'0.3', 'style':'dense6'})
+                mySymbol1 = QgsFillSymbol.createSimple({'color':'#289E26', 'color_border':'#237E21', 'width_border':'0.2', 'style':'dense6'})
                 myRenderer = vlayerM.renderer()
                 myRenderer.setSymbol(mySymbol1)
                 vlayerM.triggerRepaint()
@@ -1023,7 +1023,7 @@ class numeros_exteriores:
 
                 #layer = iface.activeLayer()
                 renderer = vlayerNE.renderer()
-                symbol1 = QgsLineSymbol.createSimple({'color':'#289e26', 'width':'0.3'})
+                symbol1 = QgsLineSymbol.createSimple({'color':'#005F00', 'width':'0.3', 'line_style':'dash'})
                 renderer.setSymbol(symbol1) 
                 vlayerNE.triggerRepaint()
                 #iface.QgsLegendInterface().refreshLayerSymbology(layer)
