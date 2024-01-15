@@ -254,6 +254,7 @@ class numeros_exteriores:
         self.dockwidget.btnRecomendaciones.clicked.connect(self.btnRecomendaciones_accion)
 
         self.dockwidget.btnMostrar.clicked.connect(self.btnMostrar_accion)
+        self.dockwidget.btnSugerir.clicked.connect(self.btnSugerir_accion)
         
         self.dockwidget.tmaxFont.clicked.connect(self.tmaxFont)
         self.dockwidget.tmedFont.clicked.connect(self.tmedFont)
@@ -1438,6 +1439,84 @@ class numeros_exteriores:
                 #self.dockwidget.txtUsuario_2.setText(result03)
                 #self.dockwidget.spinBox.setText(result04)
                 #QMessageBox.information(self.iface.mainWindow(), "Ya no hay extraccion","No hay mas elementos que importar...")
+        conn.close()
+            
+    def btnSugerir_accion(self):
+    
+
+        self.campo01 = ""
+
+        layers = list(QgsProject.instance().mapLayers().values())
+
+        vlayer_count = 0
+        for layer in layers:
+            if layer.type() == QgsMapLayer.VectorLayer:
+                vlayer_count = vlayer_count + 1
+
+
+        if vlayer_count > 0:
+        
+
+            vl = iface.activeLayer()
+            capaactiva = vl.name()
+
+            if capaactiva != "NumerosExteriores":
+                QMessageBox.warning(self.iface.mainWindow(), "Alerta", "Por favor seleccione la capa NumerosExteriores, la capa actual es "  + capaactiva)
+                return
+
+            ids = vl.selectedFeatureIds()
+ 
+            if len(ids) == 1:
+   
+                request = QgsFeatureRequest()
+                request.setFilterFids(ids)
+
+                fields = ['id']
+
+                features = vl.getFeatures(request)
+                for feature in features:
+                    attrs = [feature[field] for field in fields]
+                
+                self.campo01 = str(attrs[0])
+                
+
+            elif len(ids) == 0: 
+                QMessageBox.warning(self.iface.mainWindow(), "Verifique","No seleccionó ningún elemento.")	
+            else:
+                QMessageBox.warning(self.iface.mainWindow(), "Verifique","Debe seleccionar un solo elemento.")	
+        else:
+            QMessageBox.warning(self.iface.mainWindow(), "Verifique","No hay capas vectoriales agregadas.")		
+        
+        
+        usr = self.dockwidget.txtUsuario.text()
+        pwd = self.dockwidget.txtClave.text()
+
+        conn = psycopg2.connect(database=self.baseDatos, user=usr, password=pwd, host=self.servidor, port="5432") 
+            
+        with conn:
+
+            qry_c = "SELECT geom, id from bged.numeros_exteriores where id = %s;"
+            data_c = (self.campo01, )
+            with conn.cursor() as curs:
+
+                curs.execute(qry_c, data_c)
+                results = curs.fetchone() #one row
+                result01 = results[0]   #geom           
+                result02 = results[1]   #id
+
+
+        with conn:
+
+            qry_c = "SELECT a.id as id_mza FROM bged.manzana as a, bged.numeros_exteriores as b WHERE b.id = {0} AND ST_Intersects(ST_Buffer(a.geom,1),b.geom) = 'true';".format(result02)
+            data_c = (self.campo01, )
+            with conn.cursor() as curs:
+
+                curs.execute(qry_c, data_c)
+                results = curs.fetchone() #one row
+                idmzasug = results[0]   #id           id manzana sugerido
+             
+            self.dockwidget.idManzana.setText(str(idmzasug))
+
         conn.close()
             
     
