@@ -1658,7 +1658,7 @@ class numeros_exteriores:
             if IdNumeroManzana == "":
                 if (Id_manzana_actual and not Id_manzana_actual.isspace()) and not Id_manzana_actual == "None":
                     # the string is non-empty
-                    QMessageBox.warning(self.iface.mainWindow(), "Aviso","No se actualizó el dato de Id manzana corregido, se conserva el actual: " + Id_manzana_actual)
+                    QMessageBox.information(self.iface.mainWindow(), "Aviso","No se actualizó el dato de Id manzana corregido, se conserva el actual: " + Id_manzana_actual)
                     IdNumeroManzana = Id_manzana_actual
                 else:
                     # the string is empty
@@ -1668,7 +1668,7 @@ class numeros_exteriores:
             if IdNumeroVialidad == "":
                 if (Id_vialidad_actual and not Id_vialidad_actual.isspace()) and not Id_vialidad_actual == "None":
                     # the string is non-empty
-                    QMessageBox.warning(self.iface.mainWindow(), "Aviso","No se actualizó el dato de Identificador de Vialidad más cercano, se conserva el actual: " + Id_vialidad_actual)
+                    QMessageBox.information(self.iface.mainWindow(), "Aviso","No se actualizó el dato de Identificador de Vialidad más cercano, se conserva el actual: " + Id_vialidad_actual)
                     IdNumeroVialidad = Id_vialidad_actual
                 else:
                     # the string is empty
