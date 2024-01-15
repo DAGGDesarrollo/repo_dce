@@ -47,6 +47,9 @@ from .numeros_exteriores_dockwidget import numeros_exterioresDockWidget
 import os
 import os.path
 
+#Imports regex module
+import re
+
 # load the adapter
 import psycopg2
 # load the psycopg extras module
@@ -1515,7 +1518,7 @@ class numeros_exteriores:
                 results = curs.fetchone() #one row
                 idmzasug = results[0]   #id           id manzana sugerido
 
-                if idmzasug is None or idmzasug == '':
+                if (idmzasug is None or idmzasug == ''):
                     QMessageBox.warning(self.iface.mainWindow(), "Aviso","No se encontró ningún id de manzana.")
 
             self.dockwidget.idManzana.setText(str(idmzasug))
@@ -1744,14 +1747,42 @@ class numeros_exteriores:
         
         intervalos = ""
         puntoInicio = 0
+        intervaloAlfa = ""
         #btnCrearCadena
-        for x in range(int(self.dockwidget.txtRinicial.text()), int(self.dockwidget.txtRfinal.text())+1, int(self.dockwidget.txtRIntervalo.text())):
-            if puntoInicio == 0:
-                intervalos = intervalos + str(x)
-                puntoInicio = 1
+        if (self.dockwidget.txtRinicial.text().isnumeric() == True and self.dockwidget.txtRfinal.text().isnumeric() == True and self.dockwidget.txtRIntervalo.text().isnumeric()):
+            for x in range(int(self.dockwidget.txtRinicial.text()), int(self.dockwidget.txtRfinal.text())+1, int(self.dockwidget.txtRIntervalo.text())):
+                if puntoInicio == 0:
+                    intervalos = intervalos + str(x)
+                    puntoInicio = 1
+                else:
+                    intervalos = intervalos + "," + str(x)
+        elif(self.dockwidget.txtRIntervalo.text().isnumeric() == False):
+            QMessageBox.warning(self.iface.mainWindow(), "Aviso", "Ingrese un intervalo numérico.")
+        elif(self.dockwidget.txtRinicial.text().isnumeric() == False and self.dockwidget.txtRfinal.text().isnumeric() == True):
+            QMessageBox.warning(self.iface.mainWindow(), "Aviso", "Si desea crea una cadena de números exteriores con letras consecutivas, por favor, ingrese letra de inicio y fin en orden alfabético.")
+        elif(self.dockwidget.txtRinicial.text().isnumeric() == True and self.dockwidget.txtRfinal.text().isnumeric() == False):
+            QMessageBox.warning(self.iface.mainWindow(), "Aviso", "Si desea crea una cadena de números exteriores con letras consecutivas, por favor, ingrese letra de inicio y fin en orden alfabético.")
+        elif(self.dockwidget.txtRinicial.text().isnumeric() == False and self.dockwidget.txtRfinal.text().isnumeric() == False):
+            letraInicio = re.findall(r'\D',self.dockwidget.txtRinicial.text())
+            letraFinal = re.findall(r'\D',self.dockwidget.txtRfinal.text())
+            numInicio = self.dockwidget.txtRinicial.text().split(letraInicio[0])[0]
+            numFinal = self.dockwidget.txtRfinal.text().split(letraFinal[0])[0]
+            posInicial = ord(letraInicio[0].upper())
+            posFinal = ord(letraFinal[0].upper())
+            if numInicio == numFinal:
+                for i in range(posInicial, posFinal + 1, 1):
+                    intervaloAlfa = intervaloAlfa + (numInicio + '' + chr(i) + ',')
             else:
-                intervalos = intervalos + "," + str(x)
-                
+                for i in range(int(numInicio),int(numInicio)+1,1):
+                    for j in range(posInicial, 91, 1):
+                        intervaloAlfa = intervaloAlfa + (str(i) + '' + chr(j) + ',')
+                for i in range(int(numInicio)+1,int(numFinal),1):
+                    for j in range(65, 91, 1):
+                        intervaloAlfa = intervaloAlfa + (str(i) + '' + chr(j) + ',')
+                for i in range(int(numFinal),int(numFinal)+1,1):
+                    for j in range(int(65), posFinal + 1, 1):
+                        intervaloAlfa = intervaloAlfa + (str(i) + '' + chr(j) + ',')
+            intervalos = intervaloAlfa.rstrip(',')
         #self.dockwidget.textEdit.setText(''.join(intervalos))
         cadena1 = self.dockwidget.textEdit.toPlainText()
         if cadena1 == "":
