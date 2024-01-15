@@ -1514,7 +1514,10 @@ class numeros_exteriores:
                 curs.execute(qry_c, data_c)
                 results = curs.fetchone() #one row
                 idmzasug = results[0]   #id           id manzana sugerido
-             
+
+                if idmzasug is None or idmzasug == '':
+                    QMessageBox.warning(self.iface.mainWindow(), "Aviso","No se encontró ningún id de manzana.")
+
             self.dockwidget.idManzana.setText(str(idmzasug))
 
         conn.close()
