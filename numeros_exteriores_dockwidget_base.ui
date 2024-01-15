@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>592</width>
-    <height>606</height>
+    <width>606</width>
+    <height>611</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -648,15 +648,46 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>270</y>
+          <y>260</y>
           <width>551</width>
-          <height>251</height>
+          <height>261</height>
          </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Arial</family>
+          <pointsize>13</pointsize>
+          <weight>50</weight>
+          <bold>false</bold>
+         </font>
+        </property>
+        <property name="tabPosition">
+         <enum>QTabWidget::North</enum>
+        </property>
+        <property name="tabShape">
+         <enum>QTabWidget::Rounded</enum>
         </property>
         <property name="currentIndex">
          <number>0</number>
         </property>
+        <property name="elideMode">
+         <enum>Qt::ElideNone</enum>
+        </property>
+        <property name="tabsClosable">
+         <bool>false</bool>
+        </property>
+        <property name="tabBarAutoHide">
+         <bool>false</bool>
+        </property>
         <widget class="QWidget" name="IdentificacionSimple">
+         <property name="font">
+          <font>
+           <family>Arial</family>
+           <pointsize>12</pointsize>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
          <attribute name="title">
           <string>Validación</string>
          </attribute>
@@ -980,6 +1011,14 @@
          </widget>
         </widget>
         <widget class="QWidget" name="Cadena">
+         <property name="font">
+          <font>
+           <family>Arial</family>
+           <pointsize>12</pointsize>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
          <attribute name="title">
           <string>Cadena</string>
          </attribute>
@@ -1243,6 +1282,17 @@
          </widget>
         </widget>
         <widget class="QWidget" name="CadenaUH">
+         <property name="font">
+          <font>
+           <family>Arial</family>
+           <pointsize>12</pointsize>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="cursor">
+          <cursorShape>ArrowCursor</cursorShape>
+         </property>
          <attribute name="title">
           <string>Cadena UH</string>
          </attribute>
