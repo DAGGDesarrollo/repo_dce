@@ -1518,7 +1518,6 @@ class numeros_exteriores:
             self.dockwidget.idManzana.setText(str(idmzasug))
 
         conn.close()
-            
     
     
     def tmaxFont(self):
@@ -1531,7 +1530,7 @@ class numeros_exteriores:
         #tEditSize = int(self.dockwidget.self.dockwidget.textEdit.fontPointSize())
         #f.setPointSize( int(self.dockwidget.self.dockwidget.textEdit.fontPointSize()) + 2)
         #f.setPointSize( int(self.dockwidget.textEdit.fontPointSize()) + 2)
-        f.setPointSize(16)
+        f.setPointSize(18)
         # sets the size to 27
         
         self.dockwidget.textEdit.setFont(f)
@@ -1567,7 +1566,7 @@ class numeros_exteriores:
         #tEditSize = int(self.dockwidget.self.dockwidget.textEdit.fontPointSize())
         #f.setPointSize( int(self.dockwidget.self.dockwidget.textEdit.fontPointSize()) + 2)
         #f.setPointSize( int(self.dockwidget.textEdit.fontPointSize()) + 2)
-        f.setPointSize(13)
+        f.setPointSize(14)
         # sets the size to 27
         
         self.dockwidget.textEdit.setFont(f)
@@ -1583,7 +1582,7 @@ class numeros_exteriores:
         #tEditSize = int(self.dockwidget.self.dockwidget.textEdit.fontPointSize())
         #f.setPointSize( int(self.dockwidget.self.dockwidget.textEdit.fontPointSize()) + 2)
         #f.setPointSize( int(self.dockwidget.textEdit.fontPointSize()) + 2)
-        f.setPointSize(10)
+        f.setPointSize(12)
         # sets the size to 27
         
         self.dockwidget.textEdit.setFont(f)
