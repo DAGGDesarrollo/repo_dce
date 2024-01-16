@@ -30,13 +30,16 @@ from qgis.PyQt.QtCore import QSettings, QTranslator,qVersion, Qt, QCoreApplicati
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtWidgets import QAction, QMessageBox, QProgressBar, QSizePolicy, QWidget, QApplication
+
 #from PyQt5.QtWidgets import QAction, QMessageBox, QProgressBar
 from qgis.core import *
 from qgis.core import QgsProject
 from qgis.core import QgsVectorLayer, QgsDataSourceUri
 from qgis.utils import *
 from PyQt5 import QtTest
-#from PyQt4 import QtGui 
+from PyQt5.QtWidgets import *
+
+#from PyQt4 import QtGui
 
 # Initialize Qt resources from file resources.py
 from .resources import *
@@ -47,7 +50,8 @@ from .numeros_exteriores_dockwidget import numeros_exterioresDockWidget
 import os
 import os.path
 
-#Imports regex module
+
+#Importa módulo regex para expresiones regulares
 import re
 
 # load the adapter
@@ -360,9 +364,7 @@ class numeros_exteriores:
             for sector in sectores:
                 #item = str(sector).zfill(2)
                 item = str(sector)
-                self.dockwidget.cveSector.addItem(item)
-
-            
+                self.dockwidget.cveSector.addItem(item)     
 
     #lineas agregadas al codigo original
     def btnConectar_accion(self):
@@ -538,7 +540,7 @@ class numeros_exteriores:
             self.dockwidget.txtClave.setEnabled(False)
             #self.dockwidget.btnConectar.setEnabled(False)
 
-            QMessageBox.information(self.iface.mainWindow(), "Aviso", "Se realizó la conexión con éxito\nServidor: " + self.servidor + "\nBase de datos: " + self.baseDatos )
+            QMessageBox.information(self.iface.mainWindow(), "Aviso", "Se realizó la conexión con éxito\nServidor: " + self.servidor + "\nBase de datos: " + self.baseDatos + "\nBienvenido " + usr.split(".")[0].title())
             
 
             #print ("I was able to connect to the database")
@@ -551,7 +553,8 @@ class numeros_exteriores:
             #self.dockwidget.txtClave.setText("")
             return None
         
-        
+    
+         
     def btnDesconectar_accion(self):
         #pass
 
@@ -610,13 +613,11 @@ class numeros_exteriores:
 
             self.conectado = False
 
-        QMessageBox.information(self.iface.mainWindow(), "Aviso", "Conexión terminada.")
+        QMessageBox.information(self.iface.mainWindow(), "Aviso", "Ha cerrado su sesión, conexión terminada.")
 
-    def on_cveMunicipio_changed(self, value):
-    
-        self.dockwidget.cveSeccion.clear()
+    def on_cveMunicipio_changed(self, value):      
         
-        
+        self.dockwidget.cveSeccion.clear()   
         
         #self.iface.messageBar().pushMessage("Mensaje", "Se eligio clave de municipio: " + numeroMunicipio)
 
@@ -737,7 +738,7 @@ class numeros_exteriores:
 
         #self.comboBox.currentIndexChanged.connect(self.on_combobox_changed, self.comboBox.currentIndex())
 
-
+    
     def btnObtenerArea_accion(self):
     
         #prueba
@@ -754,7 +755,11 @@ class numeros_exteriores:
 
         try:
 
-            
+            #Se configura la barra de progreso y se fija el valor inicial en 0 para comenzar el proceso
+            prog = QProgressDialog('Cargando capas. Un momento, por favor.', '', 0, 100)
+            prog.setWindowModality(Qt.WindowModal)
+            prog.setCancelButton(None)
+            time.sleep(1)
 
             #Borrar capas si hubo cambio de entidad
             municipioActual = str(self.dockwidget.cveMunicipio.currentText().split(" :",1)[0])
@@ -844,11 +849,11 @@ class numeros_exteriores:
             myRenderer = vlayer1SEC.renderer()
             myRenderer.setSymbol(mySymbol1)
 
+            #Muestra el 20% de avance
+            prog.setValue(20)
 
             vlayer1SEC.triggerRepaint()
             QtTest.QTest.qWait(100)
-
-            
             #se elimina capa de la unica seccion solo se agrego para emular zoom, ya no se elimina se usa como transparencia
             #QgsProject.instance().removeMapLayer(vlayer1SEC)
             QtTest.QTest.qWait(200)
@@ -901,7 +906,9 @@ class numeros_exteriores:
                 vlayerSEC.triggerRepaint()
                 QtTest.QTest.qWait(1000)
                 #E83845
-
+                
+                #Muestra el 40% de avance
+                prog.setValue(40)
 
                 #Cargar capas
                 #uri.setDataSource("bged", "manzana", "geom")
@@ -950,9 +957,11 @@ class numeros_exteriores:
                 myRenderer.setSymbol(mySymbol1)
                 vlayerM.triggerRepaint()
                 QtTest.QTest.qWait(1500)
-                #E83845
+                #E83845            prog.setValue(20)
 
-                
+                #Muestra el 60% de avance
+                prog.setValue(60) 
+
                 #symbol = QgsSymbolV2.defaultSymbol(vlayerM.geometryType())
                 #renderer = QgsSingleSymbolRendererV2(symbol)
 
@@ -996,6 +1005,9 @@ class numeros_exteriores:
                 #iface.mapCanvas().refresh()
                 QtTest.QTest.qWait(3000)
 
+                #Muestra el 80% de avance
+                prog.setValue(80)
+
                 #Consulta de numeros exteriores con campos nulos
                 #uri.setDataSource("bged", "numeros_exteriores", "geom", "manzana is not null")
                 uri.setDataSource("bged", "numeros_exteriores", "geom")
@@ -1036,18 +1048,16 @@ class numeros_exteriores:
 
                 self.ultimoMunicipio = municipioActual
 
-
+            
             #Borrar campos de texto en edicion simple
             self.dockwidget.textEdit.setText("")
-                               
             self.dockwidget.idManzana.setText("")
-
             self.dockwidget.idManzana_original.setText("")
-                
-            self.dockwidget.idVialidad_original.setText("")    
-            #self.dockwidget.idVialidad.setText("")
+            self.dockwidget.idVialidad_original.setText("")  
 
-            QMessageBox.information(self.iface.mainWindow(), "Aviso", "Se cargaron las capas del área de trabajo exitosamente.")
+            #Se ajusta el valor de progreso de 100% para mostrar el fin del proceso
+            prog.setValue(100) 
+            QMessageBox.information(self.iface.mainWindow(), "Aviso", "Listo, se cargaron las capas del área de trabajo exitosamente.")
 
         except:
 
@@ -1445,7 +1455,6 @@ class numeros_exteriores:
         conn.close()
             
     def btnSugerir_accion(self):
-    
 
         self.campo01 = ""
 
@@ -1459,7 +1468,6 @@ class numeros_exteriores:
 
         if vlayer_count > 0:
         
-
             vl = iface.activeLayer()
             capaactiva = vl.name()
 
@@ -1489,42 +1497,51 @@ class numeros_exteriores:
                 QMessageBox.warning(self.iface.mainWindow(), "Verifique","Debe seleccionar un solo elemento.")	
         else:
             QMessageBox.warning(self.iface.mainWindow(), "Verifique","No hay capas vectoriales agregadas.")		
-        
-        
+ 
         usr = self.dockwidget.txtUsuario.text()
         pwd = self.dockwidget.txtClave.text()
 
         conn = psycopg2.connect(database=self.baseDatos, user=usr, password=pwd, host=self.servidor, port="5432") 
-            
+        #Configura la barra de progreso 
+        prog = QProgressDialog('Buscando Id de Manzana. Un momento, por favor.', '', 0, 100)
+        prog.setWindowModality(Qt.WindowModal)
+        prog.setCancelButton(None)
+        time.sleep(2)
+        prog.setValue(25)
+        #Se conecta a la BD para obtener el id del registro seleccionado de la capa de números exteriores
         with conn:
 
             qry_c = "SELECT geom, id from bged.numeros_exteriores where id = %s;"
             data_c = (self.campo01, )
             with conn.cursor() as curs:
 
+                prog.setValue(50)
                 curs.execute(qry_c, data_c)
                 results = curs.fetchone() #one row
                 result01 = results[0]   #geom           
                 result02 = results[1]   #id
 
-
         with conn:
 
+            #Se conecta a ala BD para obtener el id de la manzana que toca o está a 1m del número exterior selccionado
             qry_c = "SELECT a.id as id_mza FROM bged.manzana as a, bged.numeros_exteriores as b WHERE b.id = {0} AND ST_Intersects(ST_Buffer(a.geom,1),b.geom) = 'true';".format(result02)
             data_c = (self.campo01, )
             with conn.cursor() as curs:
 
+                prog.setValue(75)
                 curs.execute(qry_c, data_c)
                 results = curs.fetchone() #one row
                 idmzasug = results[0]   #id           id manzana sugerido
 
                 if (idmzasug is None or idmzasug == ''):
                     QMessageBox.warning(self.iface.mainWindow(), "Aviso","No se encontró ningún id de manzana.")
-
+                      
             self.dockwidget.idManzana.setText(str(idmzasug))
-
+            
+            prog.setValue(100)
+        #Ajusta el valor al 100% para concluir la barra de progreso
         conn.close()
-    
+        
     
     def tmaxFont(self):
         #self.dockwidget.textEdit.setFontPointSize(32);
@@ -1724,7 +1741,7 @@ class numeros_exteriores:
             #Confirmar
             #QMessageBox.information(self.iface.mainWindow(), "Captura","Captura Actualizada...")
 
-            QMessageBox.information(self.iface.mainWindow(), "Aviso","Se guardaron los cambios")
+            QMessageBox.information(self.iface.mainWindow(), "Aviso","Se guardaron los cambios.")
         
             #cadena = self.dockwidget.textEdit.toPlainText()
             #invertida = ','.join((cadena.split(",")[::-1]))
@@ -1756,12 +1773,16 @@ class numeros_exteriores:
                     puntoInicio = 1
                 else:
                     intervalos = intervalos + "," + str(x)
+        #Verifica que el valor ingresado como intervalo sea un número
         elif(self.dockwidget.txtRIntervalo.text().isnumeric() == False):
             QMessageBox.warning(self.iface.mainWindow(), "Aviso", "Ingrese un intervalo numérico.")
+        #Alerta sobre la necesidad de usar una letra en el primer valor del intervalo
         elif(self.dockwidget.txtRinicial.text().isnumeric() == False and self.dockwidget.txtRfinal.text().isnumeric() == True):
             QMessageBox.warning(self.iface.mainWindow(), "Aviso", "Si desea crea una cadena de números exteriores con letras consecutivas, por favor, ingrese letra de inicio y fin en orden alfabético.")
+        #Alerta sobre la necesidad de usar una letra en el segundo valor del intervalo
         elif(self.dockwidget.txtRinicial.text().isnumeric() == True and self.dockwidget.txtRfinal.text().isnumeric() == False):
             QMessageBox.warning(self.iface.mainWindow(), "Aviso", "Si desea crea una cadena de números exteriores con letras consecutivas, por favor, ingrese letra de inicio y fin en orden alfabético.")
+        #Crea la cadena de números exteriores usando una letra para los casos 1A, 1B,1C...
         elif(self.dockwidget.txtRinicial.text().isnumeric() == False and self.dockwidget.txtRfinal.text().isnumeric() == False):
             letraInicio = re.findall(r'\D',self.dockwidget.txtRinicial.text())
             letraFinal = re.findall(r'\D',self.dockwidget.txtRfinal.text())
