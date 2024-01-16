@@ -1,4 +1,4 @@
-1# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 /***************************************************************************
 Números Exteriores - INE
@@ -11,9 +11,9 @@ Números Exteriores - INE
         begin                : 2023-04-25
         git sha              : $Format:%H$
         copyright            : (C) 2023 by INE, Direccion de Cartografia Electoral, 
-                                Saul Valencia, Luis Enrique Cortés
-        email                : luissaul.valencia@ine.mx, enrique.cortes@ine.mx
-        version              : 2.1
+                                Luis Enrique Cortés
+        email                : enrique.cortes@ine.mx
+        version              : 3.0
  ***************************************************************************/
 
 /***************************************************************************
