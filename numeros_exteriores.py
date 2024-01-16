@@ -490,43 +490,6 @@ class numeros_exteriores:
             conn.close()
 
 
-            #colocar etiquetas, codigo de prueba
-            #expression = '"manzana"!=null'
-            #vlayer = iface.activeLayer()
-            #vlayer.setSubsetString(expression)
-            
-            #vlayerNE.setCustomProperty("labeling/drawLabels",  "True")
-            #vlayerNE = QgsPalLayerSettings()
-            #vlayerNE.fieldName = 'vialidad'
-            #vlayerNE.enabled = True
-            #vlayerNE.placement = QgsPalLayerSettings.Line
-            #labels = QgsVectorLayerSimpleLabeling(vlayerNE)
-            #layer.setLabeling(labels)
-            #layer.setLabelsEnabled(True)
-            ##label.drawLabels = True
-            #layer.triggerRepaint()
-            
-            
-            ##otro metodo para etiquetar capas
-            #text_format = QgsTextFormat()
-            #label = QgsPalLayerSettings()
-            #label.isExpression = True
-            ##label.fieldName = '''concat('Cuenta= '+to_string("''' + 'CUENTA_USU' + '''")+'\n'+'ID= '+to_string("''' + 'ID' + '''"))'''
-            ##
-            ##'''if (to_string("''' + 'CUENTA_USU' + '''")+'='+int(pol[count_2]) and to_string("''' + 'ID' + '''")+'='+int(features['ID']), concat('Cuenta= '+to_string("''' + 'CUENTA_USU' + '''")+'\n'+'ID= '+to_string("''' + 'ID' + '''")), null)'''
-            #label.fieldName = 'vialidad'
-            #label.enabled = True
-            #label.setFormat(text_format)
-            #labeler = QgsVectorLayerSimpleLabeling(label)
-            #label.isExpression = True
-            #vlayerNE.placement = QgsPalLayerSettings.Line
-            #vlayerNE.setLabelsEnabled(True)
-            #vlayerNE.setLabeling(labeler)
-            #label.drawLabels = True
-            #vlayerNE.setCustomProperty("labeling/drawLabels",  "True")
-            #vlayerNE.triggerRepaint()
-            
-            #self.iface.messageBar().pushMessage("Mensaje", "Se cargo layer en variable")
             
             #self.iface.btnDeconectar.IsEnabled
             self.dockwidget.btnDesconectar.setEnabled(True)
@@ -556,64 +519,39 @@ class numeros_exteriores:
     
          
     def btnDesconectar_accion(self):
-        #pass
 
-        #Probando funcion
-        #self.dockwidget.txtClave.setText("Adios")
-        
-        #cadena = self.dockwidget.textEdit.toPlainText()
- 
-        #cadena = self.dockwidget.idVialidad.currentText()
-        #resultado = cadena.split(',', 1)[0]
-        #string.split('-', 1)[0]
-        #string.split('-')[0]
-        
-        #this line works fine in testings to get number from number and vialidad string (452 : LOPEZ MATEOS)
-        #self.dockwidget.idManzana.setText(self.dockwidget.idVialidad.currentText().split(" :",1)[0])
-        
-        #invertida = ','.join((cadena.split(",")[::-1]))
-        
-        
-        #invertida = str(''.join([cadena.split(",")[::-1]]))
-        #placeholderText()
-        #invertida = cadena[::-1] 
-        #self.dockwidget.textEdit.setText(invertida)
-        
+        buttonReply = QMessageBox.question(self.iface.mainWindow(), 'Atención', "¿Confirma que quiere cerrar su sesión?", QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        if buttonReply == QMessageBox.Yes:
+            if self.conectado == True:
 
-        if self.conectado == True:
+                self.ultimaEntidad = self.dockwidget.cveEntidad.currentText()
 
-            self.ultimaEntidad = self.dockwidget.cveEntidad.currentText()
+                self.dockwidget.txtServidor.setText("")
+                self.dockwidget.txtUsuario.setText("")
+                self.dockwidget.txtClave.setText("")
 
-            self.dockwidget.txtServidor.setText("")
-            self.dockwidget.txtUsuario.setText("")
-            self.dockwidget.txtClave.setText("")
+                self.dockwidget.idVialidad_original.setText("")
+                self.dockwidget.idManzana_original.setText("")
 
-            self.dockwidget.idVialidad_original.setText("")
-            self.dockwidget.idManzana_original.setText("")
+                self.dockwidget.txtRinicial.setText("")
+                self.dockwidget.txtRfinal.setText("")
+                self.dockwidget.txtRIntervalo.setText("")
 
-            self.dockwidget.txtRinicial.setText("")
-            self.dockwidget.txtRfinal.setText("")
-            self.dockwidget.txtRIntervalo.setText("")
+                self.dockwidget.txtServidor.setEnabled(True)
+                self.dockwidget.cveEntidad.setEnabled(True)
+                self.dockwidget.txtUsuario.setEnabled(True)
+                self.dockwidget.txtClave.setEnabled(True)
 
-            #self.dockwidget.cveEntidad.clear()
-            #self.dockwidget.cveEntidad.setCurrentText("")
+                self.dockwidget.cveMunicipio.clear()
+                self.dockwidget.cveSeccion.clear()
 
-            self.dockwidget.txtServidor.setEnabled(True)
-            self.dockwidget.cveEntidad.setEnabled(True)
-            self.dockwidget.txtUsuario.setEnabled(True)
-            self.dockwidget.txtClave.setEnabled(True)
+                self.dockwidget.btnDesconectar.setEnabled(False)
+                self.dockwidget.btnConectar.setEnabled(True)      
 
-            self.dockwidget.cveMunicipio.clear()
-            self.dockwidget.cveSeccion.clear()
-
-            self.dockwidget.btnDesconectar.setEnabled(False)
-            self.dockwidget.btnConectar.setEnabled(True)
-
-            
-
-            self.conectado = False
-
-        QMessageBox.information(self.iface.mainWindow(), "Aviso", "Ha cerrado su sesión, conexión terminada.")
+                self.conectado = False
+        else:
+            pass
+        self.iface.mainWindow().show()
 
     def on_cveMunicipio_changed(self, value):      
         
@@ -782,9 +720,7 @@ class numeros_exteriores:
                 self.ultimaEntidad = self.dockwidget.cveEntidad.currentText()
                 self.ultimoMunicipio = municipioActual
 
-                
-
-
+            
             # Get list of vector layers
             layers = list(QgsProject.instance().mapLayers().values())
             # Check there is at least one vector layer. Selecting within the same layer is fine.
@@ -1063,198 +999,7 @@ class numeros_exteriores:
 
             QMessageBox.warning(self.iface.mainWindow(), "Aviso", "No se logró cargar las capas adecuadamente, revise su conexión a internet.")
 
-
             return None
-            #Funciona para el zoom
-            #canvas = iface.mapCanvas()
-            #canvas.waitWhileRendering()  # modification here
-            #extent = vlayer1SEC.extent()
-            #canvas.setExtent(extent)
-            #canvas.refresh()
-            
-            #vlayer1SEC.renderer().setOpacity(0.3)
-            #vlayer1SEC.triggerRepaint()
-
-            #layer = iface.activeLayer()
-            #root_rule = layer.renderer().rootRule()
-            #for rule in root_rule.children():
-            #    rule.symbol().setOpacity(0.3)
-            #layer.triggerRepaint()
-
-            #from PyQt4 import QtGui 
-            #myVectorLayer = iface.activeLayer()
-            #myRenderer  = myVectorLayer.renderer()
-            ##if myVectorLayer.geometryType() == QGis.Polygon:
-            #mySymbol1 = QgsFillSymbol.createSimple({'color':'255,0,0,0', 'color_border':'#000000', 'width_border':'0.3'})
-
-            #myRenderer.setSymbol(mySymbol1)
-            #myVectorLayer.triggerRepaint()
-            #iface.QgsLegendInterface().refreshLayerSymbology(myVectorLayer)
-
-
-
-
-            #iface.QgsLegendInterface().refreshLayerSymbology(vlayerSEC)
-            #iface.mapCanvas().refresh()
-
-            #iface.QgsLegendInterface().refreshLayerSymbology(vlayerM)
-            #iface.mapCanvas().refresh()
-
-
-            
-
-
-
-
-
-            #changing color not working
-            #symbols = self.vlayerSEC.rendererV2().symbols()
-            #symbol = symbols[0]
-            #symbol.setColor(QColor.fromRgb(50,50,250))
-
-
-            #trying to change color in layer, not working
-            ##QgsMapLayerRegistry.instance().addMapLayer(self.vlayer)       
-            #symbols = self.vlayerSEC.rendererV2().symbols()
-            #symbol = symbols[0]
-            #symbol.setColor(QtGui.QColor.fromRgb(50,50,250))
-            #iface.mapCanvas().refresh() 
-            #iface.legendInterface().refreshLayerSymbology(vlayerSEC)
-
-            #iface.setActiveLayer(vlayerSEC)
-            #iface.zoomToActiveLayer()
-
-
-            #layer = self.iface.activeLayer();
-            #iter = layer.getFeatures();
-            #for feature in iter:
-            #    #geom = feature.geometry()
-            #    #iface.mapCanvas().setSelectionColor(QColor("yellow"));
-            #    layer.setSelectedFeatures([feature.id()])
-            #    #selected_features = layer.selectedFeatures()
-            #    self.iface.mapCanvas().zoomToSelected( layer )
-            #    self.iface.mapCanvas().refresh()
-            #    #path = 'D:\Test'+ str(feature.id()) + '.png'
-
-
-
-            #another option
-            ##QgsMapLayerRegistry.instance().addMapLayer(self.vlayer)
-            ##def zoomTo(self):
-            #layer = vlayerNE
-            #atable = self.ui.table
-            #selectList=[]
-            #for i in atable.selectionModel().selectedRows():
-            #    ID = atable.item(i.row(),0).text()
-            #    selectList.append(int(ID))
-            #layer.setSelectedFeatures(selectList)
-
-
-
-            #another option
-            ##layer1 = QgsVectorLayer ( uri.uri(), "grassland", "postgres")
-            ##QgsMapLayerRegistry.instance().addMapLayer(layer1, True)
-            ##crs = QgsCoordinateReferenceSystem(4326)
-            ##self.iface.mapCanvas().mapSettings().setDestinationCrs(crs)
-            #expressionCur = 'seccion = 10'
-            #it = vlayerNE.getFeatures(QgsFeatureRequest().setFilterExpression(expressionCur))
-            #vlayerNE.setSelectedFeatures ( [ f.seccion() for f in it ])
-            #self.iface.actionZoomToSelected().trigger()
-
-            #vlayerSEC.selectByExpression("\"seccion\"=10")
-            
-            #canvas = iface.mapCanvas()
-            #canvas.zoomToSelected(vlayerSEC)
-
-            #layer = iface.activeLayer()
-
-
-            ##registry = QgsMapLayerRegistry.instance();
-            #canvas = iface.mapCanvas()
-            #name= 'seccion';
-            ##layer = registry.mapLayersByName( name )[0];
-            #vlayerSEC.removeSelection();
-            ##expr = QgsExpression("\"seccion\"='[% "numeroSeccion" %]'");
-            #expr = QgsExpression("\"seccion\"=10");
-            #it = vlayerSEC.getFeatures(QgsFeatureRequest(expr));
-            #ids = [i.id() for i in it];
-            #vlayerSEC.setSelectedFeatures(ids);
-            #canvas.zoomToSelected(vlayerSEC)
-            #canvas.refresh();
-
-            #otro final no sirve
-            #vl = iface.activeLayer()
-            #ids = vl.selectedFeatureIds()
-            #request = QgsFeatureRequest()
-            #request.setFilterFids(ids)
-            #features = vl.getFeatures(request)
-            #feats = {f.id():f.geometry().boundingBox() for f in features}
-            #canvas = iface.mapCanvas()
-            #canvas.setExtent(feats)
-            #canvas.refresh()
-
-
-
-            #otro
-            #feats = {f.id():f.geometry().boundingBox() for f in layer.getFeatures()}
-            #canvas = iface.mapCanvas()
-            #canvas.setExtent(feats[1])
-            #canvas.refresh()
-
-            #otro
-            #vl = iface.activeLayer()
-            ## get the list of selected ids 
-            #ids = vl.selectedFeatureIds()
-            #vlayerSEC.setSelectedFeatures(ids);
-            #canvas.zoomToSelected(vlayerSEC)
-            #canvas.refresh();
-
-
-
-
-            #request = QgsFeatureRequest()
-            #request.setFilterFids(ids)
-
-            #feature_number = 0
-            #features = vlayerSEC.getFeatures(request)
-            #centroid = features.geometry().centroid().asPoint()
-            #iface.mapCanvas().setCenter(centroid)
-            #iface.mapCanvas().refresh()
-            
-            #iface.mapCanvas().zoomToSelected( vlayerSEC )
-            #iface.mapCanvas().refresh()
-
-
-            #another option
-            #layer = self.iface.activeLayer()
-            #feature_number = 0
-            #feature = layer.getFeature(feature_number)
-            #centroid = feature.geometry().centroid().asPoint()
-            #self.iface.mapCanvas().setCenter(centroid)
-            #self.iface.mapCanvas().refresh()
-
-            #Antes de hacer carga de capas realizar consulta por municipio (minimo para tener menos informacion)
-
-            #uri = QgsDataSourceUri()
-            #uri.setConnection("localhost", "5432", "myBase", "myUser", "myPassword")
-            #sql = 'SELECT a.idA, a.geom, a.name FROM public.tableA a INNER JOIN public.tableB b ON st_intersects(a.geom, b.geom) WHERE a.name LIKE \'Example\' AND b.name LIKE \'Something\''
-            #uri.setDataSource('', f'({sql})', 'geom', '', 'idA')
-            #vlayer = iface.addVectorLayer(uri.uri(), 'myLayer','postgres')
-
-            #Query Felipe
-            #qry_c = "select via.id, via.nombre from bged.numeros_exteriores numext, bged.vialidad via where numext.id = %s and st_intersects(st_buffer(numext.geom, 10, 'side=both'), via.geom);"
-            #qry_c = "select * from bged.manzana mza, bged.municipio mun where mun.municipio = %s and st_intersects(mun.geom, mza.geom);"
-            #data_c = (numeroMunicipio, )
-
-
-            #vlayer = QgsVectorLayer( "?query=SELECT * FROM road WHERE type = 'Expressway'", "vlayer", "virtual" )
-            #QgsMapLayerRegistry.instance().addMapLayer(vlayer)
-
-
-            #q = QUrl.toPercentEncoding("SELECT a.* FROM shp1 AS a, shp2 AS b WHERE Intersects(a.geometry,b.geometry)")
-            #l = QgsVectorLayer( "?layer=ogr:/data/myshape.shp:shp1&layer=ogr:/data/myshape2.shp:shp2&query=%s&uid=id&geometry=geometry:2:4326" % q, "myjoin", "virtual" )
-
-
     
     def btnRecomendaciones_accion(self):
         QMessageBox.information(self.iface.mainWindow(), "Aviso", "Para visualizar adecuadamente este Plugin en su pantalla se recomienda utilzar cualquiera de las siguientes resoluciones de pantalla:\n \n-1920 x 1080 \n-2048 x 1152 \n-2560 x 1600.")
