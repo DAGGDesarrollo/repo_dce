@@ -274,6 +274,8 @@ class numeros_exteriores:
         
         self.dockwidget.btnIdentificar10.clicked.connect(self.btnIdentificar10_accion)
         self.dockwidget.btnIdentificar20.clicked.connect(self.btnIdentificar20_accion)
+        self.dockwidget.btnIdentificar10.clicked.connect(self.btnIdentificar10_accion)
+        self.dockwidget.btndistUsuario.clicked.connect(self.btndistUsuario_accion)
 
         self.dockwidget.cveSector.currentIndexChanged.connect(self.cveSector_changed)
         self.dockwidget.btnAsignarSector.clicked.connect(self.btnAsignarSector_accion)
@@ -1643,6 +1645,32 @@ class numeros_exteriores:
 
         conn.close()
 
+    def btndistUsuario_accion(self):
+        
+        #Abrir base
+        usr = self.dockwidget.txtUsuario.text()
+        pwd = self.dockwidget.txtClave.text()
+        
+        #localhost
+        #remote Samge bged 
+        conn = psycopg2.connect(database=self.baseDatos, user=usr, password=pwd, host=self.servidor, port="5432")
+    
+        with conn:
+            
+            qry_c = "select via.id, via.nombre from bged.numeros_exteriores numext, bged.vialidad via where numext.id = %s and st_intersects(st_buffer(numext.geom, {0}, 'side=both'), via.geom);".format(self.dockwidget.distUsuario.text())
+            data_c = (self.campo01, )
+
+            with conn.cursor() as curs:
+
+                curs.execute(qry_c, data_c)
+                rows = curs.fetchall() #one row
+
+                for row in rows:
+                    #self.iface.messageBar().pushMessage("Datos row  ", str(row[0]))
+                    idname = str(row[0]) + " : " + row[1].title()
+                    self.dockwidget.idVialidad.addItem(idname)
+
+        conn.close()
 
     def cveSector_changed(self):
         numero = 1
