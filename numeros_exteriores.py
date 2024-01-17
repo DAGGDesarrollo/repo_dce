@@ -480,7 +480,7 @@ class numeros_exteriores:
                     rows = curs.fetchall() #one row
                     for row in rows:
                         #self.iface.messageBar().pushMessage("Datos row  ", str(row[0]))
-                        idname = str(row[0]) + " : " + row[1]
+                        idname = str(row[0]) + " : " + row[1].title()
                         self.dockwidget.cveMunicipio.addItem(idname)
                         n=n+1
 
@@ -816,13 +816,13 @@ class numeros_exteriores:
                 #Se configura el formato de las etiquetas
                 SE_layer = QgsPalLayerSettings()
                 textFormat = QgsTextFormat()
-                textFormat.setColor(QColor('#FFFFFF'))
+                textFormat.setColor(Qt.darkRed)
                 textFormat.setSize(15)
                 textFormat.buffer().setEnabled(True)
                 textFormat.buffer().setSize(0.7)
-                textFormat.buffer().setColor(Qt.darkRed)
+                textFormat.buffer().setColor(QColor('#FFFFFF'))
                 SE_layer.setFormat(textFormat)
-                SE_layer.fieldName = '\'Sección: \' || lpad(to_string("seccion"),4,\'0\')' #Sección a cuatro digitos, del tipo 0000
+                SE_layer.fieldName = '\'Sección \n\' || lpad(to_string("seccion"),4,\'0\')' #Sección a cuatro digitos, del tipo 0000
                 SE_layer.isExpression = True
                 SE_layer.enabled = True
                 SE_layer.placement = QgsPalLayerSettings.OverPoint
@@ -863,13 +863,13 @@ class numeros_exteriores:
 
                 MZ_layer = QgsPalLayerSettings()
                 textFormat = QgsTextFormat()
-                textFormat.setColor(QColor('#FFFFFF')) 
+                textFormat.setColor(QColor('#464646')) 
                 textFormat.setSize(11) 
                 textFormat.buffer().setEnabled(True)
-                textFormat.buffer().setColor(QColor('#464646'))
+                textFormat.buffer().setColor(QColor('#FFFFFF'))
                 textFormat.buffer().setSize(0.7)
                 MZ_layer.setFormat(textFormat)
-                MZ_layer.fieldName = '\'Mza: \' || "id"'
+                MZ_layer.fieldName = '\'Mz \n\' || "id"'
                 MZ_layer.isExpression = True
                 MZ_layer.enabled = True
                 MZ_layer.placement = QgsPalLayerSettings.AroundPoint
@@ -907,13 +907,13 @@ class numeros_exteriores:
 
                 V_layer = QgsPalLayerSettings()
                 textFormat = QgsTextFormat()
-                textFormat.setColor(QColor('#FFFFFF')) 
+                textFormat.setColor(QColor('#22243B')) 
                 textFormat.setSize(11) 
                 textFormat.buffer().setEnabled(True)
-                textFormat.buffer().setColor(QColor('#22243B'))
+                textFormat.buffer().setColor(QColor('#FFFFFF'))
                 textFormat.buffer().setSize(0.7)
                 V_layer.setFormat(textFormat)
-                V_layer.fieldName = '\'Vía: \' || "id"'
+                V_layer.fieldName = '"id" || \' \' || title("nombre")'
                 V_layer.isExpression = True
                 V_layer.enabled = True
                 V_layer.placement = QgsPalLayerSettings.Curved
@@ -1596,7 +1596,7 @@ class numeros_exteriores:
                 rows = curs.fetchall() #one row
                 for row in rows:
                     #self.iface.messageBar().pushMessage("Datos row  ", str(row[0]))
-                    idname = str(row[0]) + " : " + row[1]
+                    idname = str(row[0]) + " : " + row[1].title()
                     self.dockwidget.idVialidad.addItem(idname)
 
 
@@ -1637,7 +1637,7 @@ class numeros_exteriores:
                 rows = curs.fetchall() #one row
                 for row in rows:
                     #self.iface.messageBar().pushMessage("Datos row  ", str(row[0]))
-                    idname = str(row[0]) + " : " + row[1]
+                    idname = str(row[0]) + " : " + row[1].title()
                     self.dockwidget.idVialidad.addItem(idname)
 
 
