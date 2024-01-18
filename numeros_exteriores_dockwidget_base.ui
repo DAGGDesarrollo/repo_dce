@@ -25,7 +25,7 @@
    </font>
   </property>
   <property name="windowTitle">
-   <string>Plugin de Números Exteriores - INE</string>
+   <string>Plugin de Números Exteriores INE</string>
   </property>
   <widget class="QWidget" name="dockWidgetContents">
    <layout class="QGridLayout" name="gridLayout">
@@ -877,7 +877,7 @@
            </font>
           </property>
           <property name="text">
-           <string>Identificar Vialidad Más Cercana</string>
+           <string>Identificar Vialidad más Cercana</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
@@ -1024,7 +1024,7 @@
            </font>
           </property>
           <property name="text">
-           <string>Identificar Con Esta Distancia</string>
+           <string>Distancia Mayor a 60m</string>
           </property>
          </widget>
          <widget class="QPushButton" name="btnSugerir">
