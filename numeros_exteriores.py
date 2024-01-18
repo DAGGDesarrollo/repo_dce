@@ -647,7 +647,7 @@ class numeros_exteriores:
                 textFormat.buffer().setColor(QColor('#FFFFFF'))
                 textFormat.buffer().setSize(0.7)
                 MZ_layer.setFormat(textFormat)
-                MZ_layer.fieldName = '\'Mz \n\' || "id"'
+                MZ_layer.fieldName = '\'Mz \nId \' || "id"'
                 MZ_layer.isExpression = True
                 MZ_layer.enabled = True
                 MZ_layer.placement = QgsPalLayerSettings.AroundPoint
@@ -681,7 +681,7 @@ class numeros_exteriores:
                 textFormat.buffer().setColor(QColor('#FFFFFF'))
                 textFormat.buffer().setSize(0.7)
                 V_layer.setFormat(textFormat)
-                V_layer.fieldName = '"id" || \' \' || title("nombre")'
+                V_layer.fieldName = '\'Id \'||"id" || \' \' || title("nombre")'
                 V_layer.isExpression = True
                 V_layer.enabled = True
                 V_layer.placement = QgsPalLayerSettings.Curved
@@ -694,7 +694,7 @@ class numeros_exteriores:
                 QtTest.QTest.qWait(500)
 
                 renderer = vlayerV.renderer()
-                symbol1 = QgsLineSymbol.createSimple({'color': 'brown','width':'.3'})
+                symbol1 = QgsLineSymbol.createSimple({'color': '#000000','width':'.3'})
                 renderer.setSymbol(symbol1) 
                 vlayerV.triggerRepaint()
                 QtTest.QTest.qWait(3000)
@@ -1172,7 +1172,7 @@ class numeros_exteriores:
                     curs.execute(qry_c, data_c)
                     rows = curs.fetchall() #one row
                     if len(rows) == 0:
-                        QMessageBox.warning(self.iface.mainWindow(),"Aviso","La distancia no arrojo ningún resultado. Por favor, intente con una mayor o verifique que la cartografía esté actualizada.")
+                        QMessageBox.warning(self.iface.mainWindow(),"Aviso","La distancia no arrojó ningún resultado. Por favor, intente con una mayor o verifique que la cartografía esté actualizada.")
                     else:
                         for row in rows:
       
@@ -1181,7 +1181,7 @@ class numeros_exteriores:
             conn.close()
 
         elif len(distUsuario) == 0:
-            QMessageBox.warning(self.iface.mainWindow(),"Alerta","No ha ingresado una distancia o es invalida.")
+            QMessageBox.warning(self.iface.mainWindow(),"Alerta","No ha ingresado una distancia o es igual o menor que 60m.")
 
     def cveSector_changed(self):
         numero = 1
