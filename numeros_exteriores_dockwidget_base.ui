@@ -793,7 +793,7 @@
            </font>
           </property>
           <property name="text">
-           <string>Seleccione Id de Vialidad Corregida</string>
+           <string>Seleccione Id de Vialidad Actualizada</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
@@ -907,7 +907,7 @@
            </font>
           </property>
           <property name="text">
-           <string>Id Manzana Corregido:</string>
+           <string>Actualizar Id Manzana</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
@@ -1009,9 +1009,9 @@
          <widget class="QPushButton" name="btndistUsuario">
           <property name="geometry">
            <rect>
-            <x>14</x>
+            <x>10</x>
             <y>90</y>
-            <width>241</width>
+            <width>251</width>
             <height>31</height>
            </rect>
           </property>
@@ -1024,7 +1024,7 @@
            </font>
           </property>
           <property name="text">
-           <string>Identificar con Otra Distancia</string>
+           <string>Identificar Con Esta Distancia</string>
           </property>
          </widget>
          <widget class="QPushButton" name="btnSugerir">
