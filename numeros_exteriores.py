@@ -1650,27 +1650,33 @@ class numeros_exteriores:
         #Abrir base
         usr = self.dockwidget.txtUsuario.text()
         pwd = self.dockwidget.txtClave.text()
+        distUsuario = self.dockwidget.distUsuario.text()
         
         #localhost
         #remote Samge bged 
-        conn = psycopg2.connect(database=self.baseDatos, user=usr, password=pwd, host=self.servidor, port="5432")
-    
-        with conn:
+        if len(distUsuario) >= 1:
+
+            conn = psycopg2.connect(database=self.baseDatos, user=usr, password=pwd, host=self.servidor, port="5432")
+
+            with conn:
             
-            qry_c = "select via.id, via.nombre from bged.numeros_exteriores numext, bged.vialidad via where numext.id = %s and st_intersects(st_buffer(numext.geom, {0}, 'side=both'), via.geom);".format(self.dockwidget.distUsuario.text())
-            data_c = (self.campo01, )
+                qry_c = "select via.id, via.nombre from bged.numeros_exteriores numext, bged.vialidad via where numext.id = %s and st_intersects(st_buffer(numext.geom, {0}, 'side=both'), via.geom);".format(distUsuario)
+                data_c = (self.campo01, )
+                with conn.cursor() as curs:
 
-            with conn.cursor() as curs:
+                    curs.execute(qry_c, data_c)
+                    rows = curs.fetchall() #one row
+                    if len(rows) == 0:
+                        QMessageBox.warning(self.iface.mainWindow(),"Aviso","La distancia no arrojo ningún resultado. Por favor, intente con una mayor o verifique que la cartografía esté actualizada.")
+                    else:
+                        for row in rows:
+                            #self.iface.messageBar().pushMessage("Datos row  ", str(row[0]))
+                            idname = str(row[0]) + " : " + row[1].title()
+                            self.dockwidget.idVialidad.addItem(idname)
+            conn.close()
 
-                curs.execute(qry_c, data_c)
-                rows = curs.fetchall() #one row
-
-                for row in rows:
-                    #self.iface.messageBar().pushMessage("Datos row  ", str(row[0]))
-                    idname = str(row[0]) + " : " + row[1].title()
-                    self.dockwidget.idVialidad.addItem(idname)
-
-        conn.close()
+        elif len(distUsuario) == 0:
+            QMessageBox.warning(self.iface.mainWindow(),"Alerta","No ha ingresado una distancia o es invalida.")
 
     def cveSector_changed(self):
         numero = 1
