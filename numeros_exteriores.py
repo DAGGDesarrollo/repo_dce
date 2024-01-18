@@ -505,7 +505,10 @@ class numeros_exteriores:
             self.dockwidget.txtClave.setEnabled(False)
             #self.dockwidget.btnConectar.setEnabled(False)
 
-            QMessageBox.information(self.iface.mainWindow(), "Aviso", "Se realizó la conexión con éxito\nServidor: " + self.servidor + "\nBase de datos: " + self.baseDatos + "\nBienvenido " + usr.split(".")[0].title())
+            if usr == 'postgres':
+                QMessageBox.information(self.iface.mainWindow(),'Aviso',"Se realizó la conexión con éxito...\nIP: " + self.servidor + "\nBase de datos: " + self.baseDatos + "\nBienvenido Admin")
+            else:
+                QMessageBox.information(self.iface.mainWindow(), "Aviso", "Se realizó la conexión con éxito...\nIP: " + self.servidor + "\nBase de datos: " + self.baseDatos + "\nBienvenido " + usr.split(".")[0].title())
             
 
             #print ("I was able to connect to the database")
@@ -522,6 +525,7 @@ class numeros_exteriores:
          
     def btnDesconectar_accion(self):
 
+        usuario = self.dockwidget.txtUsuario.text()
         buttonReply = QMessageBox.question(self.iface.mainWindow(), 'Atención', "¿Confirma que quiere cerrar su sesión?", QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if buttonReply == QMessageBox.Yes:
             if self.conectado == True:
@@ -554,6 +558,10 @@ class numeros_exteriores:
         else:
             pass
         self.iface.mainWindow().show()
+        if usuario == 'postgres':
+            QMessageBox.information(self.iface.mainWindow(),'Información','Se ha cerrado la sesión. \nHasta pronto Admin.')
+        else:
+            QMessageBox.information(self.iface.mainWindow(),'Información','Se ha cerrado la sesión. \nHasta pronto {0}'.format(usuario.split('.')[0].title()))
 
     def on_cveMunicipio_changed(self, value):      
         
