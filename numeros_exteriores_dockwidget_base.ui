@@ -55,10 +55,10 @@
        <widget class="QPushButton" name="btnDesconectar">
         <property name="geometry">
          <rect>
-          <x>320</x>
-          <y>250</y>
-          <width>121</width>
-          <height>41</height>
+          <x>310</x>
+          <y>230</y>
+          <width>131</width>
+          <height>31</height>
          </rect>
         </property>
         <property name="sizePolicy">
@@ -77,30 +77,6 @@
         </property>
         <property name="text">
          <string>Desconectar</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="txtClave">
-        <property name="geometry">
-         <rect>
-          <x>160</x>
-          <y>180</y>
-          <width>281</width>
-          <height>31</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <family>Arial</family>
-          <pointsize>12</pointsize>
-          <weight>50</weight>
-          <bold>false</bold>
-         </font>
-        </property>
-        <property name="inputMask">
-         <string/>
-        </property>
-        <property name="echoMode">
-         <enum>QLineEdit::Password</enum>
         </property>
        </widget>
        <widget class="QLineEdit" name="txtUsuario">
@@ -128,9 +104,9 @@
         <property name="geometry">
          <rect>
           <x>160</x>
-          <y>250</y>
-          <width>111</width>
-          <height>41</height>
+          <y>230</y>
+          <width>131</width>
+          <height>31</height>
          </rect>
         </property>
         <property name="sizePolicy">
@@ -323,9 +299,9 @@
         <property name="geometry">
          <rect>
           <x>160</x>
-          <y>320</y>
+          <y>280</y>
           <width>281</width>
-          <height>41</height>
+          <height>31</height>
          </rect>
         </property>
         <property name="sizePolicy">
@@ -344,6 +320,16 @@
         </property>
         <property name="text">
          <string notr="true">Recomendaciones de Visualización</string>
+        </property>
+       </widget>
+       <widget class="QgsPasswordLineEdit" name="txtClave">
+        <property name="geometry">
+         <rect>
+          <x>160</x>
+          <y>180</y>
+          <width>281</width>
+          <height>31</height>
+         </rect>
         </property>
        </widget>
       </widget>
@@ -1772,6 +1758,13 @@
    </layout>
   </widget>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QgsPasswordLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>qgspasswordlineedit.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
