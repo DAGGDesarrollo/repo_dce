@@ -1683,7 +1683,7 @@
          <widget class="QPushButton" name="btnEliminarSector">
           <property name="geometry">
            <rect>
-            <x>450</x>
+            <x>160</x>
             <y>150</y>
             <width>71</width>
             <height>31</height>
