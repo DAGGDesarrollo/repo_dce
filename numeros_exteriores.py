@@ -98,18 +98,8 @@ class numeros_exteriores:
         self.ultimaEntidad = ""
         self.ultimoMunicipio = ""
 
-
-        self.servidorPrueba = "172.19.122.145"
-        self.baseDatosPrueba = "bged01_desarrollo"
-
-        self.servidor09 = "10.9.0.173"
-        self.baseDatos09 = "bged09"
-
-        self.servidor28 = "10.68.0.103"
-        self.baseDatos28 = "bged28"
-
-        self.servidor = self.servidorPrueba
-        self.baseDatos = self.baseDatosPrueba
+        self.servidor = ''
+        self.baseDatos = ''
 
         self.pluginIsActive = False
         self.dockwidget = None
@@ -329,9 +319,10 @@ class numeros_exteriores:
 
             self.dockwidget.btnDesconectar.setEnabled(False)
 
-            for sector in range(1,4):
-                item = str(sector)
-                self.dockwidget.cveSector.addItem(item)     
+            if self.dockwidget.cveSector.count() == 0:
+                for sector in range(1,4):
+                    item = str(sector)
+                    self.dockwidget.cveSector.addItem(item)     
 
     #lineas agregadas al codigo original
     def btnConectar_accion(self):
@@ -401,11 +392,7 @@ class numeros_exteriores:
             self.dockwidget.txtUsuario.setEnabled(False)
             self.dockwidget.txtClave.setEnabled(False)
 
-
-            if usr == 'postgres':
-                QMessageBox.information(self.iface.mainWindow(),'Aviso',"Se realizó la conexión con éxito...\nIP: " + self.servidor + "\nBase de datos: " + self.baseDatos + "\nBienvenido Admin")
-            else:
-                QMessageBox.information(self.iface.mainWindow(), "Aviso", "Se realizó la conexión con éxito...\nIP: " + self.servidor + "\nBase de datos: " + self.baseDatos + "\nBienvenido " + usr.split(".")[0].title())
+            QMessageBox.information(self.iface.mainWindow(), "Aviso", "Se realizó la conexión con éxito...\nIP: " + self.servidor + "\nBase de datos: " + self.baseDatos + "\nBienvenido " + usr.split(".")[0].title())
 
             return None
         except:
@@ -450,10 +437,7 @@ class numeros_exteriores:
         else:
             pass
         self.iface.mainWindow().show()
-        if usuario == 'postgres':
-            QMessageBox.information(self.iface.mainWindow(),'Información','Se ha cerrado la sesión. \nHasta pronto Admin.')
-        else:
-            QMessageBox.information(self.iface.mainWindow(),'Información','Se ha cerrado la sesión. \nHasta pronto {0}'.format(usuario.split('.')[0].title()))
+        QMessageBox.information(self.iface.mainWindow(),'Información','Se ha cerrado la sesión. \nHasta pronto {0}'.format(usuario.split('.')[0].title()))
 
     def on_cveMunicipio_changed(self, value):      
         
@@ -495,9 +479,6 @@ class numeros_exteriores:
 
                 curs.close()    
             conn.close()
-
-
-
             return None
 
         except:
@@ -992,7 +973,8 @@ class numeros_exteriores:
                     # the string is empty
                     QMessageBox.warning(self.iface.mainWindow(), "Aviso","Debe ingresar el dato Id manzana actualizado para guardar los cambios.")
                     return
-
+            elif IdNumeroManzana.isnumeric == False:
+                QMessageBox.information(self.iface.mainWindow(), "Aviso","Ingrese un Id valido, caracteres especiales o letras no permitidos.\nNo se actualizó el dato de Id manzana, se conserva el actual: " + Id_manzana_actual)
             if IdNumeroVialidad == "":
                 if (Id_vialidad_actual and not Id_vialidad_actual.isspace()) and not Id_vialidad_actual == "None":
                     # the string is non-empty
@@ -1161,6 +1143,9 @@ class numeros_exteriores:
         #remote Samge bged 
         if distUsuario == '':
             QMessageBox.warning(self.iface.mainWindow(),"Alerta","No se ha ingresado una distancia, por favor, ingrese una. \nConsidere que esta debe ser mayor que 60m.")
+
+        elif distUsuario.isnumeric() == False:
+            QMessageBox.warning(self.iface.mainWindow(),"Alerta","Eso no es un valor, por favor, ingrese un valor.")
         
         elif float(distUsuario) <= 60:
             QMessageBox.warning(self.iface.mainWindow(),"Alerta","La distancia ingresada es igual o menor que 60m.")
