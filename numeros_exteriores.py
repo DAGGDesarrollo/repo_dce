@@ -328,10 +328,8 @@ class numeros_exteriores:
                     self.dockwidget.cveEntidad.addItem(str(entidad).zfill(2))
 
             self.dockwidget.btnDesconectar.setEnabled(False)
-            sectores = [1, 2, 3]
 
-
-            for sector in sectores:
+            for sector in range(1,4):
                 item = str(sector)
                 self.dockwidget.cveSector.addItem(item)     
 
@@ -350,12 +348,12 @@ class numeros_exteriores:
         
         if usr is NULL or usr == "" or usr.isspace():
 
-            QMessageBox.warning(self.iface.mainWindow(), "Aviso", "No fue posible ingresar a la base, revise sus credenciales.")
+            QMessageBox.warning(self.iface.mainWindow(), "Aviso", "No fue posible ingresar a la base, por favor, revise sus credenciales.")
             return None     #Realmente sale de la funcion
             
         if pwd is NULL or pwd == "" or pwd.isspace():
 
-            QMessageBox.warning(self.iface.mainWindow(), "Aviso", "No fue posible ingresar a la base, revise sus credenciales.")
+            QMessageBox.warning(self.iface.mainWindow(), "Aviso", "No fue posible ingresar a la base, por favor, revise sus credenciales.")
             return None
  
                 
@@ -420,7 +418,7 @@ class numeros_exteriores:
     def btnDesconectar_accion(self):
 
         usuario = self.dockwidget.txtUsuario.text()
-        buttonReply = QMessageBox.question(self.iface.mainWindow(), 'Atención', "¿Confirma que quiere cerrar su sesión?", QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        buttonReply = QMessageBox.question(self.iface.mainWindow(), 'Atención', "¿Confirma que desea cerrar su sesión?", QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if buttonReply == QMessageBox.Yes:
             if self.conectado == True:
 
@@ -775,7 +773,7 @@ class numeros_exteriores:
             capaactiva = vl.name()
 
             if capaactiva != "NumerosExteriores":
-                QMessageBox.warning(self.iface.mainWindow(), "Alerta", "Por favor seleccione la capa NumerosExteriores, la capa actual es "  + capaactiva)
+                QMessageBox.warning(self.iface.mainWindow(), "Alerta", "Por favor, seleccione la capa NumerosExteriores, la capa actual es "  + capaactiva)
                 return
 
             # get the list of selected ids 
@@ -797,7 +795,7 @@ class numeros_exteriores:
             elif len(ids) == 0: 
                 QMessageBox.warning(self.iface.mainWindow(), "Verifique","No seleccionó ningún elemento.")	
             else:
-                QMessageBox.warning(self.iface.mainWindow(), "Verifique","Debe seleccionar un solo elemento.")	
+                QMessageBox.warning(self.iface.mainWindow(), "Verifique","Debe seleccionar sólo un elemento.")	
         else:
             QMessageBox.warning(self.iface.mainWindow(), "Verifique","No hay capas vectoriales agregadas.")		
         
@@ -873,7 +871,7 @@ class numeros_exteriores:
             elif len(ids) == 0: 
                 QMessageBox.warning(self.iface.mainWindow(), "Verifique","No seleccionó ningún elemento.")	
             else:
-                QMessageBox.warning(self.iface.mainWindow(), "Verifique","Debe seleccionar un solo elemento.")	
+                QMessageBox.warning(self.iface.mainWindow(), "Verifique","Debe seleccionar sólo un elemento.")	
         else:
             QMessageBox.warning(self.iface.mainWindow(), "Verifique","No hay capas vectoriales agregadas.")		
  
@@ -988,11 +986,11 @@ class numeros_exteriores:
             if IdNumeroManzana == "":
                 if (Id_manzana_actual and not Id_manzana_actual.isspace()) and not Id_manzana_actual == "None":
                     # the string is non-empty
-                    QMessageBox.information(self.iface.mainWindow(), "Aviso","No se actualizó el dato de Id manzana corregido, se conserva el actual: " + Id_manzana_actual)
+                    QMessageBox.information(self.iface.mainWindow(), "Aviso","No se actualizó el dato de Id manzana, se conserva el actual: " + Id_manzana_actual)
                     IdNumeroManzana = Id_manzana_actual
                 else:
                     # the string is empty
-                    QMessageBox.warning(self.iface.mainWindow(), "Aviso","Debe ingresar el dato Id manzana corregido para guardar los cambios.")
+                    QMessageBox.warning(self.iface.mainWindow(), "Aviso","Debe ingresar el dato Id manzana actualizado para guardar los cambios.")
                     return
 
             if IdNumeroVialidad == "":
@@ -1008,7 +1006,7 @@ class numeros_exteriores:
 
             if numeroExterior == "" or numeroExterior == "None":
                 # the string is empty
-                QMessageBox.warning(self.iface.mainWindow(), "Aviso","Debe ingresar el dato de Numero Exterior para guardar los cambios.")
+                QMessageBox.warning(self.iface.mainWindow(), "Aviso","Debe ingresar el dato de Número Exterior para guardar los cambios.")
                 return
 
             IdNumeroManzana = IdNumeroManzana.strip()
@@ -1024,7 +1022,7 @@ class numeros_exteriores:
             conn.close()         
 
             #Confirmar
-            QMessageBox.information(self.iface.mainWindow(), "Aviso","Se guardaron los cambios.")
+            QMessageBox.information(self.iface.mainWindow(), "Aviso","Se guardaron los cambios exitosamente.")
 
         except:
 
@@ -1045,6 +1043,8 @@ class numeros_exteriores:
                     puntoInicio = 1
                 else:
                     intervalos = intervalos + "," + str(x)
+        elif(self.dockwidget.txtRIntervalo.text() == ''):
+            QMessageBox.warning(self.iface.mainWindow(), "Aviso", "No ha ingresado un intervalo, por favor, ingrese uno.")
         #Verifica que el valor ingresado como intervalo sea un número
         elif(self.dockwidget.txtRIntervalo.text().isnumeric() == False):
             QMessageBox.warning(self.iface.mainWindow(), "Aviso", "Ingrese un intervalo numérico.")
@@ -1156,15 +1156,21 @@ class numeros_exteriores:
         usr = self.dockwidget.txtUsuario.text()
         pwd = self.dockwidget.txtClave.text()
         distUsuario = self.dockwidget.distUsuario.text()
-        
+
         #localhost
         #remote Samge bged 
-        if len(distUsuario) >= 1:
+        if distUsuario == '':
+            QMessageBox.warning(self.iface.mainWindow(),"Alerta","No se ha ingresado una distancia, por favor, ingrese una. \nConsidere que esta debe ser mayor que 60m.")
+        
+        elif float(distUsuario) <= 60:
+            QMessageBox.warning(self.iface.mainWindow(),"Alerta","La distancia ingresada es igual o menor que 60m.")
+        
+        elif len(distUsuario) >= 2 and float(distUsuario) > 60:
 
             conn = psycopg2.connect(database=self.baseDatos, user=usr, password=pwd, host=self.servidor, port="5432")
 
             with conn:
-            
+
                 qry_c = "select via.id, via.nombre from bged.numeros_exteriores numext, bged.vialidad via where numext.id = %s and st_intersects(st_buffer(numext.geom, {0}, 'side=both'), via.geom);".format(distUsuario)
                 data_c = (self.campo01, )
                 with conn.cursor() as curs:
@@ -1180,8 +1186,7 @@ class numeros_exteriores:
                             self.dockwidget.idVialidad.addItem(idname)
             conn.close()
 
-        elif len(distUsuario) == 0:
-            QMessageBox.warning(self.iface.mainWindow(),"Alerta","No ha ingresado una distancia o es igual o menor que 60m.")
+
 
     def cveSector_changed(self):
         numero = 1
@@ -1340,7 +1345,7 @@ class numeros_exteriores:
 
 
         if (self.SectorNombre[0] == "" and self.SectorNombre[1] == "" and self.SectorNombre[2] == ""):
-            QMessageBox.warning(self.iface.mainWindow(), "Aviso","No se ha capturado ningún sector, por favor capture al menos uno.")
+            QMessageBox.warning(self.iface.mainWindow(), "Aviso","No se ha capturado ningún sector, por favor, capture al menos uno.")
                                 
 
         self.dockwidget.textEdit.setText(intervalos)
