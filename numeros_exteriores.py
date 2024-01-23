@@ -258,7 +258,7 @@ class numeros_exteriores:
 
 
     #--------------------------------------------------------------------------
-
+        
     def onClosePlugin(self):
         """Cleanup necessary items here when plugin dockwidget is closed"""
 
@@ -811,7 +811,7 @@ class numeros_exteriores:
                 self.dockwidget.idVialidad_original.setText(str(result04))
                 
         conn.close()
-            
+
     def btnSugerir_accion(self):
 
         self.campo01 = ""
@@ -1025,8 +1025,9 @@ class numeros_exteriores:
                     puntoInicio = 1
                 else:
                     intervalos = intervalos + "," + str(x)
-        elif(self.dockwidget.txtRIntervalo.text() == ''):
-            QMessageBox.warning(self.iface.mainWindow(), "Aviso", "No ha ingresado un intervalo, por favor, ingrese uno.")
+        #Verifica que se hayan ingresado todos los datos para gnerar la cadena
+        elif (self.dockwidget.txtRinicial.text() == '' or self.dockwidget.txtRfinal.text() == '' or self.dockwidget.txtRIntervalo.text() == ''):
+            QMessageBox.warning(self.iface.mainWindow(), "Aviso", "No ha ingresado valor de inicio, final o rango, por favor, ingrese los tres.")
         #Verifica que el valor ingresado como intervalo sea un número
         elif(self.dockwidget.txtRIntervalo.text().isnumeric() == False):
             QMessageBox.warning(self.iface.mainWindow(), "Aviso", "Ingrese un intervalo numérico.")
@@ -1044,10 +1045,10 @@ class numeros_exteriores:
             numFinal = self.dockwidget.txtRfinal.text().split(letraFinal[0])[0]
             posInicial = ord(letraInicio[0].upper())
             posFinal = ord(letraFinal[0].upper())
-            if numInicio == numFinal:
+            if numInicio == numFinal and posInicial < posFinal:
                 for i in range(posInicial, posFinal + 1, 1):
                     intervaloAlfa = intervaloAlfa + (numInicio + '' + chr(i) + ',')
-            else:
+            elif numInicio != numFinal and posInicial < posFinal:
                 for i in range(int(numInicio),int(numInicio)+1,1):
                     for j in range(posInicial, 91, 1):
                         intervaloAlfa = intervaloAlfa + (str(i) + '' + chr(j) + ',')
@@ -1057,11 +1058,15 @@ class numeros_exteriores:
                 for i in range(int(numFinal),int(numFinal)+1,1):
                     for j in range(int(65), posFinal + 1, 1):
                         intervaloAlfa = intervaloAlfa + (str(i) + '' + chr(j) + ',')
+            elif posInicial > posFinal:
+                QMessageBox.warning(self.iface.mainWindow(), "Aviso", "El orden alfabético es descendente, por favor, verifique e intente de nuevo.")
             intervalos = intervaloAlfa.rstrip(',')
         #self.dockwidget.textEdit.setText(''.join(intervalos))
         cadena1 = self.dockwidget.textEdit.toPlainText()
         if cadena1 == "":
             self.dockwidget.textEdit.setText(intervalos)
+        elif intervalos == "":
+            self.dockwidget.textEdit.setText(cadena1)
         else:
             self.dockwidget.textEdit.setText(cadena1 + "," + intervalos)
 
@@ -1145,7 +1150,7 @@ class numeros_exteriores:
             QMessageBox.warning(self.iface.mainWindow(),"Alerta","No se ha ingresado una distancia, por favor, ingrese una. \nConsidere que esta debe ser mayor que 60m.")
 
         elif distUsuario.isnumeric() == False:
-            QMessageBox.warning(self.iface.mainWindow(),"Alerta","Eso no es un valor, por favor, ingrese un valor.")
+            QMessageBox.warning(self.iface.mainWindow(),"Alerta","Eso no es un valor, por favor, ingrese uno.\nConsidere que el valor de distancia debe ser mayor que 60m.")
         
         elif float(distUsuario) <= 60:
             QMessageBox.warning(self.iface.mainWindow(),"Alerta","La distancia ingresada es igual o menor que 60m.")
