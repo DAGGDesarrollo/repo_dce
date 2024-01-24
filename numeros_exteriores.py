@@ -993,7 +993,7 @@ class numeros_exteriores:
 
             IdNumeroManzana = IdNumeroManzana.strip()
             IdNumeroVialidad = IdNumeroVialidad.strip()
-            numeroExterior = numeroExterior.strip()
+            numeroExterior = numeroExterior.strip().rstrip(',')
 
             data = (IdNumeroManzana,IdNumeroVialidad,numeroExterior,self.campo01)
         
@@ -1338,5 +1338,5 @@ class numeros_exteriores:
             QMessageBox.warning(self.iface.mainWindow(), "Aviso","No se ha capturado ningún sector, por favor, capture al menos uno.")
                                 
 
-        self.dockwidget.textEdit.setText(intervalos)
+        self.dockwidget.textEdit.setText(intervalos.rstrip(','))
 
