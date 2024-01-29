@@ -434,10 +434,10 @@ class numeros_exteriores:
                 self.dockwidget.btnConectar.setEnabled(True)      
 
                 self.conectado = False
+                self.iface.mainWindow().show()
+                QMessageBox.information(self.iface.mainWindow(),'Información','Se ha cerrado la sesión. \nHasta pronto {0}'.format(usuario.split('.')[0].title()))
         else:
             pass
-        self.iface.mainWindow().show()
-        QMessageBox.information(self.iface.mainWindow(),'Información','Se ha cerrado la sesión. \nHasta pronto {0}'.format(usuario.split('.')[0].title()))
 
     def on_cveMunicipio_changed(self, value):      
         
