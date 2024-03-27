@@ -1038,17 +1038,23 @@ class numeros_exteriores:
             QMessageBox.warning(self.iface.mainWindow(), "Aviso", "Si desea crea una cadena de números exteriores con letras consecutivas, por favor, ingrese letra de inicio y fin en orden alfabético.")
         #Crea la cadena de números exteriores usando una letra para los casos 1A, 1B,1C...
         elif(self.dockwidget.txtRinicial.text().isnumeric() == False and self.dockwidget.txtRfinal.text().isnumeric() == False):
+            #Identifica la letra que se ingresó
             letraInicio = re.findall(r'\D',self.dockwidget.txtRinicial.text())
             letraFinal = re.findall(r'\D',self.dockwidget.txtRfinal.text())
+            #Obtiene la parte numérica del texto ingresado
             numInicio = self.dockwidget.txtRinicial.text().split(letraInicio[0])[0]
             numFinal = self.dockwidget.txtRfinal.text().split(letraFinal[0])[0]
+            #Cambia a mayúscula las letras ingresadas
             posInicial = ord(letraInicio[0].upper())
             posFinal = ord(letraFinal[0].upper())
+            #Si los valores ingresados son del tipo 1A - 1C, crea 1A,1B,1C
             if numInicio == numFinal and posInicial < posFinal:
                 for i in range(posInicial, posFinal + 1, 1):
                     intervaloAlfa = intervaloAlfa + (numInicio + '' + chr(i) + ',')
+            #Si los valores ingresados son del tipo 2 - 1, envía alerta
             elif (numInicio > numFinal):
                 QMessageBox.warning(self.iface.mainWindow(), "Aviso", "El orden numérico es descendente, por favor, verifique e intente de nuevo.")          
+            #Si los valores ingresados son del tipo 1A - 2C, crea 1A, 1B, 1C,..., 1Z, 2A, 2B, 2C
             elif numInicio != numFinal and posInicial <= posFinal:
                 for i in range(int(numInicio),int(numInicio)+1,1):
                     for j in range(posInicial, 91, 1):
@@ -1059,6 +1065,7 @@ class numeros_exteriores:
                 for i in range(int(numFinal),int(numFinal)+1,1):
                     for j in range(int(65), posFinal + 1, 1):
                         intervaloAlfa = intervaloAlfa + (str(i) + '' + chr(j) + ',')
+            #Si los valores ingresados son del tipo 1X - 2C, crea 1X, 1Y, 1Z, 2A, 2B, 2C
             elif numInicio <= numFinal and posInicial > posFinal:
                 for i in range(int(numInicio),int(numInicio)+1,1):
                     for j in range(posInicial, 91, 1):
@@ -1069,6 +1076,7 @@ class numeros_exteriores:
                 for i in range(int(numFinal),int(numFinal)+1,1):
                     for j in range(int(65), posFinal + 1, 1):
                         intervaloAlfa = intervaloAlfa + (str(i) + '' + chr(j) + ',')
+            #Si los valores ingresados son iguales, es decir 1A - 1A, envía alerta
             elif (numInicio == numFinal and posInicial == posFinal):
                 QMessageBox.warning(self.iface.mainWindow(), "Aviso", "Ingresó el mismo valor, por favor, verifique e intente de nuevo.")
             intervalos = intervaloAlfa.rstrip(',')
@@ -1081,7 +1089,8 @@ class numeros_exteriores:
             self.dockwidget.textEdit.setText(cadena1 + "," + intervalos)
 
     def btnLimpiarIntervalo(self):
-
+        
+        #Permite limpiar los cuadros de texto
         self.dockwidget.txtRinicial.setText("")
         self.dockwidget.txtRfinal.setText("")
         self.dockwidget.txtRIntervalo.setText("")       
