@@ -13,7 +13,7 @@ Números Exteriores - INE
         copyright            : (C) 2023 by INE, Direccion de Cartografia Electoral, 
                                 Luis Enrique Cortés
         email                : enrique.cortes@ine.mx
-        version              : 3.0
+        version              : 3.0.1
  ***************************************************************************/
 
 /***************************************************************************
@@ -368,7 +368,6 @@ class numeros_exteriores:
             with conn:
 
                 qry_c = "SELECT municipio, nombre from bged.municipio order by municipio asc;"
-                data_c = (self.campo01, )
                 with conn.cursor() as curs:
                     curs.execute(qry_c)
                     n = 1
@@ -754,7 +753,7 @@ class numeros_exteriores:
             capaactiva = vl.name()
 
             if capaactiva != "NumerosExteriores":
-                QMessageBox.warning(self.iface.mainWindow(), "Alerta", "Por favor, seleccione la capa NumerosExteriores, la capa actual es "  + capaactiva)
+                QMessageBox.warning(self.iface.mainWindow(), "Alerta", f"Por favor, seleccione la capa NumerosExteriores, la capa actual es {capaactiva}")
                 return
 
             # get the list of selected ids 
@@ -830,7 +829,7 @@ class numeros_exteriores:
             capaactiva = vl.name()
 
             if capaactiva != "NumerosExteriores":
-                QMessageBox.warning(self.iface.mainWindow(), "Alerta", "Por favor seleccione la capa NumerosExteriores, la capa actual es "  + capaactiva)
+                QMessageBox.warning(self.iface.mainWindow(), "Alerta", f"Por favor seleccione la capa NumerosExteriores, la capa actual es {capaactiva}")
                 return
 
             ids = vl.selectedFeatureIds()
@@ -967,18 +966,18 @@ class numeros_exteriores:
             if IdNumeroManzana == "":
                 if (Id_manzana_actual and not Id_manzana_actual.isspace()) and not Id_manzana_actual == "None":
                     # the string is non-empty
-                    QMessageBox.information(self.iface.mainWindow(), "Aviso","No se actualizó el dato de Id manzana, se conserva el actual: " + Id_manzana_actual)
+                    QMessageBox.information(self.iface.mainWindow(), "Aviso",f"No se actualizó el dato de Id manzana, se conserva el actual: {Id_manzana_actual}")
                     IdNumeroManzana = Id_manzana_actual
                 else:
                     # the string is empty
                     QMessageBox.warning(self.iface.mainWindow(), "Aviso","Debe ingresar el dato Id manzana actualizado para guardar los cambios.")
                     return
             elif IdNumeroManzana.isnumeric == False:
-                QMessageBox.information(self.iface.mainWindow(), "Aviso","Ingrese un Id valido, caracteres especiales o letras no permitidos.\nNo se actualizó el dato de Id manzana, se conserva el actual: " + Id_manzana_actual)
+                QMessageBox.information(self.iface.mainWindow(), "Aviso",f"Ingrese un Id valido, caracteres especiales o letras no permitidos.\nNo se actualizó el dato de Id manzana, se conserva el actual: {Id_manzana_actual}")
             if IdNumeroVialidad == "":
                 if (Id_vialidad_actual and not Id_vialidad_actual.isspace()) and not Id_vialidad_actual == "None":
                     # the string is non-empty
-                    QMessageBox.information(self.iface.mainWindow(), "Aviso","No se actualizó el dato de Identificador de Vialidad más cercano, se conserva el actual: " + Id_vialidad_actual)
+                    QMessageBox.information(self.iface.mainWindow(), "Aviso",f"No se actualizó el dato de Identificador de Vialidad más cercano, se conserva el actual: {Id_vialidad_actual}")
                     IdNumeroVialidad = Id_vialidad_actual
                 else:
                     # the string is empty
@@ -1048,7 +1047,9 @@ class numeros_exteriores:
             if numInicio == numFinal and posInicial < posFinal:
                 for i in range(posInicial, posFinal + 1, 1):
                     intervaloAlfa = intervaloAlfa + (numInicio + '' + chr(i) + ',')
-            elif numInicio != numFinal and posInicial < posFinal:
+            elif (numInicio > numFinal):
+                QMessageBox.warning(self.iface.mainWindow(), "Aviso", "El orden numérico es descendente, por favor, verifique e intente de nuevo.")          
+            elif numInicio != numFinal and posInicial <= posFinal:
                 for i in range(int(numInicio),int(numInicio)+1,1):
                     for j in range(posInicial, 91, 1):
                         intervaloAlfa = intervaloAlfa + (str(i) + '' + chr(j) + ',')
@@ -1058,10 +1059,19 @@ class numeros_exteriores:
                 for i in range(int(numFinal),int(numFinal)+1,1):
                     for j in range(int(65), posFinal + 1, 1):
                         intervaloAlfa = intervaloAlfa + (str(i) + '' + chr(j) + ',')
-            elif posInicial > posFinal:
-                QMessageBox.warning(self.iface.mainWindow(), "Aviso", "El orden alfabético es descendente, por favor, verifique e intente de nuevo.")
+            elif numInicio <= numFinal and posInicial > posFinal:
+                for i in range(int(numInicio),int(numInicio)+1,1):
+                    for j in range(posInicial, 91, 1):
+                        intervaloAlfa = intervaloAlfa + (str(i) + '' + chr(j) + ',')
+                for i in range(int(numInicio)+1,int(numFinal),1):
+                    for j in range(65, 91, 1):
+                        intervaloAlfa = intervaloAlfa + (str(i) + '' + chr(j) + ',')
+                for i in range(int(numFinal),int(numFinal)+1,1):
+                    for j in range(int(65), posFinal + 1, 1):
+                        intervaloAlfa = intervaloAlfa + (str(i) + '' + chr(j) + ',')
+            elif (numInicio == numFinal and posInicial == posFinal):
+                QMessageBox.warning(self.iface.mainWindow(), "Aviso", "Ingresó el mismo valor, por favor, verifique e intente de nuevo.")
             intervalos = intervaloAlfa.rstrip(',')
-        #self.dockwidget.textEdit.setText(''.join(intervalos))
         cadena1 = self.dockwidget.textEdit.toPlainText()
         if cadena1 == "":
             self.dockwidget.textEdit.setText(intervalos)
@@ -1241,10 +1251,10 @@ class numeros_exteriores:
                     self.dockwidget.textEdit.setText(str(self.Sector3))
                 
             else:
-                QMessageBox.warning(self.iface.mainWindow(), "Aviso","No se tienen todos los datos del rango inicio, final e intervalo, El Sector es: " + self.dockwidget.cveSector.currentText())
+                QMessageBox.warning(self.iface.mainWindow(), "Aviso",f"No se tienen todos los datos del rango inicio, final e intervalo, El Sector es: {self.dockwidget.cveSector.currentText()}")
                 return
         else:
-            QMessageBox.warning(self.iface.mainWindow(), "Aviso","No se tiene nombre del sector: " + self.dockwidget.cveSector.currentText())
+            QMessageBox.warning(self.iface.mainWindow(), "Aviso",f"No se tiene nombre del sector: {self.dockwidget.cveSector.currentText()}")
             return
 
     def btnEliminarSector_accion(self):
