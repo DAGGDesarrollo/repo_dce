@@ -253,9 +253,8 @@ class numeros_exteriores:
         self.dockwidget.btnEliminarSector.clicked.connect(self.btnEliminarSector_accion)
 
         self.dockwidget.btnCrearCadena_2.clicked.connect(self.btnCrearCadena_2_accion)
-        
-        #self.dockwidget.btnCancelar.clicked.connect(self.btnCancelar_accion)
 
+        self.dockwidget.btnAgregarLiteralesEspeciales.clicked.connect(self.btnAgregarLiteralesEspeciales)
 
     #--------------------------------------------------------------------------
         
@@ -416,6 +415,9 @@ class numeros_exteriores:
 
                 self.dockwidget.idVialidad_original.setText("")
                 self.dockwidget.idManzana_original.setText("")
+                self.dockwidget.idVialidad.clear()
+                self.dockwidget.idManzana.clear()
+
 
                 self.dockwidget.txtRinicial.setText("")
                 self.dockwidget.txtRfinal.setText("")
@@ -428,6 +430,11 @@ class numeros_exteriores:
 
                 self.dockwidget.cveMunicipio.clear()
                 self.dockwidget.cveSeccion.clear()
+
+                self.dockwidget.distUsuario.setText("")
+                self.dockwidget.checkLl.setChecked(False)
+                self.dockwidget.checkEnne.setChecked(False)
+                self.dockwidget.checkRr.setChecked(False)
 
                 self.dockwidget.btnDesconectar.setEnabled(False)
                 self.dockwidget.btnConectar.setEnabled(True)      
@@ -1027,6 +1034,8 @@ class numeros_exteriores:
         #Verifica que se hayan ingresado todos los datos para gnerar la cadena
         elif (self.dockwidget.txtRinicial.text() == '' or self.dockwidget.txtRfinal.text() == '' or self.dockwidget.txtRIntervalo.text() == ''):
             QMessageBox.warning(self.iface.mainWindow(), "Aviso", "No ha ingresado valor de inicio, final o rango, por favor, ingrese los tres.")
+        elif ('ñ' in self.dockwidget.txtRinicial.text() or 'Ñ' in self.dockwidget.txtRinicial.text() or 'ñ' in self.dockwidget.txtRfinal.text() or 'Ñ' in self.dockwidget.txtRfinal.text()):
+            QMessageBox.warning(self.iface.mainWindow(), "Aviso", "Si desea incluir la letra 'Ñ', por favor, hágalo desde la sección de literarles especiales.")
         #Verifica que el valor ingresado como intervalo sea un número
         elif(self.dockwidget.txtRIntervalo.text().isnumeric() == False):
             QMessageBox.warning(self.iface.mainWindow(), "Aviso", "Ingrese un intervalo numérico.")
@@ -1215,7 +1224,6 @@ class numeros_exteriores:
 
 
     def btnAsignarSector_accion(self):
-        numero = 1
         intervalos = ""
         puntoInicio = 0
         
@@ -1267,7 +1275,6 @@ class numeros_exteriores:
             return
 
     def btnEliminarSector_accion(self):
-        numero = 1
         
         if (int(self.dockwidget.cveSector.currentText()) == 1):
             self.Sector1.clear()
@@ -1295,7 +1302,6 @@ class numeros_exteriores:
         self.dockwidget.txtRIntervalo_2.setText("")
 
     def btnCrearCadena_2_accion(self):
-        numero = 1
 
         intervalos = ""
         puntoInicio = 0
@@ -1359,3 +1365,42 @@ class numeros_exteriores:
 
         self.dockwidget.textEdit.setText(intervalos.rstrip(','))
 
+    def btnAgregarLiteralesEspeciales(self):
+        
+        #Verifica si no se selección alguna opción, de ser cierto, alerta al usuario
+        if self.dockwidget.checkLl.isChecked() == False and self.dockwidget.checkEnne.isChecked() == False and self.dockwidget.checkRr.isChecked() == False: 
+            QMessageBox.warning(self.iface.mainWindow(), "Aviso","No se ha seleccionado ninguna literal especial, por favor, seleccione al menos una.")
+        #Si se selecciona la LL, se inserta en la cadena generada
+        if self.dockwidget.checkLl.isChecked():
+            if 'LL' in self.dockwidget.textEdit.toPlainText():
+                QMessageBox.information(self.iface.mainWindow(), "Aviso","Ya se ha insertado la literal especial 'LL'.")
+            else:
+                inserted_numExt = insertarLetras(self.dockwidget.textEdit.toPlainText(),'L','LL')
+                self.dockwidget.textEdit.setText(inserted_numExt)
+
+        #Si se selecciona la Ñ, se inserta en la cadena generada
+        if self.dockwidget.checkEnne.isChecked():
+            if 'Ñ' in self.dockwidget.textEdit.toPlainText():
+                QMessageBox.information(self.iface.mainWindow(), "Aviso","Ya se ha insertado la literal especial 'Ñ'.")
+            else:
+                inserted_numExt = insertarLetras(self.dockwidget.textEdit.toPlainText(),'N','Ñ')
+                self.dockwidget.textEdit.setText(inserted_numExt)
+        #Si se selecciona la R, se inserta en la cadena generada
+        if self.dockwidget.checkRr.isChecked():
+            if 'RR' in self.dockwidget.textEdit.toPlainText():
+                QMessageBox.information(self.iface.mainWindow(), "Aviso","Ya se ha insertado la literal especial 'RR'.")
+            else:
+                inserted_numExt = insertarLetras(self.dockwidget.textEdit.toPlainText(),'R','RR')
+                self.dockwidget.textEdit.setText(inserted_numExt)
+
+
+#Función que inserta las literales seleccionadas por el usuario
+def insertarLetras(numExt: str,letraBuscada: str,letraInsertada: str):
+    lista = numExt.split(',')
+    #Inserta la letra
+    for position,i in enumerate(lista):
+        if letraBuscada in i:
+            numero = re.findall(r'\d+',i)
+            if i.count(letraBuscada) == 1: lista.insert(position + 1,f'{numero[0]}{letraInsertada}')  
+    nueva_lista = ','.join(lista)
+    return nueva_lista
