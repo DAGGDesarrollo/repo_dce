@@ -326,6 +326,9 @@ class numeros_exteriores:
     #lineas agregadas al codigo original
     def btnConectar_accion(self):
 
+        #Esconde la contraseña al momento de establecerse la conexión, en caso de que el usuario la haya dejado visible
+        self.dockwidget.txtClave.setPasswordVisibility(False)
+        
         if self.conectado == True:
             return
            
@@ -390,7 +393,7 @@ class numeros_exteriores:
             self.dockwidget.txtUsuario.setEnabled(False)
             self.dockwidget.txtClave.setEnabled(False)
 
-            QMessageBox.information(self.iface.mainWindow(), "Aviso", "Se realizó la conexión con éxito...\nIP: " + self.servidor + "\nBase de datos: " + self.baseDatos + "\nBienvenido " + usr.split(".")[0].title())
+            QMessageBox.information(self.iface.mainWindow(), 'Aviso', f'Se realizó la conexión con éxito...\nIP: {self.servidor}\nBase de datos: {self.baseDatos}\nBienvenido {usr.split(".")[0].title()}')
 
             return None
         except:
@@ -441,7 +444,7 @@ class numeros_exteriores:
 
                 self.conectado = False
                 self.iface.mainWindow().show()
-                QMessageBox.information(self.iface.mainWindow(),'Información','Se ha cerrado la sesión. \nHasta pronto {0}'.format(usuario.split('.')[0].title()))
+                QMessageBox.information(self.iface.mainWindow(),'Información',f'Se ha cerrado la sesión. \nHasta pronto {usuario.split(".")[0].title()}.')
         else:
             pass
 
@@ -1286,7 +1289,6 @@ class numeros_exteriores:
             self.SectorRInicial[1]=""
             self.SectorRFinal[1]=""
             self.SectorRIntervalo[1]=""
-
         if (int(self.dockwidget.cveSector.currentText()) == 3):
             self.Sector3.clear()
             self.SectorRInicial[2]=""
