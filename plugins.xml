@@ -4,3 +4,23 @@
 	<download_url>https://github.com/quiqueDevDCE/enriquecortes.github.io.git/numeros_exteriores.zip</download_url>
   </pyqgis_plugin>
 </plugins>
+<plugins>
+    <pyqgis_plugin name="Números Exteriores - INE" version="3.2.0">
+        <description><![CDATA[Repositorio de Plugins del Instituto Nacional Elctoral INE]]></description>
+        <version>3.2.0</version>
+        <qgis_minimum_version>3.16</qgis_minimum_version>
+        <homepage>https://cartografia.ife.org.mx</homepage>
+        <file_name>numeros_exteriores.zip</file_name>
+        <icon>resources/icons/icon.png</icon>
+        <author_name>enrique.cortes</author_name>
+        <download_url>https://github.com/quiqueDevDCE/enriquecortes.github.io.git/numeros_exteriores.zip</download_url>
+        <uploaded_by>Gustry</uploaded_by>
+        <create_date>2024-04-09</create_date>
+        <update_date>2024-04-09</update_date>
+        <experimental>False</experimental>
+        <deprecated>False</deprecated>
+        <tracker>https://github.com/quiqueDevDCE/enriquecortes.github.io.git/issues</tracker>
+        <repository>https://github.com/quiqueDevDCE/enriquecortes.github.io.git</repository>
+        <tags>python</tags>
+    </pyqgis_plugin>
+</plugins>
