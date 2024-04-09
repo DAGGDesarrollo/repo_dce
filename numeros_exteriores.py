@@ -95,6 +95,7 @@ class numeros_exteriores:
 
         self.campo01 = ""
         self.conectado = False
+        self.conectadoflag = 0
         self.ultimaEntidad = ""
         self.ultimoMunicipio = ""
 
@@ -104,11 +105,12 @@ class numeros_exteriores:
         self.pluginIsActive = False
         self.dockwidget = None
 
+        self.control = 0
         self.SectorNombre = ['', '', '']
         self.SectorRInicial = ['', '', '']
         self.SectorRFinal = ['', '', '']
         self.SectorRIntervalo = ['', '', '']
-
+        self.flagSinIntervalo = [False,False,False]
 
         self.Sector1 = []
         self.Sector2 = []
@@ -220,41 +222,41 @@ class numeros_exteriores:
             parent=self.iface.mainWindow())
 
     #--------------------------------------------------------------------------
+    #Sección para conectar el código con los botones de acción con la interfaz gráfica
 
-
-
+        #Botones de Acceso
         self.dockwidget.btnConectar.clicked.connect(self.btnConectar_accion)
         self.dockwidget.btnDesconectar.clicked.connect(self.btnDesconectar_accion)
+        self.dockwidget.btnRecomendaciones.clicked.connect(self.btnRecomendaciones_accion)
 
+        #Botones de Sección
         self.dockwidget.cveMunicipio.currentIndexChanged.connect(self.on_cveMunicipio_changed)
         self.dockwidget.btnObtenerArea.clicked.connect(self.btnObtenerArea_accion)
 
-        self.dockwidget.btnRecomendaciones.clicked.connect(self.btnRecomendaciones_accion)
-
+        #Botones de Edición
         self.dockwidget.btnMostrar.clicked.connect(self.btnMostrar_accion)
-        self.dockwidget.btnSugerir.clicked.connect(self.btnSugerir_accion)
-        
         self.dockwidget.tmaxFont.clicked.connect(self.tmaxFont)
         self.dockwidget.tmedFont.clicked.connect(self.tmedFont)
         self.dockwidget.tminFont.clicked.connect(self.tminFont)
 
-        self.dockwidget.btnInvertir.clicked.connect(self.btnInvertir)
-        self.dockwidget.btnCrearCadena.clicked.connect(self.btnCrearCadena)
-        self.dockwidget.btnGuardar.clicked.connect(self.btnGuardar)
-        self.dockwidget.btnLimpiarIntervalo.clicked.connect(self.btnLimpiarIntervalo)
-        
-        self.dockwidget.btnIdentificar10.clicked.connect(self.btnIdentificar10_accion)
+        #Botones de Validación
         self.dockwidget.btnIdentificar20.clicked.connect(self.btnIdentificar20_accion)
-        self.dockwidget.btnIdentificar10.clicked.connect(self.btnIdentificar10_accion)
+        self.dockwidget.btnIdentificar60.clicked.connect(self.btnIdentificar60_accion)
         self.dockwidget.btndistUsuario.clicked.connect(self.btndistUsuario_accion)
+        self.dockwidget.btnSugerir.clicked.connect(self.btnSugerir_accion)        
+        self.dockwidget.btnGuardar.clicked.connect(self.btnGuardar)
+        
+        #Botones de Cadena
+        self.dockwidget.btnCrearCadena.clicked.connect(self.btnCrearCadena)
+        self.dockwidget.btnInvertir.clicked.connect(self.btnInvertir)
+        self.dockwidget.btnLimpiarIntervalo.clicked.connect(self.btnLimpiarIntervalo)
+        self.dockwidget.btnAgregarLiteralesEspeciales.clicked.connect(self.btnAgregarLiteralesEspeciales)       
 
+        #Botones de Cadena UH
         self.dockwidget.cveSector.currentIndexChanged.connect(self.cveSector_changed)
-        self.dockwidget.btnAsignarSector.clicked.connect(self.btnAsignarSector_accion)
         self.dockwidget.btnEliminarSector.clicked.connect(self.btnEliminarSector_accion)
-
-        self.dockwidget.btnCrearCadena_2.clicked.connect(self.btnCrearCadena_2_accion)
-
-        self.dockwidget.btnAgregarLiteralesEspeciales.clicked.connect(self.btnAgregarLiteralesEspeciales)
+        self.dockwidget.btnAsignarSector.clicked.connect(self.btnAsignarSector_accion)
+        self.dockwidget.btnCrearCadenaUH.clicked.connect(self.btnCrearCadenaUH_accion)
 
     #--------------------------------------------------------------------------
         
@@ -273,7 +275,6 @@ class numeros_exteriores:
         # self.dockwidget = None
 
         self.pluginIsActive = False
-
 
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
@@ -316,7 +317,13 @@ class numeros_exteriores:
                 for entidad in range(1,33):
                     self.dockwidget.cveEntidad.addItem(str(entidad).zfill(2))
 
-            self.dockwidget.btnDesconectar.setEnabled(False)
+            #Utiliza una bandera para saber si ya se ha iniciado una instancia del Plugin
+            #Si se ha iniciado sesión la bandera cambia a 1 y si se cierra la ventana del plugin se mantiene el botón desbloqueado
+            if self.conectadoflag == 1:
+                self.dockwidget.btnDesconectar.setEnabled(True)
+            #Se mantiene el botón bloqueado hasta iniciar sesión
+            else:
+                self.dockwidget.btnDesconectar.setEnabled(False)            
 
             if self.dockwidget.cveSector.count() == 0:
                 for sector in range(1,4):
@@ -326,9 +333,9 @@ class numeros_exteriores:
     #lineas agregadas al codigo original
     def btnConectar_accion(self):
 
+        self.conectadoflag = 1
         #Esconde la contraseña al momento de establecerse la conexión, en caso de que el usuario la haya dejado visible
         self.dockwidget.txtClave.setPasswordVisibility(False)
-        
         if self.conectado == True:
             return
            
@@ -405,8 +412,11 @@ class numeros_exteriores:
          
     def btnDesconectar_accion(self):
 
+        #Pregunta al usuario si desea cerrar su sesión
         usuario = self.dockwidget.txtUsuario.text()
         buttonReply = QMessageBox.question(self.iface.mainWindow(), 'Atención', "¿Confirma que desea cerrar su sesión?", QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        
+        #Si se cierra la sesión se limpian todos los cuadros de textos y se desbloquean nuevamente los cuadros de texto de la pestaña "Acceso"
         if buttonReply == QMessageBox.Yes:
             if self.conectado == True:
 
@@ -438,6 +448,7 @@ class numeros_exteriores:
                 self.dockwidget.checkLl.setChecked(False)
                 self.dockwidget.checkEnne.setChecked(False)
                 self.dockwidget.checkRr.setChecked(False)
+                self.dockwidget.checkSinIntervalo.setChecked(False)
 
                 self.dockwidget.btnDesconectar.setEnabled(False)
                 self.dockwidget.btnConectar.setEnabled(True)      
@@ -445,8 +456,9 @@ class numeros_exteriores:
                 self.conectado = False
                 self.iface.mainWindow().show()
                 QMessageBox.information(self.iface.mainWindow(),'Información',f'Se ha cerrado la sesión. \nHasta pronto {usuario.split(".")[0].title()}.')
+                self.iface.messageBar().pushSuccess('Despedida', f' Hasta luego {usuario.split(".")[0].title()} que tengas buen día.')
         else:
-            pass
+            self.iface.messageBar().pushMessage('Información', f' De acuerdo {usuario.split(".")[0].title()} la sesión continua.')
 
     def on_cveMunicipio_changed(self, value):      
         
@@ -532,10 +544,8 @@ class numeros_exteriores:
                 if layer.name() == "SeccionUnica":
                     QgsProject.instance().removeMapLayer(layer)
 
-
             numeroSeccion = str(self.dockwidget.cveSeccion.currentText())
             numeroMunicipio = str(self.dockwidget.cveMunicipio.currentText().split(" :",1)[0])
-
 
             usr = self.dockwidget.txtUsuario.text()
             pwd = self.dockwidget.txtClave.text()
@@ -545,8 +555,6 @@ class numeros_exteriores:
             uri.setConnection(self.servidor, "5432", self.baseDatos, usr, pwd)
             # set database schema, table name, geometry column and optionally
             # subset (WHERE clause)
-
-
 
             #Capa auxiliar para reconocer la seccion a trabajar
             QtTest.QTest.qWait(100)
@@ -736,7 +744,6 @@ class numeros_exteriores:
     def btnRecomendaciones_accion(self):
         QMessageBox.information(self.iface.mainWindow(), "Aviso", "Para visualizar adecuadamente este Plugin en su pantalla se recomienda utilzar cualquiera de las siguientes resoluciones de pantalla:\n \n-1920 x 1080 \n-2048 x 1152 \n-2560 x 1600.")
         return
-
         
     def btnMostrar_accion(self):
     
@@ -909,33 +916,28 @@ class numeros_exteriores:
         #Ajusta el valor al 100% para concluir la barra de progreso
         conn.close()
         
-    
+    #Aumenta el tamaño del texto en el cuadro de texto de números exteriores al máximo
     def tmaxFont(self):
 
-        
         f = self.dockwidget.textEdit.font()
         f.setPointSize(18)
         self.dockwidget.textEdit.setFont(f)
 
-
-        
+    #Regresa el tamaño del texto en el cuadro de texto de números exteriores al valor original
     def tmedFont(self):
 
         f = self.dockwidget.textEdit.font()
         f.setPointSize(14)
         self.dockwidget.textEdit.setFont(f)
 
-
-        
+    #Disminuye el tamaño del texto en el cuadro de texto de números exteriores al mínimo
     def tminFont(self):
 
-        
         f = self.dockwidget.textEdit.font()
         f.setPointSize(12)
         self.dockwidget.textEdit.setFont(f)
 
-    
-    
+    #Invierte el orden de la cadena del texto en el cuadro de texto de números exteriores   
     def btnInvertir(self):
     
         cadena = self.dockwidget.textEdit.toPlainText()
@@ -1102,17 +1104,19 @@ class numeros_exteriores:
 
     def btnLimpiarIntervalo(self):
         
-        #Permite limpiar los cuadros de texto
+        #Permite limpiar los cuadros de texto y los checkboxes
         self.dockwidget.txtRinicial.setText("")
         self.dockwidget.txtRfinal.setText("")
-        self.dockwidget.txtRIntervalo.setText("")       
+        self.dockwidget.txtRIntervalo.setText("")
+        self.dockwidget.checkLl.setChecked(False)
+        self.dockwidget.checkEnne.setChecked(False)
+        self.dockwidget.checkRr.setChecked(False)       
        
-    def btnIdentificar10_accion(self):
+    def btnIdentificar20_accion(self):
         
         #limpiar datos en combo mediante consulta
         self.dockwidget.idVialidad.clear()
 
-        
         #Abrir base
         usr = self.dockwidget.txtUsuario.text()
         pwd = self.dockwidget.txtClave.text()
@@ -1134,12 +1138,9 @@ class numeros_exteriores:
                     idname = str(row[0]) + " : " + row[1].title()
                     self.dockwidget.idVialidad.addItem(idname)
 
-
         conn.close()
 
-
-
-    def btnIdentificar20_accion(self):
+    def btnIdentificar60_accion(self):
         
         #limpiar datos en combo mediante consulta
         self.dockwidget.idVialidad.clear()
@@ -1207,15 +1208,17 @@ class numeros_exteriores:
                             self.dockwidget.idVialidad.addItem(idname)
             conn.close()
 
-
-
     def cveSector_changed(self):
-        numero = 1
+
+        #Función para el cambio de sector en el combobox
+        #Carga los datos en pantalla según lo que se tenga guardado en memoria
         self.dockwidget.txtNombreSector.setText(self.SectorNombre[int(self.dockwidget.cveSector.currentText())-1])
         self.dockwidget.txtRinicial_2.setText(self.SectorRInicial[int(self.dockwidget.cveSector.currentText())-1])
         self.dockwidget.txtRfinal_2.setText(self.SectorRFinal[int(self.dockwidget.cveSector.currentText())-1])
         self.dockwidget.txtRIntervalo_2.setText(self.SectorRIntervalo[int(self.dockwidget.cveSector.currentText())-1])
+        self.dockwidget.checkSinIntervalo.setChecked(self.flagSinIntervalo[int(self.dockwidget.cveSector.currentText())-1])
 
+        #Carga el contenido de la cadena generada
         if (int(self.dockwidget.cveSector.currentText()) == 1):
             self.dockwidget.textEdit.setText(str(self.Sector1))
         if (int(self.dockwidget.cveSector.currentText()) == 2):
@@ -1223,34 +1226,52 @@ class numeros_exteriores:
         if (int(self.dockwidget.cveSector.currentText()) == 3):
             self.dockwidget.textEdit.setText(str(self.Sector3))
 
-
-
-
     def btnAsignarSector_accion(self):
         intervalos = ""
         puntoInicio = 0
         
+        #verifica que se haya asignado un sector sin intervalo sólo dos veces.
+        if self.flagSinIntervalo.count(True) == 2 and self.control ==2:
+            self.flagSinIntervalo[int(self.dockwidget.cveSector.currentText())-1] = False
+            self.dockwidget.checkSinIntervalo.setChecked(False)
+            QMessageBox.warning(self.iface.mainWindow(),'Aviso',f'Ya se han seleccionado {self.flagSinIntervalo.count(True)} sectores «Sin Intervalo».\nUtilice el botón «Limpiar» para este sector, ingrese un intervalo y comience nuevamente.')
+        #Si se marca el checkbox cambia el valor de la bandera
+        if self.dockwidget.checkSinIntervalo.isChecked() and self.flagSinIntervalo.count(True) <= 2:
+            self.control+=1
+            #Agrega el valor "True" a flagSinIntervalo del sector seleccionado siempre y cuando no haya más de dos sectores seleccionados           
+            self.flagSinIntervalo[int(self.dockwidget.cveSector.currentText())-1] = True
+            #Se alerta que ya se han seleccionado dos sectores y no es posible seleccionar un tercero   
+            QMessageBox.warning(self.iface.mainWindow(),'Aviso',f'Ya se han seleccionado {self.flagSinIntervalo.count(True)} sectores «Sin Intervalo», no podrá seleccionar más de 2.\nSi desea insertar una cadena sin intervalos puede hacerlo manualmente.')
+            
+        #Verifica que se haya ingresado texto en la sección "Nombre de Sector"
+        #Se ingresó texto, lo guarda en la lista con SectorNombre[SectorActual-1], SectorActual-1 para empezar desde la primera posición
         if self.dockwidget.txtNombreSector.text() != "":
             self.SectorNombre[int(self.dockwidget.cveSector.currentText())-1] = self.dockwidget.txtNombreSector.text()
             
-            if self.dockwidget.txtRinicial_2.text() != "" and self.dockwidget.txtRfinal_2.text() != "" and self.dockwidget.txtRIntervalo_2.text() != "":
+            #Si se ingresaron todos los datos de inicio, final e intervalo del rango se guargan en la lista de cada rango, en la posición del sector actual menos uno para empezar desde la primera posición
+            if self.dockwidget.txtRinicial_2.text() != "" and self.dockwidget.txtRinicial_2.text().isnumeric() and self.dockwidget.txtRfinal_2.text() != "" and self.dockwidget.txtRfinal_2.text().isnumeric and self.dockwidget.txtRIntervalo_2.text() != "" and self.dockwidget.txtRIntervalo_2.text().isnumeric():
 
                 self.SectorRInicial[int(self.dockwidget.cveSector.currentText())-1] = self.dockwidget.txtRinicial_2.text()
                 self.SectorRFinal[int(self.dockwidget.cveSector.currentText())-1] = self.dockwidget.txtRfinal_2.text()
                 self.SectorRIntervalo[int(self.dockwidget.cveSector.currentText())-1] = self.dockwidget.txtRIntervalo_2.text()
 
+                #Se crea la cadena de numeros con los valores ingresados por el usuario
                 for x in range(int(self.dockwidget.txtRinicial_2.text()), int(self.dockwidget.txtRfinal_2.text())+1, int(self.dockwidget.txtRIntervalo_2.text())):
+                    
+                    #Si no existe cadena de números exteriores en el cuadro de texto, se crea
                     if puntoInicio == 0:
                         intervalos = intervalos + str(x)
                         puntoInicio = 1
 
+                        #Dependiendo el sector se agrega el valor
                         if (int(self.dockwidget.cveSector.currentText()) == 1):
                             self.Sector1.append(str(x))
                         if (int(self.dockwidget.cveSector.currentText()) == 2):
                             self.Sector2.append(str(x))
                         if (int(self.dockwidget.cveSector.currentText()) == 3):
                             self.Sector3.append(str(x))
-
+                    
+                    #Si existe una cadena de números exteriores se crea y se pega al final de la existente según sea el sector
                     else:
                         intervalos = intervalos + "," + str(x)
                         appendString = "," + str(x)
@@ -1262,23 +1283,93 @@ class numeros_exteriores:
                         if (int(self.dockwidget.cveSector.currentText()) == 3):
                             self.Sector3.append(appendString)
 
-
+                #Dependiendo el sector en turno, se agregan los datos a la pantalla
                 if (int(self.dockwidget.cveSector.currentText()) == 1):
                     self.dockwidget.textEdit.setText(str(self.Sector1))
                 if (int(self.dockwidget.cveSector.currentText()) == 2):
                     self.dockwidget.textEdit.setText(str(self.Sector2))
                 if (int(self.dockwidget.cveSector.currentText()) == 3):
                     self.dockwidget.textEdit.setText(str(self.Sector3))
-                
-            else:
-                QMessageBox.warning(self.iface.mainWindow(), "Aviso",f"No se tienen todos los datos del rango inicio, final e intervalo, El Sector es: {self.dockwidget.cveSector.currentText()}")
+            
+            #Si el usuario ingresa letras en los cuadros de texto para inicio, fin e intervalo se alerta a este
+            elif (self.dockwidget.txtRinicial_2.text().isnumeric() == False and self.dockwidget.txtRinicial_2.text() != '') or (self.dockwidget.txtRfinal_2.text().isnumeric == False and self.dockwidget.txtRfinal_2.text() != '') or (self.dockwidget.txtRIntervalo_2.text().isnumeric() == False and self.dockwidget.txtRIntervalo_2.text() != ''):
+                QMessageBox.warning(self.iface.mainWindow(), "Aviso","Por favor, ingrese sólo valores para inicio, final e intervalo.")
+            
+            #Si no se ha ingresado algún o ninún valor de inicio, fin e intervalo del rango se alerta al usuario
+            elif self.dockwidget.txtRinicial_2.text() == "" and self.dockwidget.txtRfinal_2.text() == "" and self.dockwidget.txtRIntervalo_2.text() == "" and (self.dockwidget.checkSinIntervalo.isChecked() or self.flagSinIntervalo[int(self.dockwidget.cveSector.currentText())-1] == True):
+                QMessageBox.information(self.iface.mainWindow(), "Aviso",f"Se marcó la casilla «Sin Intervalo», se ignorarán los valores de inicio, fin e intervalo para el sector {self.dockwidget.cveSector.currentText()}.")
+
+                if (int(self.dockwidget.cveSector.currentText()) == 1):
+                    self.Sector1 = ['']
+                if (int(self.dockwidget.cveSector.currentText()) == 2):
+                    self.Sector2 = ['']
+                if (int(self.dockwidget.cveSector.currentText()) == 3):
+                    self.Sector3 = ['']
+    
+            #Si no se han ingresado todos los datos se alerta al usuario
+            elif self.dockwidget.txtRinicial_2.text() == "" or self.dockwidget.txtRfinal_2.text() == "" or self.dockwidget.txtRIntervalo_2.text() == "" and (self.dockwidget.checkSinIntervalo.isChecked() == False or self.flagSinIntervalo[int(self.dockwidget.cveSector.currentText())-1] == False):
+                QMessageBox.warning(self.iface.mainWindow(), "Aviso",f"Por favor, ingrese todos los datos de inicio, final e intervalo del rango para el sector {self.dockwidget.cveSector.currentText()}.")
                 return
+            
+        #Si no se ingesó texto en el Nombre del Sector se alerta el usuario
         else:
-            QMessageBox.warning(self.iface.mainWindow(), "Aviso",f"No se tiene nombre del sector: {self.dockwidget.cveSector.currentText()}")
+            QMessageBox.warning(self.iface.mainWindow(), "Aviso",f"No ha ingresado ningún nombre para el sector {self.dockwidget.cveSector.currentText()}.")
             return
+    
+    def btnCrearCadenaUH_accion(self): 
+
+        intervalos = ""
+
+        #Verifica que se tengan datos en los tres sectores y que el checkbox no esté marcado, si se cumple, avanza
+        if self.SectorNombre[0] != "" and self.SectorNombre[1] != "" and self.SectorNombre[2] != "":
+            for i in range(len(self.Sector1)):
+                for j in range(len(self.Sector2)):
+                    for k in range(len(self.Sector3)):
+                        intervalos = f"{intervalos}{self.SectorNombre[0]} {self.Sector1[i].replace(',', '')} {self.SectorNombre[1]} {self.Sector2[j].replace(',', '')} {self.SectorNombre[2]} {self.Sector3[k].replace(',', '')},"
+                
+        #Si sólo se tinen los datos del primer sector se ejecuta esta parte
+        if (self.SectorNombre[0] != "" and self.SectorNombre[1] == "" and self.SectorNombre[2] == ""):
+            for i in range(len(self.Sector1)):
+                intervalos = f"{intervalos}{self.SectorNombre[0]} {self.Sector1[i].replace(',', '')},"
+
+        #Si sólo se tinen los datos del segundo sector se ejecuta esta parte
+        if (self.SectorNombre[0] == "" and self.SectorNombre[1] != "" and self.SectorNombre[2] == ""):
+            for j in range(len(self.Sector2)):
+                intervalos = f"{intervalos}{self.SectorNombre[1]} {self.Sector2[j].replace(',', '')},"
+
+        #Si sólo se tinen los datos del trecer sector se ejecuta esta parte
+        if (self.SectorNombre[0] == "" and self.SectorNombre[1] == "" and self.SectorNombre[2] != ""):
+            for k in range(len(self.Sector3)):
+                intervalos = f"{intervalos}{self.SectorNombre[2]} {self.Sector3[k].replace(',', '')},"
+
+        #Si sólo se tinen los datos del primer y segundo sector se ejecuta esta parte
+        if (self.SectorNombre[0] != "" and self.SectorNombre[1] != "" and self.SectorNombre[2] == ""):
+            for i in range(len(self.Sector1)):
+                for j in range(len(self.Sector2)):
+                    intervalos = f"{intervalos}{self.SectorNombre[0]} {self.Sector1[i].replace(',', '')} {self.SectorNombre[1]} {self.Sector2[j].replace(',', '')},"
+ 
+        #Si sólo se tinen los datos del primer y tercer se ejecuta esta parte
+        if (self.SectorNombre[0] == "" and self.SectorNombre[1] != "" and self.SectorNombre[2] != ""):
+            for j in range(len(self.Sector2)):
+                for k in range(len(self.Sector3)):
+                    intervalos = f"{intervalos}{self.SectorNombre[1]} {self.Sector2[j].replace(',', '')} {self.SectorNombre[2]} {self.Sector3[k].replace(',', '')},"
+
+        #Si sólo se tinen los datos del segundo y terver sector se ejecuta esta parte
+        if (self.SectorNombre[0] != "" and self.SectorNombre[1] == "" and self.SectorNombre[2] != ""):
+            for i in range(len(self.Sector1)):
+                for k in range(len(self.Sector3)):
+                    intervalos = f"{intervalos}{self.SectorNombre[0]} {self.Sector1[i].replace(',', '')} {self.SectorNombre[2]} {self.Sector3[k].replace(',', '')},"
+
+        #Si no se ha ingresado ningún dato en nigún sector, se alerta al usuario
+        if (self.SectorNombre[0] == "" and self.SectorNombre[1] == "" and self.SectorNombre[2] == ""):
+            QMessageBox.warning(self.iface.mainWindow(), "Aviso","No se ha ingresado ningún dato en ningún sector, por favor, capture al menos uno.")
+                            
+        #Quita la coma del final de la cadena
+        self.dockwidget.textEdit.setText(intervalos.rstrip(',').replace('  ',' '))
 
     def btnEliminarSector_accion(self):
         
+        #Elimina los datos ingresados según el sector seleccionado
         if (int(self.dockwidget.cveSector.currentText()) == 1):
             self.Sector1.clear()
             self.SectorRInicial[0]=""
@@ -1293,85 +1384,24 @@ class numeros_exteriores:
             self.Sector3.clear()
             self.SectorRInicial[2]=""
             self.SectorRFinal[2]=""
-            self.SectorRIntervalo[2]=""
-
-
-        self.SectorNombre[int(self.dockwidget.cveSector.currentText())-1] = ""
+            self.SectorRIntervalo[2]=""  
+        self.control = 0         
+        self.SectorNombre[int(self.dockwidget.cveSector.currentText())-1] = ""      
+        self.flagSinIntervalo[int(self.dockwidget.cveSector.currentText())-1] = False
         
+        #Elimina los datos de las cajas de texto de Nombre, Inicio, Final e Intervalo
         self.dockwidget.txtNombreSector.setText("")
         self.dockwidget.txtRinicial_2.setText("")
         self.dockwidget.txtRfinal_2.setText("")
         self.dockwidget.txtRIntervalo_2.setText("")
-
-    def btnCrearCadena_2_accion(self):
-
-        intervalos = ""
-        puntoInicio = 0
-        #btnCrearCadena
-
-        if (self.SectorNombre[0] != "" and self.SectorNombre[1] != "" and self.SectorNombre[2] != ""):
-            for i in range(len(self.Sector1)):
-                if puntoInicio == 0:
-                    for j in range(len(self.Sector2)):
-                        for k in range(len(self.Sector3)):
-                            intervalos = intervalos + self.SectorNombre[0] + self.Sector1[i].replace(',', '') + " " + self.SectorNombre[1] + self.Sector2[j].replace(',', '') + " " + self.SectorNombre[2] + self.Sector3[k].replace(',', '') + ","
-
-        
-        if (self.SectorNombre[0] != "" and self.SectorNombre[1] == "" and self.SectorNombre[2] == ""):
-            for i in range(len(self.Sector1)):
-                if puntoInicio == 0:
-                    intervalos = intervalos + self.SectorNombre[0] + self.Sector1[i].replace(',', '') + ","
-
-        
-        if (self.SectorNombre[0] == "" and self.SectorNombre[1] != "" and self.SectorNombre[2] == ""):
-
-                if puntoInicio == 0:
-                    for j in range(len(self.Sector2)):
-                        intervalos = intervalos + self.SectorNombre[1] + self.Sector2[j].replace(',', '') + ","
-
-
-        if (self.SectorNombre[0] == "" and self.SectorNombre[1] == "" and self.SectorNombre[2] != ""):
-
-                if puntoInicio == 0:
-
-                        for k in range(len(self.Sector3)):
-                            intervalos = intervalos + self.SectorNombre[2] + self.Sector3[k].replace(',', '') + ","
-
-
-        if (self.SectorNombre[0] != "" and self.SectorNombre[1] != "" and self.SectorNombre[2] == ""):
-            for i in range(len(self.Sector1)):
-                if puntoInicio == 0:
-                    for j in range(len(self.Sector2)):
-                        intervalos = intervalos + self.SectorNombre[0] + self.Sector1[i].replace(',', '') + " " + self.SectorNombre[1] + self.Sector2[j].replace(',', '') + ","
- 
-
-        if (self.SectorNombre[0] == "" and self.SectorNombre[1] != "" and self.SectorNombre[2] != ""):
-
-                if puntoInicio == 0:
-                    for j in range(len(self.Sector2)):
-                        for k in range(len(self.Sector3)):
-                            intervalos = intervalos + self.SectorNombre[1] + self.Sector2[j].replace(',', '') + " " + self.SectorNombre[2] + self.Sector3[k].replace(',', '') + ","
-
-
-        if (self.SectorNombre[0] != "" and self.SectorNombre[1] == "" and self.SectorNombre[2] != ""):
-            for i in range(len(self.Sector1)):
-                if puntoInicio == 0:
-        
-                        for k in range(len(self.Sector3)):
-                            intervalos = intervalos + self.SectorNombre[0] + self.Sector1[i].replace(',', '') + " " + self.SectorNombre[2] + self.Sector3[k].replace(',', '') + ","
-
-
-        if (self.SectorNombre[0] == "" and self.SectorNombre[1] == "" and self.SectorNombre[2] == ""):
-            QMessageBox.warning(self.iface.mainWindow(), "Aviso","No se ha capturado ningún sector, por favor, capture al menos uno.")
-                                
-
-        self.dockwidget.textEdit.setText(intervalos.rstrip(','))
+        self.dockwidget.checkSinIntervalo.setChecked(False)       
 
     def btnAgregarLiteralesEspeciales(self):
         
         #Verifica si no se selección alguna opción, de ser cierto, alerta al usuario
         if self.dockwidget.checkLl.isChecked() == False and self.dockwidget.checkEnne.isChecked() == False and self.dockwidget.checkRr.isChecked() == False: 
             QMessageBox.warning(self.iface.mainWindow(), "Aviso","No se ha seleccionado ninguna literal especial, por favor, seleccione al menos una.")
+
         #Si se selecciona la LL, se inserta en la cadena generada
         if self.dockwidget.checkLl.isChecked():
             if 'LL' in self.dockwidget.textEdit.toPlainText():
@@ -1387,6 +1417,7 @@ class numeros_exteriores:
             else:
                 inserted_numExt = insertarLetras(self.dockwidget.textEdit.toPlainText(),'N','Ñ')
                 self.dockwidget.textEdit.setText(inserted_numExt)
+
         #Si se selecciona la R, se inserta en la cadena generada
         if self.dockwidget.checkRr.isChecked():
             if 'RR' in self.dockwidget.textEdit.toPlainText():
