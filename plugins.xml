@@ -4,10 +4,10 @@
         <version>3.2.0</version>
         <qgis_minimum_version>3.28</qgis_minimum_version>
         <homepage>https://cartografia.ife.org.mx</homepage>
-        <file_name>numeros_exteriores.zip</file_name>
+        <file_name>numeros_exteriores.3.2.0.zip</file_name>
         <icon>resources/icons/icon.png</icon>
         <author_name>enrique.cortes</author_name>
-        <download_url>https://github.com/quiqueDevDCE/ine_dce.github.io/numeros_exteriores.zip</download_url>
+        <download_url>https://github.com/quiqueDevDCE/ine_dce.github.io/numeros_exteriores.3.2.0.zip</download_url>
         <uploaded_by>LuisEnriqueCortes</uploaded_by>
         <create_date>2024-04-09</create_date>
         <update_date>2024-04-09</update_date>
