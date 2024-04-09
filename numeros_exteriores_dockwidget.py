@@ -8,8 +8,8 @@
                              -------------------
         begin                : 2023-04-25
         git sha              : $Format:%H$
-        copyright            : (C) 2023 by INE, Direccion de Cartografia Electoral, Saul Valencia
-        email                : luissaul.valencia@ine.mx
+        copyright            : (C) 2023 by INE, Direccion de Cartografia Electoral, Luis Enrique Cortés
+        email                : enrique.cortes@ine.mx
  ***************************************************************************/
 
 /***************************************************************************
