@@ -1,7 +1,0 @@
-<plugins>
-  <pyqgis_plugin name="Números Exteriores - INE" version="3.0.1">
-    <qgis_minimum_version>3.0.0</qgis_minimum_version>
-      <file_name>FolderName.SomeInfo</file_name>
-	  <download_url>https://github.com/quiqueDevDCE/numeros_exteriores_dce/numeros_exteriores.zip</download_url>
-  </pyqgis_plugin>
-</plugins>
