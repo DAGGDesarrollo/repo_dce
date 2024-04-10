@@ -1,5 +1,4 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
-<?xml-stylesheet type="text/xsl" href="/static/static/style/plugins.xsl" ?>
 <plugins>
     <pyqgis_plugin name="Números Exteriores - INE" version="3.2.0">
         <description><![CDATA[Este Plugin otorga herramientas para el procesamiento, depuración y actualización de los números exteriores pertenecientes a la cartografía electoral generada para la Dirección de Cartografía Electoral del Instituto Nacional Electoral (INE).]]></description>
@@ -8,19 +7,19 @@
         <trusted>True</trusted>
         <qgis_minimum_version>3.0.0</qgis_minimum_version>
         <qgis_maximum_version>3.99.0</qgis_maximum_version>
-        <homepage><![CDATA[https://cartografia.ife.org.mx]]></homepage>
+        <homepage>https://cartografia.ife.org.mx</homepage>
         <file_name>numeros_exteriores.3.2.0.zip</file_name>
         <icon>resources/icons/icon.png</icon>
-        <author_name><![CDATA[Luis Enrique Cortés]]></author_name>
-        <download_url>https://github.com/quiqueDevDCE/ine_dce.github.io/</download_url>
-        <uploaded_by><![CDATA[LuisEnriqueCortes]]></uploaded_by>
+        <author_name>Luis Enrique Cortés</author_name>
+        <download_url>https://github.com/LuiseCortes/numeros_exteriores_dce/releases/download/3.2.0/numeros_exteriores.3.2.0.zip</download_url>
+        <uploaded_by>LuisEnriqueCortes></uploaded_by>
         <create_date>2024-04-09</create_date>
         <update_date>2024-04-09</update_date>
         <experimental>False</experimental>
         <deprecated>False</deprecated>
-        <tracker><![CDATA[https://github.com/quiqueDevDCE/ine_dce.github.io/issues]]></tracker>
-        <repository><![CDATA[https://github.com/quiqueDevDCE/ine_dce.github.io]]></repository>
-        <tags><![CDATA[python,database]]></tags>
+        <tracker>https://github.com/LuiseCortes/numeros_exteriores_dce/issues</tracker>
+        <repository>https://github.com/LuiseCortes/numeros_exteriores_dce</repository>
+        <tags>python,database></tags>
         <external_dependencies></external_dependencies>
         <server>False</server>
     </pyqgis_plugin>
