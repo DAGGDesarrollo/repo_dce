@@ -1405,26 +1405,23 @@ class numeros_exteriores:
         #Si se selecciona la LL, se inserta en la cadena generada
         if self.dockwidget.checkLl.isChecked():
             if 'LL' in self.dockwidget.textEdit.toPlainText():
-                QMessageBox.information(self.iface.mainWindow(), "Aviso","Ya se ha insertado la literal especial 'LL'.")
+                QMessageBox.information(self.iface.mainWindow(), "Aviso","Ya se ha insertado la literal especial «LL».")
             else:
-                inserted_numExt = insertarLetras(self.dockwidget.textEdit.toPlainText(),'L','LL')
-                self.dockwidget.textEdit.setText(inserted_numExt)
+                self.dockwidget.textEdit.setText(insertarLetras(self.dockwidget.textEdit.toPlainText(),'L','LL'))
 
         #Si se selecciona la Ñ, se inserta en la cadena generada
         if self.dockwidget.checkEnne.isChecked():
             if 'Ñ' in self.dockwidget.textEdit.toPlainText():
-                QMessageBox.information(self.iface.mainWindow(), "Aviso","Ya se ha insertado la literal especial 'Ñ'.")
+                QMessageBox.information(self.iface.mainWindow(), "Aviso","Ya se ha insertado la literal especial «Ñ».")
             else:
-                inserted_numExt = insertarLetras(self.dockwidget.textEdit.toPlainText(),'N','Ñ')
-                self.dockwidget.textEdit.setText(inserted_numExt)
+                self.dockwidget.textEdit.setText(insertarLetras(self.dockwidget.textEdit.toPlainText(),'N','Ñ'))
 
         #Si se selecciona la R, se inserta en la cadena generada
         if self.dockwidget.checkRr.isChecked():
             if 'RR' in self.dockwidget.textEdit.toPlainText():
-                QMessageBox.information(self.iface.mainWindow(), "Aviso","Ya se ha insertado la literal especial 'RR'.")
+                QMessageBox.information(self.iface.mainWindow(), "Aviso","Ya se ha insertado la literal especial «RR».")
             else:
-                inserted_numExt = insertarLetras(self.dockwidget.textEdit.toPlainText(),'R','RR')
-                self.dockwidget.textEdit.setText(inserted_numExt)
+                self.dockwidget.textEdit.setText(insertarLetras(self.dockwidget.textEdit.toPlainText(),'R','RR'))
 
 
 #Función que inserta las literales seleccionadas por el usuario
