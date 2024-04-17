@@ -307,8 +307,7 @@ class numeros_exteriores:
             # connect to provide cleanup on closing of dockwidget
             self.dockwidget.closingPlugin.connect(self.onClosePlugin)
 
-            # show the dockwidget
-            # TODO: fix to allow choice of dock location
+            # Muestra el Dockwidget del lado derecho cuando se abre
             self.iface.addDockWidget(Qt.RightDockWidgetArea, self.dockwidget)
             self.dockwidget.show()
 
@@ -1241,7 +1240,7 @@ class numeros_exteriores:
             #Agrega el valor "True" a flagSinIntervalo del sector seleccionado siempre y cuando no haya más de dos sectores seleccionados           
             self.flagSinIntervalo[int(self.dockwidget.cveSector.currentText())-1] = True
             #Se alerta que ya se han seleccionado dos sectores y no es posible seleccionar un tercero   
-            QMessageBox.warning(self.iface.mainWindow(),'Aviso',f'Ya se han seleccionado {self.flagSinIntervalo.count(True)} sectores «Sin Intervalo», no podrá seleccionar más de 2.\nSi desea insertar una cadena sin intervalos puede hacerlo manualmente.')
+            QMessageBox.information(self.iface.mainWindow(),'Aviso',f'Ya se han seleccionado {self.flagSinIntervalo.count(True)} sectores «Sin Intervalo», no podrá seleccionar más de 2.\nSi desea insertar una cadena sin intervalos puede hacerlo manualmente.')
             
         #Verifica que se haya ingresado texto en la sección "Nombre de Sector"
         #Se ingresó texto, lo guarda en la lista con SectorNombre[SectorActual-1], SectorActual-1 para empezar desde la primera posición
@@ -1405,26 +1404,23 @@ class numeros_exteriores:
         #Si se selecciona la LL, se inserta en la cadena generada
         if self.dockwidget.checkLl.isChecked():
             if 'LL' in self.dockwidget.textEdit.toPlainText():
-                QMessageBox.information(self.iface.mainWindow(), "Aviso","Ya se ha insertado la literal especial 'LL'.")
+                QMessageBox.information(self.iface.mainWindow(), "Aviso","Ya se ha insertado la literal especial «LL».")
             else:
-                inserted_numExt = insertarLetras(self.dockwidget.textEdit.toPlainText(),'L','LL')
-                self.dockwidget.textEdit.setText(inserted_numExt)
+                self.dockwidget.textEdit.setText(insertarLetras(self.dockwidget.textEdit.toPlainText(),'L','LL'))
 
         #Si se selecciona la Ñ, se inserta en la cadena generada
         if self.dockwidget.checkEnne.isChecked():
             if 'Ñ' in self.dockwidget.textEdit.toPlainText():
-                QMessageBox.information(self.iface.mainWindow(), "Aviso","Ya se ha insertado la literal especial 'Ñ'.")
+                QMessageBox.information(self.iface.mainWindow(), "Aviso","Ya se ha insertado la literal especial «Ñ».")
             else:
-                inserted_numExt = insertarLetras(self.dockwidget.textEdit.toPlainText(),'N','Ñ')
-                self.dockwidget.textEdit.setText(inserted_numExt)
+                self.dockwidget.textEdit.setText(insertarLetras(self.dockwidget.textEdit.toPlainText(),'N','Ñ'))
 
         #Si se selecciona la R, se inserta en la cadena generada
         if self.dockwidget.checkRr.isChecked():
             if 'RR' in self.dockwidget.textEdit.toPlainText():
-                QMessageBox.information(self.iface.mainWindow(), "Aviso","Ya se ha insertado la literal especial 'RR'.")
+                QMessageBox.information(self.iface.mainWindow(), "Aviso","Ya se ha insertado la literal especial «RR».")
             else:
-                inserted_numExt = insertarLetras(self.dockwidget.textEdit.toPlainText(),'R','RR')
-                self.dockwidget.textEdit.setText(inserted_numExt)
+                self.dockwidget.textEdit.setText(insertarLetras(self.dockwidget.textEdit.toPlainText(),'R','RR'))
 
 
 #Función que inserta las literales seleccionadas por el usuario
