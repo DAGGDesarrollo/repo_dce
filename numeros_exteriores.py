@@ -1240,7 +1240,7 @@ class numeros_exteriores:
             #Agrega el valor "True" a flagSinIntervalo del sector seleccionado siempre y cuando no haya más de dos sectores seleccionados           
             self.flagSinIntervalo[int(self.dockwidget.cveSector.currentText())-1] = True
             #Se alerta que ya se han seleccionado dos sectores y no es posible seleccionar un tercero   
-            QMessageBox.warning(self.iface.mainWindow(),'Aviso',f'Ya se han seleccionado {self.flagSinIntervalo.count(True)} sectores «Sin Intervalo», no podrá seleccionar más de 2.\nSi desea insertar una cadena sin intervalos puede hacerlo manualmente.')
+            QMessageBox.information(self.iface.mainWindow(),'Aviso',f'Ya se han seleccionado {self.flagSinIntervalo.count(True)} sectores «Sin Intervalo», no podrá seleccionar más de 2.\nSi desea insertar una cadena sin intervalos puede hacerlo manualmente.')
             
         #Verifica que se haya ingresado texto en la sección "Nombre de Sector"
         #Se ingresó texto, lo guarda en la lista con SectorNombre[SectorActual-1], SectorActual-1 para empezar desde la primera posición
