@@ -747,7 +747,7 @@ class numeros_exteriores:
     def btnRecomendaciones_accion(self):
         
         try:
-            QMessageBox.information(self.iface.mainWindow(), "Aviso", "Para visualizar adecuadamente este Plugin en su pantalla se recomienda utilzar cualquiera de las siguientes resoluciones de pantalla:\n \n-1920 x 1080 \n-2048 x 1152 \n-2560 x 1600.")
+            QMessageBox.information(self.iface.mainWindow(), "Aviso", "Para visualizar adecuadamente este Plugin en su pantalla se recomienda utilzar cualquiera de las siguientes resoluciones de pantalla:\n \n-1920 x 1080 \n-2048 x 1152 \n-2560 x 1600.\n\nAdemás, para completar la configuración, por favor, seleccione el 100% para 'Escala y Diseño' en la configuración.")
         
         except Exception as error:
             QMessageBox.critical(self.iface.mainWindow(), "¡Oops!",f"Ocurrió un error al mostrar las recomendaciones. \nMotivo: \n{error}.\n Se escribe en el registro.")
