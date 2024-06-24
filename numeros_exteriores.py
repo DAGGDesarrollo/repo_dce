@@ -403,18 +403,13 @@ class numeros_exteriores:
             self.dockwidget.txtClave.setEnabled(False)
 
             QMessageBox.information(self.iface.mainWindow(), 'Aviso', f'Se realizó la conexión con éxito...\nIP: {self.servidor}\nBase de datos: {self.baseDatos}\nBienvenido {usr.split(".")[0].title()}')
-
             return None
 
-        except Exception as error:
-            self.iface.messageBar().pushMessage("Mensaje", "No se logró ingresar a la Base.")
-            QMessageBox.critical(self.iface.mainWindow(), "¡Oops!",f"Ocurrió un error al cambiar el municipio. \nMotivo: \n{error}.\n Se escribe en el registro.")
-            conn.close()
+        except psycopg2.Error as error:
+            self.iface.messageBar().pushMessage("Mensaje", "No se logró ingresar a la Base. Si el error persiste levante un caso CAU para recibir asistencia.")
+            QMessageBox.critical(self.iface.mainWindow(), "¡Oops!",f"Ocurrió un error al establecer la conexión. \nMotivo: \n{error}.\n Se escribe en el registro.")
             return None
 
-        
-    
-         
     def btnDesconectar_accion(self):
 
         try:
