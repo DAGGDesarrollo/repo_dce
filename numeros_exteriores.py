@@ -344,18 +344,22 @@ class numeros_exteriores:
             
             self.baseDatos = "bged" + self.dockwidget.cveEntidad.currentText()
             self.servidor = self.dockwidget.txtServidor.text()
-
             
+            #Sección que valida que se hayan ingresado todos los datos para la conexión
             if usr is NULL or usr == "" or usr.isspace():
 
-                QMessageBox.warning(self.iface.mainWindow(), "Aviso", "No fue posible ingresar a la base, por favor, revise sus credenciales.")
+                QMessageBox.warning(self.iface.mainWindow(), "Aviso", "No ingresó nombre de usuario, por favor, ingrese uno.")
                 return None     #Realmente sale de la funcion
                 
             if pwd is NULL or pwd == "" or pwd.isspace():
 
-                QMessageBox.warning(self.iface.mainWindow(), "Aviso", "No fue posible ingresar a la base, por favor, revise sus credenciales.")
+                QMessageBox.warning(self.iface.mainWindow(), "Aviso", "No ingresó una contraseña, por favor, ingrese una.")
                 return None
-                
+            
+            if self.servidor is NULL or self.servidor == "" or self.servidor.isspace():
+
+                QMessageBox.warning(self.iface.mainWindow(), "Aviso", "No ingresó una dirección IP, por favor, ingrese una.")
+                return None
             
             usr = self.dockwidget.txtUsuario.text()
             pwd = self.dockwidget.txtClave.text()
