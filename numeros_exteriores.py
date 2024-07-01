@@ -608,7 +608,7 @@ class numeros_exteriores:
                 textFormat.buffer().setSize(0.7)
                 textFormat.buffer().setColor(QColor('#FFFFFF'))
                 SE_layer.setFormat(textFormat)
-                SE_layer.fieldName = '\'Sección \n\' || lpad(to_string("seccion"),4,\'0\')' #Sección a cuatro digitos, del tipo 0000
+                SE_layer.fieldName = '\'Sección \n\' || lpad(to_string("seccion"),4,\'0\')' #Sección a cuatro digitos, del tipo 00001
                 SE_layer.isExpression = True
                 SE_layer.enabled = True
                 SE_layer.placement = QgsPalLayerSettings.OverPoint
@@ -910,7 +910,7 @@ class numeros_exteriores:
             with conn:
 
                 #Se conecta a ala BD para obtener el id de la manzana que toca o está a 1m del número exterior selccionado
-                qry_c = "SELECT a.id as id_mza FROM bged.manzana as a, bged.numeros_exteriores as b WHERE b.id = {0} AND ST_Intersects(ST_Buffer(a.geom,1),b.geom) = 'true';".format(result02)
+                qry_c = "SELECT a.id as id_mza FROM bged.manzana as a, bged.numeros_exteriores as b WHERE a.seccion = {0} AND b.id = {1} AND ST_Intersects(ST_Buffer(a.geom,1),b.geom) = 'true';".format(self.dockwidget.cveSeccion.currentText(),result02)
                 data_c = (self.campo01, )
                 with conn.cursor() as curs:
 
