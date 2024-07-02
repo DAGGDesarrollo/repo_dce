@@ -44,9 +44,14 @@ from .numeros_exteriores_dockwidget import numeros_exterioresDockWidget
 import os
 import os.path
 
-
 #Importa módulo regex para expresiones regulares
 import re
+
+#Importa módulo para el archivo log
+import logging
+
+#Importa módulo para las fechas
+from datetime import datetime
 
 # load the adapter
 import psycopg2
@@ -89,9 +94,10 @@ class numeros_exteriores:
         # Declare instance attributes
         self.actions = []
         self.menu = self.tr(u'&Números Exteriores')
-        # TODO: We are going to let the user set this up in a future iteration
         self.toolbar = self.iface.addToolBar(u'Números Exteriores')
         self.toolbar.setObjectName(u'Números Exteriores')
+        
+        self.timeformat = '%Y-%m-%d %H:%M:%S'
 
         self.campo01 = ""
         self.conectado = False
@@ -333,6 +339,19 @@ class numeros_exteriores:
     def btnConectar_accion(self):
         
         try:
+                        
+            #Se crea el logger y se configura según el usuario ingresado
+            logging.basicConfig(filename=f'{os.path.dirname(os.path.realpath(__file__))}/plugin_numext_{self.dockwidget.cveEntidad.currentText()}_{self.dockwidget.txtUsuario.text()}.log', filemode='a', level=logging.INFO)
+            self.logger = logging.getLogger(f'{self.dockwidget.cveEntidad.currentText()}_{self.dockwidget.txtUsuario.text()}')
+            #Se crea el handler y el nivel de INFO
+            ch = logging.StreamHandler()
+            
+            #Se crea el formato
+            formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s',datefmt=self.timeformat)
+            ch.setFormatter(formatter)
+            self.logger.addHandler(ch)  
+                     
+            #Bandera que establece el valor cuando se conecta
             self.conectadoflag = 1
             #Esconde la contraseña al momento de establecerse la conexión, en caso de que el usuario la haya dejado visible
             self.dockwidget.txtClave.setPasswordVisibility(False)
@@ -392,7 +411,7 @@ class numeros_exteriores:
                 curs.close()
 
             conn.close()
-
+            
             self.dockwidget.btnDesconectar.setEnabled(True)
             self.dockwidget.btnConectar.setEnabled(False)
             self.conectado = True
@@ -403,12 +422,14 @@ class numeros_exteriores:
             self.dockwidget.txtClave.setEnabled(False)
 
             QMessageBox.information(self.iface.mainWindow(), 'Aviso', f'Se realizó la conexión con éxito...\nIP: {self.servidor}\nBase de datos: {self.baseDatos}\nBienvenido {usr.split(".")[0].title()}')
-            return None
+            self.logger.info(f'{datetime.now().strftime(self.timeformat)} Conexión exitosa')
+
 
         except psycopg2.Error as error:
             self.iface.messageBar().pushMessage("Mensaje", "No se logró ingresar a la Base. Si el error persiste levante un caso CAU para recibir asistencia.")
             QMessageBox.critical(self.iface.mainWindow(), "¡Oops!",f"Ocurrió un error al establecer la conexión. \nMotivo: \n{error}.\n Se escribe en el registro.")
-            return None
+            self.logger.error(f'{datetime.now().strftime(self.timeformat)} Error al establecer la conexión: {error}')
+
 
     def btnDesconectar_accion(self):
 
@@ -458,12 +479,14 @@ class numeros_exteriores:
                     self.iface.mainWindow().show()
                     QMessageBox.information(self.iface.mainWindow(),'Información',f'Se ha cerrado la sesión. \nHasta pronto {usuario.split(".")[0].title()}.')
                     self.iface.messageBar().pushSuccess('Despedida', f' Hasta luego {usuario.split(".")[0].title()} que tengas buen día.')
+                    self.logger.info(f'{datetime.now().strftime(self.timeformat)} Se cerró exitósamente la conexión')
             else:
                 self.iface.messageBar().pushMessage('Información', f' De acuerdo {usuario.split(".")[0].title()} la sesión continua.')
+            
 
         except Exception as error:
             QMessageBox.critical(self.iface.mainWindow(), "¡Oops!",f"Ocurrió un error al terminar la conexión. \nMotivo: \n{error}.\n Se escribe en el registro.")
-            return None
+            self.logger.error(f'{datetime.now().strftime(self.timeformat)} Error al cerrar la conexión: {error}')
 
     def on_cveMunicipio_changed(self, value):      
         
@@ -504,12 +527,11 @@ class numeros_exteriores:
 
                 curs.close()    
             conn.close()
-            return None
             
         except Exception as error:
             QMessageBox.critical(self.iface.mainWindow(), "¡Oops!",f"Ocurrió un error al cambiar el municipio. \nMotivo: \n{error}.\n Se escribe en el registro.")
+            self.logger.error(f'{datetime.now().strftime(self.timeformat)} Error al cambiar de municipio: {error}')
             conn.close()
-            return None
 
 
     def btnObtenerArea_accion(self):
@@ -740,6 +762,7 @@ class numeros_exteriores:
 
         except Exception as error:
             QMessageBox.critical(self.iface.mainWindow(), "¡Oops!",f"Ocurrió un error al cargar las capas. \nMotivo: \n{error}.\n Se escribe en el registro.")
+            self.logger.error(f'{datetime.now().strftime(self.timeformat)} Error al cargar las capas: {error}')
             prog.setValue(100) 
             return None
     
@@ -750,6 +773,7 @@ class numeros_exteriores:
         
         except Exception as error:
             QMessageBox.critical(self.iface.mainWindow(), "¡Oops!",f"Ocurrió un error al mostrar las recomendaciones. \nMotivo: \n{error}.\n Se escribe en el registro.")
+            self.logger.error(f'{datetime.now().strftime(self.timeformat)} Error al mostrar las recomendaciones: {error}')
         
     def btnMostrar_accion(self):
         
@@ -838,7 +862,8 @@ class numeros_exteriores:
         #Si ocurriera un error durante la ejecución se alerta al usuario para evitar que el Plugin arroje errores de Python.
         except Exception as error:
             conn.close()
-            QMessageBox.critical(self.iface.mainWindow(), "¡Oops!",f"Ocurrió un error durante la ejecución. \nMotivo: \n{error}.\n Se escribe en el registro.")
+            QMessageBox.critical(self.iface.mainWindow(), "¡Oops!",f"Ocurrió un error al mostrar la información del registro seleccionado. \nMotivo: \n{error}.\n Se escribe en el registro.")
+            self.logger.error(f'{datetime.now().strftime(self.timeformat)} Error al mostrar la información del registro seleccionado: {error}')
 
     def btnSugerir_accion(self):
         try:
@@ -933,6 +958,7 @@ class numeros_exteriores:
         except Exception as error:
             prog.setValue(100)
             QMessageBox.critical(self.iface.mainWindow(), "¡Oops!",f"Ocurrió un error durante la ejecución. \nMotivo: \n{error}.\n Se escribe en el registro.")
+            self.logger.error(f'{datetime.now().strftime(self.timeformat)} Error al obtener un Id de manzana sugerido: {error}')
             conn.close()
             
         
@@ -946,6 +972,7 @@ class numeros_exteriores:
             
         except Exception as error:
             QMessageBox.critical(self.iface.mainWindow(), "¡Oops!",f"Ocurrió un error al ajustar el tamaño de fuente. \nMotivo: \n{error}.\n Se escribe en el registro.")
+            self.logger.error(f'{datetime.now().strftime(self.timeformat)} Error al aumentar el tamaño de fuente: {error}')
 
 
     #Regresa el tamaño del texto en el cuadro de texto de números exteriores al valor original
@@ -958,6 +985,7 @@ class numeros_exteriores:
             
         except Exception as error:
             QMessageBox.critical(self.iface.mainWindow(), "¡Oops!",f"Ocurrió un error al ajustar el tamaño de fuente. \nMotivo: \n{error}.\n Se escribe en el registro.")
+            self.logger.error(f'{datetime.now().strftime(self.timeformat)} Error al fijar el tamaño de fuente medio: {error}')
 
     #Disminuye el tamaño del texto en el cuadro de texto de números exteriores al mínimo
     def tminFont(self):
@@ -969,6 +997,7 @@ class numeros_exteriores:
             
         except Exception as error:
             QMessageBox.critical(self.iface.mainWindow(), "¡Oops!",f"Ocurrió un error al ajustar el tamaño de fuente. \nMotivo: \n{error}.\n Se escribe en el registro.")
+            self.logger.error(f'{datetime.now().strftime(self.timeformat)} Error al disminuir el tamaño de fuente: {error}')
 
     #Invierte el orden de la cadena del texto en el cuadro de texto de números exteriores   
     def btnInvertir(self):
@@ -980,6 +1009,7 @@ class numeros_exteriores:
             
         except Exception as error:
             QMessageBox.critical(self.iface.mainWindow(), "¡Oops!",f"Ocurrió un error al invertir la cadena. \nMotivo: \n{error}.\n Se escribe en el registro.")
+            self.logger.error(f'{datetime.now().strftime(self.timeformat)} Error al invertir el orden de la cadena: {error}')
         
         #btnInvertir
       
@@ -1056,7 +1086,7 @@ class numeros_exteriores:
 
         except Exception as error:
             QMessageBox.critical(self.iface.mainWindow(), "¡Oops!",f"Ocurrió un error al guardar los cambios. Por favor, revise el estado de red o su conexión \nMotivo: \n{error}.\n Se escribe en el registro.")
-            return None
+            self.logger.error(f'{datetime.now().strftime(self.timeformat)} Error al guardar los cambios: {error}')
 
         
     def btnCrearCadena(self):
@@ -1141,6 +1171,7 @@ class numeros_exteriores:
                 
         except Exception as error:
             QMessageBox.critical(self.iface.mainWindow(), "¡Oops!",f"Ocurrió un error al crear la cadena. \nMotivo: \n{error}.\n Se escribe en el registro.")
+            self.logger.error(f'{datetime.now().strftime(self.timeformat)} Error al crear la cadena de números exteriores: {error}')
 
     def btnLimpiarIntervalo(self):
         
@@ -1154,6 +1185,7 @@ class numeros_exteriores:
             self.dockwidget.checkRr.setChecked(False)       
         except Exception as error:
             QMessageBox.critical(self.iface.mainWindow(), "¡Oops!",f"Ocurrió un error al limpiar los campos. \nMotivo: \n{error}.\n Se escribe en el registro.")
+            self.logger.error(f'{datetime.now().strftime(self.timeformat)} Error al limpiar los campos: {error}')
        
     def btnIdentificar20_accion(self):
         
@@ -1188,6 +1220,7 @@ class numeros_exteriores:
         except Exception as error:
             conn.close()
             QMessageBox.critical(self.iface.mainWindow(), "¡Oops!",f"Ocurrió un error al identificar las vialidades. \nMotivo: \n{error}.\n Se escribe en el registro.")
+            self.logger.error(f'{datetime.now().strftime(self.timeformat)} Error al identificar las vialidades a 20 m: {error}')
             
     def btnIdentificar60_accion(self):
         
@@ -1221,6 +1254,7 @@ class numeros_exteriores:
         except Exception as error:
             conn.close()
             QMessageBox.critical(self.iface.mainWindow(), "¡Oops!",f"Ocurrió un error al identificar las vialidades. \nMotivo: \n{error}.\n Se escribe en el registro.")
+            self.logger.error(f'{datetime.now().strftime(self.timeformat)} Error al identificar las vialidades a 60 m: {error}')
 
     def btndistUsuario_accion(self):
         
@@ -1266,6 +1300,7 @@ class numeros_exteriores:
         except Exception as error:
             conn.close()
             QMessageBox.critical(self.iface.mainWindow(), "¡Oops!",f"Ocurrió un error al identificar las vialidades. \nMotivo: \n{error}.\n Se escribe en el registro.")
+            self.logger.error(f'{datetime.now().strftime(self.timeformat)} Error al identificar las vialidades con la distancia ingresada: {error}')
 
     def cveSector_changed(self):
         
@@ -1288,6 +1323,7 @@ class numeros_exteriores:
                 
         except Exception as error:
             QMessageBox.critical(self.iface.mainWindow(), "¡Oops!",f"Ocurrió un error al cambiar el sector. \nMotivo: \n{error}.\n Se escribe en el registro.")
+            self.logger.error(f'{datetime.now().strftime(self.timeformat)} Error al cambiar de sector: {error}')
             
     def btnAsignarSector_accion(self):
         
@@ -1383,6 +1419,7 @@ class numeros_exteriores:
             
         except Exception as error:
             QMessageBox.critical(self.iface.mainWindow(), "¡Oops!",f"Ocurrió un error al asignar el sector. \nMotivo: \n{error}.\n Se escribe en el registro.")
+            self.logger.error(f'{datetime.now().strftime(self.timeformat)} Error al asignar el sector: {error}')
     
     def btnCrearCadenaUH_accion(self): 
 
@@ -1438,6 +1475,7 @@ class numeros_exteriores:
             
         except Exception as error:
             QMessageBox.critical(self.iface.mainWindow(), "¡Oops!",f"Ocurrió un error al crear la cadena UH. \nMotivo: \n{error}.\n Se escribe en el registro.")
+            self.logger.error(f'{datetime.now().strftime(self.timeformat)} Error al crear la cadena UH: {error}')
 
     def btnEliminarSector_accion(self):
         
@@ -1471,6 +1509,7 @@ class numeros_exteriores:
         
         except Exception as error:
             QMessageBox.critical(self.iface.mainWindow(), "¡Oops!",f"Ocurrió un error al limpiar el sector. \nMotivo: \n{error}.\n Se escribe en el registro.")     
+            self.logger.error(f'{datetime.now().strftime(self.timeformat)} Error al eliminar los datos del sector: {error}')
 
     def btnAgregarLiteralesEspeciales(self):
         
@@ -1502,6 +1541,7 @@ class numeros_exteriores:
                     
         except Exception as error:
             QMessageBox.critical(self.iface.mainWindow(), "¡Oops!",f"Ocurrió un error al agregar las literales especiales. \nMotivo: \n{error}.\n Se escribe en el registro.")
+            self.logger.error(f'{datetime.now().strftime(self.timeformat)} Error al insertar las literales especiales: {error}')
 
 
 #Función que inserta las literales seleccionadas por el usuario
