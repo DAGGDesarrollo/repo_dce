@@ -188,8 +188,6 @@ class numeros_exteriores:
         :rtype: QAction
         """
 
-
-
         #linea agregada al codigo original
         self.dockwidget = numeros_exterioresDockWidget() #Se instancia la clase del cuadro de dialogo
  
@@ -365,20 +363,9 @@ class numeros_exteriores:
             self.servidor = self.dockwidget.txtServidor.text()
             
             #Sección que valida que se hayan ingresado todos los datos para la conexión
-            if usr is NULL or usr == "" or usr.isspace():
-
-                QMessageBox.warning(self.iface.mainWindow(), "Aviso", "No ingresó nombre de usuario, por favor, ingrese uno.")
-                return None     #Realmente sale de la funcion
-                
-            if pwd is NULL or pwd == "" or pwd.isspace():
-
-                QMessageBox.warning(self.iface.mainWindow(), "Aviso", "No ingresó una contraseña, por favor, ingrese una.")
-                return None
-            
-            if self.servidor is NULL or self.servidor == "" or self.servidor.isspace():
-
-                QMessageBox.warning(self.iface.mainWindow(), "Aviso", "No ingresó una dirección IP, por favor, ingrese una.")
-                return None
+            if usr is NULL or usr == "" or usr.isspace(): QMessageBox.warning(self.iface.mainWindow(), "Aviso", "No ingresó nombre de usuario, por favor, ingrese uno.")
+            if pwd is NULL or pwd == "" or pwd.isspace(): QMessageBox.warning(self.iface.mainWindow(), "Aviso", "No ingresó una contraseña, por favor, ingrese una.")
+            if self.servidor is NULL or self.servidor == "" or self.servidor.isspace(): QMessageBox.warning(self.iface.mainWindow(), "Aviso", "No ingresó una dirección IP, por favor, ingrese una.")
             
             usr = self.dockwidget.txtUsuario.text()
             pwd = self.dockwidget.txtClave.text()
@@ -423,7 +410,6 @@ class numeros_exteriores:
 
             QMessageBox.information(self.iface.mainWindow(), 'Aviso', f'Se realizó la conexión con éxito...\nIP: {self.servidor}\nBase de datos: {self.baseDatos}\nBienvenido {usr.split(".")[0].title()}')
             self.logger.info(f'{datetime.now().strftime(self.timeformat)} Conexión exitosa')
-
 
         except psycopg2.Error as error:
             self.iface.messageBar().pushMessage("Mensaje", "No se logró ingresar a la Base. Si el error persiste levante un caso CAU para recibir asistencia.")
@@ -505,11 +491,7 @@ class numeros_exteriores:
             uri = QgsDataSourceUri()
             # set host name, port, database name, username and password
             uri.setConnection(self.servidor, "5432", self.baseDatos, usr, pwd)
-          
-            #localhost
-            #remote Samge bged 
-            connectDB = psycopg2.connect(database=self.baseDatos, user=usr, password=pwd, host=self.servidor, port="5432")
-     
+            
             conn = psycopg2.connect(database=self.baseDatos, user=usr, password=pwd, host=self.servidor, port="5432")
             with conn:
 
@@ -566,7 +548,7 @@ class numeros_exteriores:
             for layer in layers:
                 if layer.type() == QgsMapLayer.VectorLayer:
                     vlayer_count = vlayer_count + 1
-                if layer.name() == "SeccionUnica":
+                if "Seccion_" in layer.name():
                     QgsProject.instance().removeMapLayer(layer)
 
             numeroSeccion = str(self.dockwidget.cveSeccion.currentText())
@@ -584,8 +566,8 @@ class numeros_exteriores:
             #Capa auxiliar para reconocer la seccion a trabajar
             QtTest.QTest.qWait(100)
             #Consulta de seccion mediante seccion (una seccion para emular zoom en ella)
-            uri.setDataSource("bged", "seccion", "geom", "seccion=" + numeroSeccion)
-            vlayer1SEC = QgsVectorLayer(uri.uri(False), "SeccionUnica", "postgres")
+            uri.setDataSource("bged", "seccion", "geom", f'seccion={numeroSeccion}')
+            vlayer1SEC = QgsVectorLayer(uri.uri(False), f'Seccion_{numeroSeccion.zfill(4)}', "postgres")
             QgsProject.instance().addMapLayer(vlayer1SEC)
 
             QtTest.QTest.qWait(700)
@@ -653,7 +635,6 @@ class numeros_exteriores:
                 prog.setValue(40)
 
                 #Cargar capas
-                qry_c =  'SELECT * FROM bged.manzana mza, bged.municipio mun where mun.municipio={}.format(numeroMunicipio) and st_intersects(mun.geom, mza.geom)'
                 uri.setDataSource("bged", "manzana", "geom", "municipio=" + numeroMunicipio)
 
                 vlayerM = QgsVectorLayer(uri.uri(False), "Manzana", "postgres")
@@ -746,7 +727,7 @@ class numeros_exteriores:
                 renderer.setSymbol(symbol1) 
                 vlayerNE.triggerRepaint()
                 QtTest.QTest.qWait(3000)
-
+                
                 self.ultimoMunicipio = municipioActual
 
             
@@ -1071,7 +1052,7 @@ class numeros_exteriores:
 
             IdNumeroManzana = IdNumeroManzana.strip()
             IdNumeroVialidad = IdNumeroVialidad.strip()
-            numeroExterior = numeroExterior.strip().rstrip(',')
+            numeroExterior = numeroExterior.upper().strip().rstrip(',')
 
             data = (IdNumeroManzana,IdNumeroVialidad,numeroExterior,self.campo01)
         
@@ -1203,7 +1184,7 @@ class numeros_exteriores:
         
             with conn:
 
-                qry_c = "select via.id, via.nombre from bged.numeros_exteriores numext, bged.vialidad via where numext.id = %s and st_intersects(st_buffer(numext.geom, 20, 'side=both'), via.geom);"
+                qry_c = "SELECT via.id, via.nombre, ROUND(ST_Distance(numext.geom,via.geom)::numeric,2) as distancia FROM bged.numeros_exteriores numext, bged.vialidad via WHERE numext.id = %s AND ST_DWithin(numext.geom,via.geom,20) ORDER BY distancia ASC;"
                 data_c = (self.campo01, )
                 with conn.cursor() as curs:
 
@@ -1212,7 +1193,7 @@ class numeros_exteriores:
 
                     for row in rows:
 
-                        idname = str(row[0]) + " : " + row[1].title()
+                        idname = f'{row[0]} : {row[1].title()} a {row[2]} m.'
                         self.dockwidget.idVialidad.addItem(idname)
 
             conn.close()
@@ -1237,7 +1218,7 @@ class numeros_exteriores:
         
             with conn:
 
-                qry_c = "select via.id, via.nombre from bged.numeros_exteriores numext, bged.vialidad via where numext.id = %s and st_intersects(st_buffer(numext.geom, 60, 'side=both'), via.geom);"
+                qry_c = "SELECT via.id, via.nombre, ROUND(ST_Distance(numext.geom,via.geom)::numeric,2) as distancia FROM bged.numeros_exteriores numext, bged.vialidad via WHERE numext.id = %s AND ST_DWithin(numext.geom,via.geom,60) ORDER BY distancia ASC;"
                 data_c = (self.campo01, )
                 with conn.cursor() as curs:
 
@@ -1246,7 +1227,7 @@ class numeros_exteriores:
 
                     for row in rows:
 
-                        idname = str(row[0]) + " : " + row[1].title()
+                        idname = f'{row[0]} : {row[1].title()} a {row[2]} m.'
                         self.dockwidget.idVialidad.addItem(idname)
 
             conn.close()
@@ -1282,7 +1263,7 @@ class numeros_exteriores:
 
                 with conn:
 
-                    qry_c = "select via.id, via.nombre from bged.numeros_exteriores numext, bged.vialidad via where numext.id = %s and st_intersects(st_buffer(numext.geom, {0}, 'side=both'), via.geom);".format(distUsuario)
+                    qry_c = "SELECT via.id, via.nombre, ROUND(ST_Distance(numext.geom,via.geom)::numeric,2) as distancia FROM bged.numeros_exteriores numext, bged.vialidad via WHERE numext.id = %s AND ST_DWithin(numext.geom,via.geom,{0}) ORDER BY distancia ASC;".format(distUsuario)
                     data_c = (self.campo01, )
                     with conn.cursor() as curs:
 
@@ -1293,7 +1274,7 @@ class numeros_exteriores:
                         else:
                             for row in rows:
         
-                                idname = str(row[0]) + " : " + row[1].title()
+                                idname = f'{row[0]} : {row[1].title()} a {row[2]} m.'
                                 self.dockwidget.idVialidad.addItem(idname)
                 conn.close()
                 
@@ -1542,7 +1523,6 @@ class numeros_exteriores:
         except Exception as error:
             QMessageBox.critical(self.iface.mainWindow(), "¡Oops!",f"Ocurrió un error al agregar las literales especiales. \nMotivo: \n{error}.\n Se escribe en el registro.")
             self.logger.error(f'{datetime.now().strftime(self.timeformat)} Error al insertar las literales especiales: {error}')
-
 
 #Función que inserta las literales seleccionadas por el usuario
 def insertarLetras(numExt: str,letraBuscada: str,letraInsertada: str):
