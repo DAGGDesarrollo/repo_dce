@@ -412,9 +412,12 @@ class numeros_exteriores:
             self.logger.info(f'{datetime.now().strftime(self.timeformat)} Conexión exitosa')
 
         except psycopg2.Error as error:
-            self.iface.messageBar().pushMessage("Mensaje", "No se logró ingresar a la Base. Si el error persiste levante un caso CAU para recibir asistencia.")
-            QMessageBox.critical(self.iface.mainWindow(), "¡Oops!",f"Ocurrió un error al establecer la conexión. \nMotivo: \n{error}.\n Se escribe en el registro.")
-            self.logger.error(f'{datetime.now().strftime(self.timeformat)} Error al establecer la conexión: {error}')
+            if psycopg2.errors.lookup("28P01"):
+                QMessageBox.warning(self.iface.mainWindow(), "Aviso","Credenciales incorrectas, por favor, verifique.")                    
+            else:
+                self.iface.messageBar().pushMessage("Mensaje", "No se logró ingresar a la Base. Si el error persiste levante un caso CAU para recibir asistencia.")
+                QMessageBox.critical(self.iface.mainWindow(), "¡Oops!",f"Ocurrió un error al establecer la conexión.\nMotivo: \n{error}.\n Se escribe en el registro.")
+                self.logger.error(f'{datetime.now().strftime(self.timeformat)} Error al establecer la conexión: {error}')
 
 
     def btnDesconectar_accion(self):
@@ -739,7 +742,7 @@ class numeros_exteriores:
 
             #Se ajusta el valor de progreso de 100% para mostrar el fin del proceso
             prog.setValue(100) 
-            QMessageBox.information(self.iface.mainWindow(), "Aviso", "Listo, se cargaron las capas del área de trabajo exitosamente.")
+            QMessageBox.information(self.iface.mainWindow(), "Aviso", "Se cargaron las capas en el área de trabajo. Continúe con la edición de los números exteriores.")
 
         except Exception as error:
             QMessageBox.critical(self.iface.mainWindow(), "¡Oops!",f"Ocurrió un error al cargar las capas. \nMotivo: \n{error}.\n Se escribe en el registro.")
@@ -782,7 +785,7 @@ class numeros_exteriores:
                 capaactiva = vl.name()
 
                 if capaactiva != "NumerosExteriores":
-                    QMessageBox.warning(self.iface.mainWindow(), "Alerta", f"Por favor, seleccione la capa NumerosExteriores, la capa actual es {capaactiva}")
+                    QMessageBox.warning(self.iface.mainWindow(), "Alerta", f"No ha seleccionado la capa NumerosExteriores. Imposible mostrar. \nLa capa seleccionada actual es {capaactiva}. ")
                     return
 
                 # get the list of selected ids 
@@ -802,7 +805,7 @@ class numeros_exteriores:
                     self.campo01 = str(attrs[0])
                     
                 elif len(ids) == 0: 
-                    QMessageBox.warning(self.iface.mainWindow(), "Verifique","No seleccionó ningún elemento.")	
+                    QMessageBox.warning(self.iface.mainWindow(), "Verifique","No ha seleccionado ninguna geometría de números exteriores. Imposible mostrar.")	
                 else:
                     QMessageBox.warning(self.iface.mainWindow(), "Verifique","Debe seleccionar sólo un elemento.")	
             else:
