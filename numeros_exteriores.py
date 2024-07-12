@@ -522,228 +522,229 @@ class numeros_exteriores:
     def btnObtenerArea_accion(self):
 
         try:
+            if self.conectado == 1:
+                #Se configura la barra de progreso y se fija el valor inicial en 0 para comenzar el proceso
+                prog = QProgressDialog('Cargando capas. Un momento, por favor.', '', 0, 100)
+                prog.setWindowModality(Qt.WindowModal)
+                prog.setCancelButton(None)
+                time.sleep(1)
 
-            #Se configura la barra de progreso y se fija el valor inicial en 0 para comenzar el proceso
-            prog = QProgressDialog('Cargando capas. Un momento, por favor.', '', 0, 100)
-            prog.setWindowModality(Qt.WindowModal)
-            prog.setCancelButton(None)
-            time.sleep(1)
+                #Borrar capas si hubo cambio de entidad
+                municipioActual = str(self.dockwidget.cveMunicipio.currentText().split(" :",1)[0])
+                if self.dockwidget.cveEntidad.currentText() != self.ultimaEntidad  or self.ultimoMunicipio != municipioActual:
+                    #borrar capas
+                    # Get list of vector layers
+                    layers = list(QgsProject.instance().mapLayers().values())
+                    # Check there is at least one vector layer. Selecting within the same layer is fine.
+                    for layer in layers:
+                        if layer.type() == QgsMapLayer.VectorLayer:
+                            QgsProject.instance().removeMapLayer(layer)
 
-            #Borrar capas si hubo cambio de entidad
-            municipioActual = str(self.dockwidget.cveMunicipio.currentText().split(" :",1)[0])
-            if self.dockwidget.cveEntidad.currentText() != self.ultimaEntidad  or self.ultimoMunicipio != municipioActual:
-                #borrar capas
+                    self.ultimaEntidad = self.dockwidget.cveEntidad.currentText()
+                    self.ultimoMunicipio = municipioActual
+
+                
                 # Get list of vector layers
                 layers = list(QgsProject.instance().mapLayers().values())
                 # Check there is at least one vector layer. Selecting within the same layer is fine.
+                vlayer_count = 0
                 for layer in layers:
                     if layer.type() == QgsMapLayer.VectorLayer:
+                        vlayer_count = vlayer_count + 1
+                    if "Seccion_" in layer.name():
                         QgsProject.instance().removeMapLayer(layer)
 
-                self.ultimaEntidad = self.dockwidget.cveEntidad.currentText()
-                self.ultimoMunicipio = municipioActual
+                numeroSeccion = str(self.dockwidget.cveSeccion.currentText())
+                numeroMunicipio = str(self.dockwidget.cveMunicipio.currentText().split(" :",1)[0])
 
-            
-            # Get list of vector layers
-            layers = list(QgsProject.instance().mapLayers().values())
-            # Check there is at least one vector layer. Selecting within the same layer is fine.
-            vlayer_count = 0
-            for layer in layers:
-                if layer.type() == QgsMapLayer.VectorLayer:
-                    vlayer_count = vlayer_count + 1
-                if "Seccion_" in layer.name():
-                    QgsProject.instance().removeMapLayer(layer)
+                usr = self.dockwidget.txtUsuario.text()
+                pwd = self.dockwidget.txtClave.text()
+                
+                uri = QgsDataSourceUri()
+                # set host name, port, database name, username and password
+                uri.setConnection(self.servidor, "5432", self.baseDatos, usr, pwd)
+                # set database schema, table name, geometry column and optionally
+                # subset (WHERE clause)
 
-            numeroSeccion = str(self.dockwidget.cveSeccion.currentText())
-            numeroMunicipio = str(self.dockwidget.cveMunicipio.currentText().split(" :",1)[0])
+                #Capa auxiliar para reconocer la seccion a trabajar
+                QtTest.QTest.qWait(100)
+                #Consulta de seccion mediante seccion (una seccion para emular zoom en ella)
+                uri.setDataSource("bged", "seccion", "geom", f'seccion={numeroSeccion}')
+                vlayer1SEC = QgsVectorLayer(uri.uri(False), f'Seccion_{numeroSeccion.zfill(4)}', "postgres")
+                QgsProject.instance().addMapLayer(vlayer1SEC)
 
-            usr = self.dockwidget.txtUsuario.text()
-            pwd = self.dockwidget.txtClave.text()
-            
-            uri = QgsDataSourceUri()
-            # set host name, port, database name, username and password
-            uri.setConnection(self.servidor, "5432", self.baseDatos, usr, pwd)
-            # set database schema, table name, geometry column and optionally
-            # subset (WHERE clause)
+                QtTest.QTest.qWait(700)
 
-            #Capa auxiliar para reconocer la seccion a trabajar
-            QtTest.QTest.qWait(100)
-            #Consulta de seccion mediante seccion (una seccion para emular zoom en ella)
-            uri.setDataSource("bged", "seccion", "geom", f'seccion={numeroSeccion}')
-            vlayer1SEC = QgsVectorLayer(uri.uri(False), f'Seccion_{numeroSeccion.zfill(4)}', "postgres")
-            QgsProject.instance().addMapLayer(vlayer1SEC)
+                #funciona para el zoom
+                iface.setActiveLayer(vlayer1SEC)
+                iface.zoomToActiveLayer()
 
-            QtTest.QTest.qWait(700)
-
-            #funciona para el zoom
-            iface.setActiveLayer(vlayer1SEC)
-            iface.zoomToActiveLayer()
-
-            #	232	56	69
-            QtTest.QTest.qWait(200)
-
-            vlayer1SEC.setOpacity(0.3)
-
-            mySymbol1 = QgsFillSymbol.createSimple({'color':'red', 'color_border':'red', 'width_border':'0.3', 'style':'solid'})
-            myRenderer = vlayer1SEC.renderer()
-            myRenderer.setSymbol(mySymbol1)
-
-            #Muestra el 20% de avance
-            prog.setValue(20)
-
-            vlayer1SEC.triggerRepaint()
-            QtTest.QTest.qWait(100)
-
-            #se elimina capa de la unica seccion solo se agrego para emular zoom, ya no se elimina se usa como transparencia
-            QtTest.QTest.qWait(200)
-
-            #Estas capas se cargan una sola vez, Seccion, Manzana, Vialidad, Num Ext
-            if vlayer_count == 0:
-
-                #Consulta de seccion mediante municipio/seccion
-                uri.setDataSource("bged", "seccion", "geom", "municipio=" + numeroMunicipio)
-                vlayerSEC = QgsVectorLayer(uri.uri(False), "Seccion", "postgres")
-                QgsProject.instance().addMapLayer(vlayerSEC)
-
-
-                #Se configura el formato de las etiquetas
-                SE_layer = QgsPalLayerSettings()
-                textFormat = QgsTextFormat()
-                textFormat.setColor(Qt.darkRed)
-                textFormat.setSize(15)
-                textFormat.buffer().setEnabled(True)
-                textFormat.buffer().setSize(0.7)
-                textFormat.buffer().setColor(QColor('#FFFFFF'))
-                SE_layer.setFormat(textFormat)
-                SE_layer.fieldName = '\'Sección \n\' || lpad(to_string("seccion"),4,\'0\')' #Sección a cuatro digitos, del tipo 00001
-                SE_layer.isExpression = True
-                SE_layer.enabled = True
-                SE_layer.placement = QgsPalLayerSettings.OverPoint
-                SElabels = QgsVectorLayerSimpleLabeling(SE_layer)
-                SElabels.drawLabels = True
-                vlayerSEC.setLabeling(SElabels)
-                vlayerSEC.setLabelsEnabled(True)
-                vlayerSEC.setCustomProperty("labeling/drawLabels",  "True") 
-                vlayerSEC.triggerRepaint()
+                #	232	56	69
                 QtTest.QTest.qWait(200)
 
-                mySymbol1 = QgsFillSymbol.createSimple({'color':'red', 'color_border':'red', 'width_border':'0.4', 'style':'no'})
-                myRenderer = vlayerSEC.renderer()
+                vlayer1SEC.setOpacity(0.3)
+
+                mySymbol1 = QgsFillSymbol.createSimple({'color':'red', 'color_border':'red', 'width_border':'0.3', 'style':'solid'})
+                myRenderer = vlayer1SEC.renderer()
                 myRenderer.setSymbol(mySymbol1)
-                vlayerSEC.triggerRepaint()
-                QtTest.QTest.qWait(1000)
-                #E83845
-                
-                #Muestra el 40% de avance
-                prog.setValue(40)
 
-                #Cargar capas
-                uri.setDataSource("bged", "manzana", "geom", "municipio=" + numeroMunicipio)
+                #Muestra el 20% de avance
+                prog.setValue(20)
 
-                vlayerM = QgsVectorLayer(uri.uri(False), "Manzana", "postgres")
-                
-                QgsProject.instance().addMapLayer(vlayerM)
-
-                MZ_layer = QgsPalLayerSettings()
-                textFormat = QgsTextFormat()
-                textFormat.setColor(QColor('#464646')) 
-                textFormat.setSize(11) 
-                textFormat.buffer().setEnabled(True)
-                textFormat.buffer().setColor(QColor('#FFFFFF'))
-                textFormat.buffer().setSize(0.7)
-                MZ_layer.setFormat(textFormat)
-                MZ_layer.fieldName = '\'Mz \nId \' || "id"'
-                MZ_layer.isExpression = True
-                MZ_layer.enabled = True
-                MZ_layer.placement = QgsPalLayerSettings.AroundPoint
-                MZlabels = QgsVectorLayerSimpleLabeling(MZ_layer)
-                MZlabels.drawLabels = True
-                vlayerM.setLabeling(MZlabels)
-                vlayerM.setLabelsEnabled(True)
-                vlayerM.setCustomProperty("labeling/drawLabels",  "True")
-                vlayerM.triggerRepaint()
-                QtTest.QTest.qWait(200)
-
-                mySymbol1 = QgsFillSymbol.createSimple({'color':'#289E26', 'color_border':'#237E21', 'width_border':'0.2', 'style':'dense6'})
-                myRenderer = vlayerM.renderer()
-                myRenderer.setSymbol(mySymbol1)
-                vlayerM.triggerRepaint()
-                QtTest.QTest.qWait(1500)
-                #E83845            prog.setValue(20)
-
-                #Muestra el 60% de avance
-                prog.setValue(60) 
-
-                uri.setDataSource("bged", "vialidad", "geom")
-                vlayerV = QgsVectorLayer(uri.uri(False), "Vialidad", "postgres")
-                QgsProject.instance().addMapLayer(vlayerV)
-
-                V_layer = QgsPalLayerSettings()
-                textFormat = QgsTextFormat()
-                textFormat.setColor(QColor('#22243B')) 
-                textFormat.setSize(11) 
-                textFormat.buffer().setEnabled(True)
-                textFormat.buffer().setColor(QColor('#FFFFFF'))
-                textFormat.buffer().setSize(0.7)
-                V_layer.setFormat(textFormat)
-                V_layer.fieldName = '\'Id \'||"id" || \' \' || title("nombre")'
-                V_layer.isExpression = True
-                V_layer.enabled = True
-                V_layer.placement = QgsPalLayerSettings.Curved
-                Vlabels = QgsVectorLayerSimpleLabeling(V_layer)
-                Vlabels.drawLabels = True
-                vlayerV.setLabeling(Vlabels)
-                vlayerV.setLabelsEnabled(True)
-                vlayerV.setCustomProperty("labeling/drawLabels",  "True")
-                vlayerV.triggerRepaint()
-                QtTest.QTest.qWait(500)
-
-                renderer = vlayerV.renderer()
-                symbol1 = QgsLineSymbol.createSimple({'color': '#000000','width':'.3'})
-                renderer.setSymbol(symbol1) 
-                vlayerV.triggerRepaint()
-                QtTest.QTest.qWait(3000)
-
-                #Muestra el 80% de avance
-                prog.setValue(80)
-
-                #Consulta de numeros exteriores con campos nulos
-                uri.setDataSource("bged", "numeros_exteriores", "geom")
-                vlayerNE = QgsVectorLayer(uri.uri(False), "NumerosExteriores", "postgres")
-                QgsProject.instance().addMapLayer(vlayerNE)
+                vlayer1SEC.triggerRepaint()
                 QtTest.QTest.qWait(100)
 
-                NE_layer = QgsPalLayerSettings()
-                NE_layer.fieldName = 'id'
-                NE_layer.enabled = True
-                NE_layer.placement = QgsPalLayerSettings.Free
-                NElabels = QgsVectorLayerSimpleLabeling(NE_layer)
-                NElabels.drawLabels = True
-                vlayerNE.setLabeling(NElabels)
-                vlayerNE.setLabelsEnabled(True)
-                vlayerNE.setCustomProperty("labeling/drawLabels",  "True")
-                vlayerNE.triggerRepaint()
+                #se elimina capa de la unica seccion solo se agrego para emular zoom, ya no se elimina se usa como transparencia
                 QtTest.QTest.qWait(200)
 
-                renderer = vlayerNE.renderer()
-                symbol1 = QgsLineSymbol.createSimple({'color':'#005F00', 'width':'0.3', 'line_style':'dash'})
-                renderer.setSymbol(symbol1) 
-                vlayerNE.triggerRepaint()
-                QtTest.QTest.qWait(3000)
+                #Estas capas se cargan una sola vez, Seccion, Manzana, Vialidad, Num Ext
+                if vlayer_count == 0:
+
+                    #Consulta de seccion mediante municipio/seccion
+                    uri.setDataSource("bged", "seccion", "geom", "municipio=" + numeroMunicipio)
+                    vlayerSEC = QgsVectorLayer(uri.uri(False), "Seccion", "postgres")
+                    QgsProject.instance().addMapLayer(vlayerSEC)
+
+
+                    #Se configura el formato de las etiquetas
+                    SE_layer = QgsPalLayerSettings()
+                    textFormat = QgsTextFormat()
+                    textFormat.setColor(Qt.darkRed)
+                    textFormat.setSize(15)
+                    textFormat.buffer().setEnabled(True)
+                    textFormat.buffer().setSize(0.7)
+                    textFormat.buffer().setColor(QColor('#FFFFFF'))
+                    SE_layer.setFormat(textFormat)
+                    SE_layer.fieldName = '\'Sección \n\' || lpad(to_string("seccion"),4,\'0\')' #Sección a cuatro digitos, del tipo 00001
+                    SE_layer.isExpression = True
+                    SE_layer.enabled = True
+                    SE_layer.placement = QgsPalLayerSettings.OverPoint
+                    SElabels = QgsVectorLayerSimpleLabeling(SE_layer)
+                    SElabels.drawLabels = True
+                    vlayerSEC.setLabeling(SElabels)
+                    vlayerSEC.setLabelsEnabled(True)
+                    vlayerSEC.setCustomProperty("labeling/drawLabels",  "True") 
+                    vlayerSEC.triggerRepaint()
+                    QtTest.QTest.qWait(200)
+
+                    mySymbol1 = QgsFillSymbol.createSimple({'color':'red', 'color_border':'red', 'width_border':'0.4', 'style':'no'})
+                    myRenderer = vlayerSEC.renderer()
+                    myRenderer.setSymbol(mySymbol1)
+                    vlayerSEC.triggerRepaint()
+                    QtTest.QTest.qWait(1000)
+                    #E83845
+                    
+                    #Muestra el 40% de avance
+                    prog.setValue(40)
+
+                    #Cargar capas
+                    uri.setDataSource("bged", "manzana", "geom", "municipio=" + numeroMunicipio)
+
+                    vlayerM = QgsVectorLayer(uri.uri(False), "Manzana", "postgres")
+                    
+                    QgsProject.instance().addMapLayer(vlayerM)
+
+                    MZ_layer = QgsPalLayerSettings()
+                    textFormat = QgsTextFormat()
+                    textFormat.setColor(QColor('#464646')) 
+                    textFormat.setSize(11) 
+                    textFormat.buffer().setEnabled(True)
+                    textFormat.buffer().setColor(QColor('#FFFFFF'))
+                    textFormat.buffer().setSize(0.7)
+                    MZ_layer.setFormat(textFormat)
+                    MZ_layer.fieldName = '\'Mz \nId \' || "id"'
+                    MZ_layer.isExpression = True
+                    MZ_layer.enabled = True
+                    MZ_layer.placement = QgsPalLayerSettings.AroundPoint
+                    MZlabels = QgsVectorLayerSimpleLabeling(MZ_layer)
+                    MZlabels.drawLabels = True
+                    vlayerM.setLabeling(MZlabels)
+                    vlayerM.setLabelsEnabled(True)
+                    vlayerM.setCustomProperty("labeling/drawLabels",  "True")
+                    vlayerM.triggerRepaint()
+                    QtTest.QTest.qWait(200)
+
+                    mySymbol1 = QgsFillSymbol.createSimple({'color':'#289E26', 'color_border':'#237E21', 'width_border':'0.2', 'style':'dense6'})
+                    myRenderer = vlayerM.renderer()
+                    myRenderer.setSymbol(mySymbol1)
+                    vlayerM.triggerRepaint()
+                    QtTest.QTest.qWait(1500)
+                    #E83845            prog.setValue(20)
+
+                    #Muestra el 60% de avance
+                    prog.setValue(60) 
+
+                    uri.setDataSource("bged", "vialidad", "geom")
+                    vlayerV = QgsVectorLayer(uri.uri(False), "Vialidad", "postgres")
+                    QgsProject.instance().addMapLayer(vlayerV)
+
+                    V_layer = QgsPalLayerSettings()
+                    textFormat = QgsTextFormat()
+                    textFormat.setColor(QColor('#22243B')) 
+                    textFormat.setSize(11) 
+                    textFormat.buffer().setEnabled(True)
+                    textFormat.buffer().setColor(QColor('#FFFFFF'))
+                    textFormat.buffer().setSize(0.7)
+                    V_layer.setFormat(textFormat)
+                    V_layer.fieldName = '\'Id \'||"id" || \' \' || title("nombre")'
+                    V_layer.isExpression = True
+                    V_layer.enabled = True
+                    V_layer.placement = QgsPalLayerSettings.Curved
+                    Vlabels = QgsVectorLayerSimpleLabeling(V_layer)
+                    Vlabels.drawLabels = True
+                    vlayerV.setLabeling(Vlabels)
+                    vlayerV.setLabelsEnabled(True)
+                    vlayerV.setCustomProperty("labeling/drawLabels",  "True")
+                    vlayerV.triggerRepaint()
+                    QtTest.QTest.qWait(500)
+
+                    renderer = vlayerV.renderer()
+                    symbol1 = QgsLineSymbol.createSimple({'color': '#000000','width':'.3'})
+                    renderer.setSymbol(symbol1) 
+                    vlayerV.triggerRepaint()
+                    QtTest.QTest.qWait(3000)
+
+                    #Muestra el 80% de avance
+                    prog.setValue(80)
+
+                    #Consulta de numeros exteriores con campos nulos
+                    uri.setDataSource("bged", "numeros_exteriores", "geom")
+                    vlayerNE = QgsVectorLayer(uri.uri(False), "NumerosExteriores", "postgres")
+                    QgsProject.instance().addMapLayer(vlayerNE)
+                    QtTest.QTest.qWait(100)
+
+                    NE_layer = QgsPalLayerSettings()
+                    NE_layer.fieldName = 'id'
+                    NE_layer.enabled = True
+                    NE_layer.placement = QgsPalLayerSettings.Free
+                    NElabels = QgsVectorLayerSimpleLabeling(NE_layer)
+                    NElabels.drawLabels = True
+                    vlayerNE.setLabeling(NElabels)
+                    vlayerNE.setLabelsEnabled(True)
+                    vlayerNE.setCustomProperty("labeling/drawLabels",  "True")
+                    vlayerNE.triggerRepaint()
+                    QtTest.QTest.qWait(200)
+
+                    renderer = vlayerNE.renderer()
+                    symbol1 = QgsLineSymbol.createSimple({'color':'#005F00', 'width':'0.3', 'line_style':'dash'})
+                    renderer.setSymbol(symbol1) 
+                    vlayerNE.triggerRepaint()
+                    QtTest.QTest.qWait(3000)
+                    
+                    self.ultimoMunicipio = municipioActual
+
                 
-                self.ultimoMunicipio = municipioActual
+                #Borrar campos de texto en edicion simple
+                self.dockwidget.textEdit.setText("")
+                self.dockwidget.idManzana.setText("")
+                self.dockwidget.idManzana_original.setText("")
+                self.dockwidget.idVialidad_original.setText("")  
 
-            
-            #Borrar campos de texto en edicion simple
-            self.dockwidget.textEdit.setText("")
-            self.dockwidget.idManzana.setText("")
-            self.dockwidget.idManzana_original.setText("")
-            self.dockwidget.idVialidad_original.setText("")  
-
-            #Se ajusta el valor de progreso de 100% para mostrar el fin del proceso
-            prog.setValue(100) 
-            QMessageBox.information(self.iface.mainWindow(), "Aviso", "Se cargaron las capas en el área de trabajo. Continúe con la edición de los números exteriores.")
-
+                #Se ajusta el valor de progreso de 100% para mostrar el fin del proceso
+                prog.setValue(100) 
+                QMessageBox.information(self.iface.mainWindow(), "Aviso", "Se cargaron las capas en el área de trabajo. Continúe con la edición de los números exteriores.")
+            else:
+                QMessageBox.warning(self.iface.mainWindow(), "Aviso","No ha iniciado sesión. Imposible ejecutar la acción.")   
         except Exception as error:
             QMessageBox.critical(self.iface.mainWindow(), "¡Oops!",f"Ocurrió un error al cargar las capas. \nMotivo: \n{error}.\n Se escribe en el registro.")
             self.logger.error(f'{datetime.now().strftime(self.timeformat)} Error al cargar las capas: {error}')
@@ -762,86 +763,89 @@ class numeros_exteriores:
     def btnMostrar_accion(self):
         
         try:
-            #pass
-            #Probando funcion
-            self.campo01 = ""
+            if self.conectado == 1:
+                #pass
+                #Probando funcion
+                self.campo01 = ""
 
-            #limpiar datos en combo idVialidad e idManzana
-            self.dockwidget.idVialidad.clear()
-            self.dockwidget.idManzana.setText("")
-            
-            # Get list of vector layers
-            layers = list(QgsProject.instance().mapLayers().values())
-            # Check there is at least one vector layer. Selecting within the same layer is fine.
-            vlayer_count = 0
-            for layer in layers:
-                if layer.type() == QgsMapLayer.VectorLayer:
-                    vlayer_count = vlayer_count + 1
-
-            if vlayer_count > 0:
-            
-                #Obtener Datos, modificar para activar el layer de numero exteriores, Importante!!! se evita error de seleccion de tramo
-                vl = iface.activeLayer()
-                capaactiva = vl.name()
-
-                if capaactiva != "NumerosExteriores":
-                    QMessageBox.warning(self.iface.mainWindow(), "Alerta", f"No ha seleccionado la capa NumerosExteriores. Imposible mostrar. \nLa capa seleccionada actual es {capaactiva}. ")
-                    return
-
-                # get the list of selected ids 
-                ids = vl.selectedFeatureIds()
+                #limpiar datos en combo idVialidad e idManzana
+                self.dockwidget.idVialidad.clear()
+                self.dockwidget.idManzana.setText("")
                 
-                if len(ids) == 1:
-                    # create the request with the selected ids
-                    request = QgsFeatureRequest()
-                    request.setFilterFids(ids)
+                # Get list of vector layers
+                layers = list(QgsProject.instance().mapLayers().values())
+                # Check there is at least one vector layer. Selecting within the same layer is fine.
+                vlayer_count = 0
+                for layer in layers:
+                    if layer.type() == QgsMapLayer.VectorLayer:
+                        vlayer_count = vlayer_count + 1
 
-                    fields = ['id']
+                if vlayer_count > 0:
+                
+                    #Obtener Datos, modificar para activar el layer de numero exteriores, Importante!!! se evita error de seleccion de tramo
+                    vl = iface.activeLayer()
+                    capaactiva = vl.name()
 
-                    features = vl.getFeatures(request)
-                    for feature in features:
-                        attrs = [feature[field] for field in fields]
+                    if capaactiva != "NumerosExteriores":
+                        QMessageBox.warning(self.iface.mainWindow(), "Alerta", f"No ha seleccionado la capa NumerosExteriores. Imposible mostrar. \nLa capa seleccionada actual es {capaactiva}. ")
+                        return
+
+                    # get the list of selected ids 
+                    ids = vl.selectedFeatureIds()
                     
-                    self.campo01 = str(attrs[0])
-                    
-                elif len(ids) == 0: 
-                    QMessageBox.warning(self.iface.mainWindow(), "Verifique","No ha seleccionado ninguna geometría de números exteriores. Imposible mostrar.")	
+                    if len(ids) == 1:
+                        # create the request with the selected ids
+                        request = QgsFeatureRequest()
+                        request.setFilterFids(ids)
+
+                        fields = ['id']
+
+                        features = vl.getFeatures(request)
+                        for feature in features:
+                            attrs = [feature[field] for field in fields]
+                        
+                        self.campo01 = str(attrs[0])
+                        
+                    elif len(ids) == 0: 
+                        QMessageBox.warning(self.iface.mainWindow(), "Verifique","No ha seleccionado ninguna geometría de números exteriores. Imposible mostrar.")	
+                    else:
+                        QMessageBox.warning(self.iface.mainWindow(), "Verifique","Debe seleccionar sólo un elemento.")	
                 else:
-                    QMessageBox.warning(self.iface.mainWindow(), "Verifique","Debe seleccionar sólo un elemento.")	
-            else:
-                QMessageBox.warning(self.iface.mainWindow(), "Verifique","No hay capas vectoriales agregadas.")		
-            
-            
-            usr = self.dockwidget.txtUsuario.text()
-            pwd = self.dockwidget.txtClave.text()
-            
-            #localhost
-            #remote Samge bged 
-            conn = psycopg2.connect(database=self.baseDatos, user=usr, password=pwd, host=self.servidor, port="5432")
-            
-            with conn:
-
-                qry_c = "SELECT geom, tramo, manzana, vialidad, numext, valida from bged.numeros_exteriores where id = %s;"
-                data_c = (self.campo01, )
-                with conn.cursor() as curs:
-
-                    curs.execute(qry_c, data_c)
-        
-                    
-                    results = curs.fetchone() #one row
-
-                    result01 = results[0]   #geom           tramo
-                    result02 = results[1]   #tramo          manzana
-                    result03 = results[2]   #idManzana      vialidad
-                    result04 = results[3]   #idVialidad     numext
-                    result05 = results[4]   #idNumExt       valida
-                    result06 = results[5]   #valida         pro
-        
-                    self.dockwidget.textEdit.setText(result05)
-                    self.dockwidget.idManzana_original.setText(str(result03))
-                    self.dockwidget.idVialidad_original.setText(str(result04))
+                    QMessageBox.warning(self.iface.mainWindow(), "Verifique","No hay capas vectoriales agregadas.")		
                 
-            conn.close()
+                
+                usr = self.dockwidget.txtUsuario.text()
+                pwd = self.dockwidget.txtClave.text()
+                
+                #localhost
+                #remote Samge bged 
+                conn = psycopg2.connect(database=self.baseDatos, user=usr, password=pwd, host=self.servidor, port="5432")
+                
+                with conn:
+
+                    qry_c = "SELECT geom, tramo, manzana, vialidad, numext, valida from bged.numeros_exteriores where id = %s;"
+                    data_c = (self.campo01, )
+                    with conn.cursor() as curs:
+
+                        curs.execute(qry_c, data_c)
+            
+                        
+                        results = curs.fetchone() #one row
+
+                        result01 = results[0]   #geom           tramo
+                        result02 = results[1]   #tramo          manzana
+                        result03 = results[2]   #idManzana      vialidad
+                        result04 = results[3]   #idVialidad     numext
+                        result05 = results[4]   #idNumExt       valida
+                        result06 = results[5]   #valida         pro
+            
+                        self.dockwidget.textEdit.setText(result05)
+                        self.dockwidget.idManzana_original.setText(str(result03))
+                        self.dockwidget.idVialidad_original.setText(str(result04))
+                    
+                conn.close()
+            else:
+                QMessageBox.warning(self.iface.mainWindow(), "Aviso","No ha iniciado sesión. Imposible ejecutar la acción.")  
         
         #Si ocurriera un error durante la ejecución se alerta al usuario para evitar que el Plugin arroje errores de Python.
         except Exception as error:
@@ -852,92 +856,94 @@ class numeros_exteriores:
     def btnSugerir_accion(self):
         try:
             self.campo01 = ""
+            if self.conectadoflag == 1:
+                layers = list(QgsProject.instance().mapLayers().values())
 
-            layers = list(QgsProject.instance().mapLayers().values())
-
-            vlayer_count = 0
-            for layer in layers:
-                if layer.type() == QgsMapLayer.VectorLayer:
-                    vlayer_count = vlayer_count + 1
+                vlayer_count = 0
+                for layer in layers:
+                    if layer.type() == QgsMapLayer.VectorLayer:
+                        vlayer_count = vlayer_count + 1
 
 
-            if vlayer_count > 0:
-            
-                vl = iface.activeLayer()
-                capaactiva = vl.name()
-
-                if capaactiva != "NumerosExteriores":
-                    QMessageBox.warning(self.iface.mainWindow(), "Alerta", f"Por favor seleccione la capa NumerosExteriores, la capa actual es {capaactiva}")
-                    return
-
-                ids = vl.selectedFeatureIds()
-    
-                if len(ids) == 1:
-    
-                    request = QgsFeatureRequest()
-                    request.setFilterFids(ids)
-
-                    fields = ['id']
-
-                    features = vl.getFeatures(request)
-                    for feature in features:
-                        attrs = [feature[field] for field in fields]
-                    
-                    self.campo01 = str(attrs[0])
-                    
-
-                elif len(ids) == 0: 
-                    QMessageBox.warning(self.iface.mainWindow(), "Verifique","No seleccionó ningún elemento.")	
-                else:
-                    QMessageBox.warning(self.iface.mainWindow(), "Verifique","Debe seleccionar sólo un elemento.")	
-            else:
-                QMessageBox.warning(self.iface.mainWindow(), "Verifique","No hay capas vectoriales agregadas.")		
-    
-            usr = self.dockwidget.txtUsuario.text()
-            pwd = self.dockwidget.txtClave.text()
-
-            conn = psycopg2.connect(database=self.baseDatos, user=usr, password=pwd, host=self.servidor, port="5432") 
-            #Configura la barra de progreso 
-            prog = QProgressDialog('Buscando Id de Manzana. Un momento, por favor.', '', 0, 100)
-            prog.setWindowModality(Qt.WindowModal)
-            prog.setCancelButton(None)
-            time.sleep(2)
-            prog.setValue(25)
-            #Se conecta a la BD para obtener el id del registro seleccionado de la capa de números exteriores
-            with conn:
-
-                qry_c = "SELECT geom, id from bged.numeros_exteriores where id = %s;"
-                data_c = (self.campo01, )
-                with conn.cursor() as curs:
-
-                    prog.setValue(50)
-                    curs.execute(qry_c, data_c)
-                    results = curs.fetchone() #one row
-                    result01 = results[0]   #geom           
-                    result02 = results[1]   #id
-
-            with conn:
-
-                #Se conecta a ala BD para obtener el id de la manzana que toca o está a 1m del número exterior selccionado
-                qry_c = "SELECT a.id as id_mza FROM bged.manzana as a, bged.numeros_exteriores as b WHERE a.seccion = {0} AND b.id = {1} AND ST_Intersects(ST_Buffer(a.geom,1),b.geom) = 'true';".format(self.dockwidget.cveSeccion.currentText(),result02)
-                data_c = (self.campo01, )
-                with conn.cursor() as curs:
-
-                    prog.setValue(75)
-                    curs.execute(qry_c, data_c)
-                    results = curs.fetchone() #one row
-                    if(results is None):QMessageBox.warning(self.iface.mainWindow(), "Aviso","El segmento de número exterior está fuera de la tolerancia. Ajuste el segmento al polígono de manzana, o bien, revise la validez de la geometría.")
-                    else:idmzasug = results[0]   #id           id manzana sugerido
-
-                    if (idmzasug is None or idmzasug == ''):
-                        QMessageBox.warning(self.iface.mainWindow(), "Aviso","No se encontró ningún id de manzana.")
-                        
-                self.dockwidget.idManzana.setText(str(idmzasug))
+                if vlayer_count > 0:
                 
-                prog.setValue(100)
-            #Ajusta el valor al 100% para concluir la barra de progreso
-            conn.close()
+                    vl = iface.activeLayer()
+                    capaactiva = vl.name()
+
+                    if capaactiva != "NumerosExteriores":
+                        QMessageBox.warning(self.iface.mainWindow(), "Alerta", f"Por favor seleccione la capa NumerosExteriores, la capa actual es {capaactiva}")
+                        return
+
+                    ids = vl.selectedFeatureIds()
+        
+                    if len(ids) == 1:
+        
+                        request = QgsFeatureRequest()
+                        request.setFilterFids(ids)
+
+                        fields = ['id']
+
+                        features = vl.getFeatures(request)
+                        for feature in features:
+                            attrs = [feature[field] for field in fields]
+                        
+                        self.campo01 = str(attrs[0])
+                        
+
+                    elif len(ids) == 0: 
+                        QMessageBox.warning(self.iface.mainWindow(), "Verifique","No seleccionó ningún elemento.")	
+                    else:
+                        QMessageBox.warning(self.iface.mainWindow(), "Verifique","Debe seleccionar sólo un elemento.")	
+                else:
+                    QMessageBox.warning(self.iface.mainWindow(), "Verifique","No hay capas vectoriales agregadas.")		
+    
             
+                usr = self.dockwidget.txtUsuario.text()
+                pwd = self.dockwidget.txtClave.text()
+
+                conn = psycopg2.connect(database=self.baseDatos, user=usr, password=pwd, host=self.servidor, port="5432") 
+                #Configura la barra de progreso 
+                prog = QProgressDialog('Buscando Id de Manzana. Un momento, por favor.', '', 0, 100)
+                prog.setWindowModality(Qt.WindowModal)
+                prog.setCancelButton(None)
+                time.sleep(2)
+                prog.setValue(25)
+                #Se conecta a la BD para obtener el id del registro seleccionado de la capa de números exteriores
+                with conn:
+
+                    qry_c = "SELECT geom, id from bged.numeros_exteriores where id = %s;"
+                    data_c = (self.campo01, )
+                    with conn.cursor() as curs:
+
+                        prog.setValue(50)
+                        curs.execute(qry_c, data_c)
+                        results = curs.fetchone() #one row
+                        result01 = results[0]   #geom           
+                        result02 = results[1]   #id
+
+                with conn:
+
+                    #Se conecta a ala BD para obtener el id de la manzana que toca o está a 1m del número exterior selccionado
+                    qry_c = "SELECT a.id as id_mza FROM bged.manzana as a, bged.numeros_exteriores as b WHERE a.seccion = {0} AND b.id = {1} AND ST_Intersects(ST_Buffer(a.geom,1),b.geom) = 'true';".format(self.dockwidget.cveSeccion.currentText(),result02)
+                    data_c = (self.campo01, )
+                    with conn.cursor() as curs:
+
+                        prog.setValue(75)
+                        curs.execute(qry_c, data_c)
+                        results = curs.fetchone() #one row
+                        if(results is None):QMessageBox.warning(self.iface.mainWindow(), "Aviso","El segmento de número exterior está fuera de la tolerancia. Ajuste el segmento al polígono de manzana, o bien, revise la validez de la geometría.")
+                        else:idmzasug = results[0]   #id           id manzana sugerido
+
+                        if (idmzasug is None or idmzasug == ''):
+                            QMessageBox.warning(self.iface.mainWindow(), "Aviso","No se encontró ningún id de manzana.")
+                            
+                    self.dockwidget.idManzana.setText(str(idmzasug))
+                    
+                    prog.setValue(100)
+                #Ajusta el valor al 100% para concluir la barra de progreso
+                conn.close()
+            else:
+                QMessageBox.warning(self.iface.mainWindow(), "Aviso","No ha iniciado sesión. Imposible ejecutar la acción.")          
         #Si ocurriera un error durante la ejecución se alerta al usuario para evitar que el Plugin arroje errores de Python.
         except Exception as error:
             prog.setValue(100)
@@ -1002,71 +1008,73 @@ class numeros_exteriores:
         #pass
  
         try:
-
-            usr = self.dockwidget.txtUsuario.text()
-            pwd = self.dockwidget.txtClave.text()
+            if self.conectado == 1:
+                usr = self.dockwidget.txtUsuario.text()
+                pwd = self.dockwidget.txtClave.text()
+            
+                #localhost
+                conn = psycopg2.connect(database=self.baseDatos, user=usr, password=pwd, host=self.servidor, port="5432")
         
-            #localhost
-            conn = psycopg2.connect(database=self.baseDatos, user=usr, password=pwd, host=self.servidor, port="5432")
-    
-            #Grabar a Postgres
-            cursor = conn.cursor()
-        
-            qry = "UPDATE bged.numeros_exteriores set manzana = %s, vialidad = %s, numext = %s where id = %s;"
-        
-
-            Id_manzana_actual = self.dockwidget.idManzana_original.text()
-            Id_vialidad_actual = self.dockwidget.idVialidad_original.text()
-            numeroExterior = self.dockwidget.textEdit.toPlainText()
-
-            #Mostrar variables de datos actuales del numero exterior
-            IdNumeroManzana = self.dockwidget.idManzana.text()
-            if ' : ' in self.dockwidget.idVialidad.currentText():
-                IdNumeroVialidad = str(self.dockwidget.idVialidad.currentText().split(" :",1)[0])
-            else:
-                IdNumeroVialidad = self.dockwidget.idVialidad.currentText()
-           
-            if IdNumeroManzana == "":
-                if (Id_manzana_actual and not Id_manzana_actual.isspace()) and not Id_manzana_actual == "None":
-                    # the string is non-empty
-                    QMessageBox.information(self.iface.mainWindow(), "Aviso",f"No se actualizó el dato de Id manzana, se conserva el actual: {Id_manzana_actual}")
-                    IdNumeroManzana = Id_manzana_actual
-                else:
-                    # the string is empty
-                    QMessageBox.warning(self.iface.mainWindow(), "Aviso","Debe ingresar el dato Id manzana actualizado para guardar los cambios.")
-                    return
-            elif IdNumeroManzana.isnumeric == False:
-                QMessageBox.information(self.iface.mainWindow(), "Aviso",f"Ingrese un Id valido, caracteres especiales o letras no permitidos.\nNo se actualizó el dato de Id manzana, se conserva el actual: {Id_manzana_actual}")
-            if IdNumeroVialidad == "":
-                if (Id_vialidad_actual and not Id_vialidad_actual.isspace()) and not Id_vialidad_actual == "None":
-                    # the string is non-empty
-                    QMessageBox.information(self.iface.mainWindow(), "Aviso",f"No se actualizó el dato de Identificador de Vialidad más cercano, se conserva el actual: {Id_vialidad_actual}")
-                    IdNumeroVialidad = Id_vialidad_actual
-                else:
-                    # the string is empty
-                    QMessageBox.warning(self.iface.mainWindow(), "Aviso","Debe ingresar el dato de Identificador de Vialidad más cercano para guardar los cambios.")
-                    return
+                #Grabar a Postgres
+                cursor = conn.cursor()
+            
+                qry = "UPDATE bged.numeros_exteriores set manzana = %s, vialidad = %s, numext = %s where id = %s;"
             
 
-            if numeroExterior == "" or numeroExterior == "None":
-                # the string is empty
-                QMessageBox.warning(self.iface.mainWindow(), "Aviso","Debe ingresar el dato de Número Exterior para guardar los cambios.")
-                return
+                Id_manzana_actual = self.dockwidget.idManzana_original.text()
+                Id_vialidad_actual = self.dockwidget.idVialidad_original.text()
+                numeroExterior = self.dockwidget.textEdit.toPlainText()
 
-            IdNumeroManzana = IdNumeroManzana.strip()
-            IdNumeroVialidad = IdNumeroVialidad.strip()
-            numeroExterior = numeroExterior.upper().strip().rstrip(',')
+                #Mostrar variables de datos actuales del numero exterior
+                IdNumeroManzana = self.dockwidget.idManzana.text()
+                if ' : ' in self.dockwidget.idVialidad.currentText():
+                    IdNumeroVialidad = str(self.dockwidget.idVialidad.currentText().split(" :",1)[0])
+                else:
+                    IdNumeroVialidad = self.dockwidget.idVialidad.currentText()
+            
+                if IdNumeroManzana == "":
+                    if (Id_manzana_actual and not Id_manzana_actual.isspace()) and not Id_manzana_actual == "None":
+                        # the string is non-empty
+                        QMessageBox.information(self.iface.mainWindow(), "Aviso",f"No se actualizó el dato de Id manzana, se conserva el actual: {Id_manzana_actual}")
+                        IdNumeroManzana = Id_manzana_actual
+                    else:
+                        # the string is empty
+                        QMessageBox.warning(self.iface.mainWindow(), "Aviso","Debe ingresar el dato Id manzana actualizado para guardar los cambios.")
+                        return
+                elif IdNumeroManzana.isnumeric == False:
+                    QMessageBox.information(self.iface.mainWindow(), "Aviso",f"Ingrese un Id valido, caracteres especiales o letras no permitidos.\nNo se actualizó el dato de Id manzana, se conserva el actual: {Id_manzana_actual}")
+                if IdNumeroVialidad == "":
+                    if (Id_vialidad_actual and not Id_vialidad_actual.isspace()) and not Id_vialidad_actual == "None":
+                        # the string is non-empty
+                        QMessageBox.information(self.iface.mainWindow(), "Aviso",f"No se actualizó el dato de Identificador de Vialidad más cercano, se conserva el actual: {Id_vialidad_actual}")
+                        IdNumeroVialidad = Id_vialidad_actual
+                    else:
+                        # the string is empty
+                        QMessageBox.warning(self.iface.mainWindow(), "Aviso","Debe ingresar el dato de Identificador de Vialidad más cercano para guardar los cambios.")
+                        return
+                
 
-            data = (IdNumeroManzana,IdNumeroVialidad,numeroExterior,self.campo01)
-        
-        
-            cursor.execute(qry,data) 
-            conn.commit()
-            cursor.close()
-            conn.close()         
+                if numeroExterior == "" or numeroExterior == "None":
+                    # the string is empty
+                    QMessageBox.warning(self.iface.mainWindow(), "Aviso","Debe ingresar el dato de Número Exterior para guardar los cambios.")
+                    return
 
-            #Confirmar
-            QMessageBox.information(self.iface.mainWindow(), "Aviso","Se guardaron los cambios exitosamente.")
+                IdNumeroManzana = IdNumeroManzana.strip()
+                IdNumeroVialidad = IdNumeroVialidad.strip()
+                numeroExterior = numeroExterior.upper().strip().rstrip(',')
+
+                data = (IdNumeroManzana,IdNumeroVialidad,numeroExterior,self.campo01)
+            
+            
+                cursor.execute(qry,data) 
+                conn.commit()
+                cursor.close()
+                conn.close()         
+
+                #Confirmar
+                QMessageBox.information(self.iface.mainWindow(), "Aviso","Se guardaron los cambios exitosamente.")
+            else:
+                QMessageBox.warning(self.iface.mainWindow(), "Aviso","No ha iniciado sesión. Imposible ejecutar la acción.")  
 
         except Exception as error:
             QMessageBox.critical(self.iface.mainWindow(), "¡Oops!",f"Ocurrió un error al guardar los cambios. Por favor, revise el estado de red o su conexión \nMotivo: \n{error}.\n Se escribe en el registro.")
@@ -1175,32 +1183,34 @@ class numeros_exteriores:
         
         try:
             
-            #limpiar datos en combo mediante consulta
-            self.dockwidget.idVialidad.clear()
+            if self.conectado == 1:
+                #limpiar datos en combo mediante consulta
+                self.dockwidget.idVialidad.clear()
 
-            #Abrir base
-            usr = self.dockwidget.txtUsuario.text()
-            pwd = self.dockwidget.txtClave.text()
+                #Abrir base
+                usr = self.dockwidget.txtUsuario.text()
+                pwd = self.dockwidget.txtClave.text()
+                
+                #localhost
+                conn = psycopg2.connect(database=self.baseDatos, user=usr, password=pwd, host=self.servidor, port="5432")
             
-            #localhost
-            conn = psycopg2.connect(database=self.baseDatos, user=usr, password=pwd, host=self.servidor, port="5432")
-        
-            with conn:
+                with conn:
 
-                qry_c = "SELECT via.id, via.nombre, ROUND(ST_Distance(numext.geom,via.geom)::numeric,2) as distancia FROM bged.numeros_exteriores numext, bged.vialidad via WHERE numext.id = %s AND ST_DWithin(numext.geom,via.geom,20) ORDER BY distancia ASC;"
-                data_c = (self.campo01, )
-                with conn.cursor() as curs:
+                    qry_c = "SELECT via.id, via.nombre, ROUND(ST_Distance(numext.geom,via.geom)::numeric,2) as distancia FROM bged.numeros_exteriores numext, bged.vialidad via WHERE numext.id = %s AND ST_DWithin(numext.geom,via.geom,20) ORDER BY distancia ASC;"
+                    data_c = (self.campo01, )
+                    with conn.cursor() as curs:
 
-                    curs.execute(qry_c, data_c)              
-                    rows = curs.fetchall() #one row
+                        curs.execute(qry_c, data_c)              
+                        rows = curs.fetchall() #one row
 
-                    for row in rows:
+                        for row in rows:
 
-                        idname = f'{row[0]} : {row[1].title()} a {row[2]} m.'
-                        self.dockwidget.idVialidad.addItem(idname)
+                            idname = f'{row[0]} : {row[1].title()} a {row[2]} m.'
+                            self.dockwidget.idVialidad.addItem(idname)
 
-            conn.close()
-            
+                conn.close()
+            else:
+                QMessageBox.warning(self.iface.mainWindow(), "Aviso","No ha iniciado sesión. Imposible ejecutar la acción.")      
         except Exception as error:
             conn.close()
             QMessageBox.critical(self.iface.mainWindow(), "¡Oops!",f"Ocurrió un error al identificar las vialidades. \nMotivo: \n{error}.\n Se escribe en el registro.")
@@ -1209,32 +1219,34 @@ class numeros_exteriores:
     def btnIdentificar60_accion(self):
         
         try:
-            #limpiar datos en combo mediante consulta
-            self.dockwidget.idVialidad.clear()
+            if self.conectado == 1:
+                #limpiar datos en combo mediante consulta
+                self.dockwidget.idVialidad.clear()
+                
+                #Abrir base
+                usr = self.dockwidget.txtUsuario.text()
+                pwd = self.dockwidget.txtClave.text()
+                
+                #localhost
+                conn = psycopg2.connect(database=self.baseDatos, user=usr, password=pwd, host=self.servidor, port="5432")
             
-            #Abrir base
-            usr = self.dockwidget.txtUsuario.text()
-            pwd = self.dockwidget.txtClave.text()
-            
-            #localhost
-            conn = psycopg2.connect(database=self.baseDatos, user=usr, password=pwd, host=self.servidor, port="5432")
-        
-            with conn:
+                with conn:
 
-                qry_c = "SELECT via.id, via.nombre, ROUND(ST_Distance(numext.geom,via.geom)::numeric,2) as distancia FROM bged.numeros_exteriores numext, bged.vialidad via WHERE numext.id = %s AND ST_DWithin(numext.geom,via.geom,60) ORDER BY distancia ASC;"
-                data_c = (self.campo01, )
-                with conn.cursor() as curs:
+                    qry_c = "SELECT via.id, via.nombre, ROUND(ST_Distance(numext.geom,via.geom)::numeric,2) as distancia FROM bged.numeros_exteriores numext, bged.vialidad via WHERE numext.id = %s AND ST_DWithin(numext.geom,via.geom,60) ORDER BY distancia ASC;"
+                    data_c = (self.campo01, )
+                    with conn.cursor() as curs:
 
-                    curs.execute(qry_c, data_c)        
-                    rows = curs.fetchall() #one row
+                        curs.execute(qry_c, data_c)        
+                        rows = curs.fetchall() #one row
 
-                    for row in rows:
+                        for row in rows:
 
-                        idname = f'{row[0]} : {row[1].title()} a {row[2]} m.'
-                        self.dockwidget.idVialidad.addItem(idname)
+                            idname = f'{row[0]} : {row[1].title()} a {row[2]} m.'
+                            self.dockwidget.idVialidad.addItem(idname)
 
-            conn.close()
-            
+                conn.close()
+            else:
+                QMessageBox.warning(self.iface.mainWindow(), "Aviso","No ha iniciado sesión. Imposible ejecutar la acción.")     
         except Exception as error:
             conn.close()
             QMessageBox.critical(self.iface.mainWindow(), "¡Oops!",f"Ocurrió un error al identificar las vialidades. \nMotivo: \n{error}.\n Se escribe en el registro.")
@@ -1243,44 +1255,45 @@ class numeros_exteriores:
     def btndistUsuario_accion(self):
         
         try:
-            
-            #Abrir base
-            usr = self.dockwidget.txtUsuario.text()
-            pwd = self.dockwidget.txtClave.text()
-            distUsuario = self.dockwidget.distUsuario.text()
+            if self.conectado == 1:
+                #Abrir base
+                usr = self.dockwidget.txtUsuario.text()
+                pwd = self.dockwidget.txtClave.text()
+                distUsuario = self.dockwidget.distUsuario.text()
 
-            #localhost
-            #remote Samge bged 
-            if distUsuario == '':
-                QMessageBox.warning(self.iface.mainWindow(),"Alerta","No se ha ingresado una distancia, por favor, ingrese una. \nConsidere que esta debe ser mayor que 60m.")
+                #localhost
+                #remote Samge bged 
+                if distUsuario == '':
+                    QMessageBox.warning(self.iface.mainWindow(),"Alerta","No se ha ingresado una distancia, por favor, ingrese una. \nConsidere que esta debe ser mayor que 60m.")
 
-            elif distUsuario.isnumeric() == False:
-                QMessageBox.warning(self.iface.mainWindow(),"Alerta","Eso no es un valor, por favor, ingrese uno.\nConsidere que el valor de distancia debe ser mayor que 60m.")
-            
-            elif float(distUsuario) <= 60:
-                QMessageBox.warning(self.iface.mainWindow(),"Alerta","La distancia ingresada es igual o menor que 60m.")
-            
-            elif len(distUsuario) >= 2 and float(distUsuario) > 60:
-
-                conn = psycopg2.connect(database=self.baseDatos, user=usr, password=pwd, host=self.servidor, port="5432")
-
-                with conn:
-
-                    qry_c = "SELECT via.id, via.nombre, ROUND(ST_Distance(numext.geom,via.geom)::numeric,2) as distancia FROM bged.numeros_exteriores numext, bged.vialidad via WHERE numext.id = %s AND ST_DWithin(numext.geom,via.geom,{0}) ORDER BY distancia ASC;".format(distUsuario)
-                    data_c = (self.campo01, )
-                    with conn.cursor() as curs:
-
-                        curs.execute(qry_c, data_c)
-                        rows = curs.fetchall() #one row
-                        if len(rows) == 0:
-                            QMessageBox.warning(self.iface.mainWindow(),"Aviso","La distancia no arrojó ningún resultado. Por favor, intente con una mayor o verifique que la cartografía esté actualizada.")
-                        else:
-                            for row in rows:
-        
-                                idname = f'{row[0]} : {row[1].title()} a {row[2]} m.'
-                                self.dockwidget.idVialidad.addItem(idname)
-                conn.close()
+                elif distUsuario.isnumeric() == False:
+                    QMessageBox.warning(self.iface.mainWindow(),"Alerta","Eso no es un valor, por favor, ingrese uno.\nConsidere que el valor de distancia debe ser mayor que 60m.")
                 
+                elif float(distUsuario) <= 60:
+                    QMessageBox.warning(self.iface.mainWindow(),"Alerta","La distancia ingresada es igual o menor que 60m.")
+                
+                elif len(distUsuario) >= 2 and float(distUsuario) > 60:
+
+                    conn = psycopg2.connect(database=self.baseDatos, user=usr, password=pwd, host=self.servidor, port="5432")
+
+                    with conn:
+
+                        qry_c = "SELECT via.id, via.nombre, ROUND(ST_Distance(numext.geom,via.geom)::numeric,2) as distancia FROM bged.numeros_exteriores numext, bged.vialidad via WHERE numext.id = %s AND ST_DWithin(numext.geom,via.geom,{0}) ORDER BY distancia ASC;".format(distUsuario)
+                        data_c = (self.campo01, )
+                        with conn.cursor() as curs:
+
+                            curs.execute(qry_c, data_c)
+                            rows = curs.fetchall() #one row
+                            if len(rows) == 0:
+                                QMessageBox.warning(self.iface.mainWindow(),"Aviso","La distancia no arrojó ningún resultado. Por favor, intente con una mayor o verifique que la cartografía esté actualizada.")
+                            else:
+                                for row in rows:
+            
+                                    idname = f'{row[0]} : {row[1].title()} a {row[2]} m.'
+                                    self.dockwidget.idVialidad.addItem(idname)
+                    conn.close()
+            else:
+                QMessageBox.warning(self.iface.mainWindow(), "Aviso","No ha iniciado sesión. Imposible ejecutar la acción.")      
         except Exception as error:
             conn.close()
             QMessageBox.critical(self.iface.mainWindow(), "¡Oops!",f"Ocurrió un error al identificar las vialidades. \nMotivo: \n{error}.\n Se escribe en el registro.")
