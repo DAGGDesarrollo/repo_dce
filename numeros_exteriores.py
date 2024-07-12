@@ -656,6 +656,7 @@ class numeros_exteriores:
                     MZ_layer.isExpression = True
                     MZ_layer.enabled = True
                     MZ_layer.placement = QgsPalLayerSettings.AroundPoint
+                    MZ_layer.fitInPolygonOnly = True
                     MZlabels = QgsVectorLayerSimpleLabeling(MZ_layer)
                     MZlabels.drawLabels = True
                     vlayerM.setLabeling(MZlabels)
