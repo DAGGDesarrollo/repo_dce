@@ -1071,6 +1071,27 @@ class numeros_exteriores:
                 cursor.close()
                 conn.close()         
 
+                #Se limpian los distintos campos al guardar
+                self.dockwidget.textEdit.setText("")
+                self.dockwidget.idVialidad_original.setText("")
+                self.dockwidget.idManzana_original.setText("")
+                self.dockwidget.idVialidad.clear()
+                self.dockwidget.idManzana.clear()
+                self.dockwidget.txtRinicial.setText("")
+                self.dockwidget.txtRfinal.setText("")
+                self.dockwidget.txtRIntervalo.setText("")
+                self.dockwidget.distUsuario.setText("")
+                self.dockwidget.checkLl.setChecked(False)
+                self.dockwidget.checkEnne.setChecked(False)
+                self.dockwidget.checkRr.setChecked(False)
+                self.dockwidget.checkSinIntervalo.setChecked(False)
+                self.control = 0
+                self.SectorNombre = ['', '', '']
+                self.SectorRInicial = ['', '', '']
+                self.SectorRFinal = ['', '', '']
+                self.SectorRIntervalo = ['', '', '']
+                self.flagSinIntervalo = [False,False,False]
+
                 #Confirmar
                 QMessageBox.information(self.iface.mainWindow(), "Aviso","Se guardaron los cambios exitosamente.")
             else:
