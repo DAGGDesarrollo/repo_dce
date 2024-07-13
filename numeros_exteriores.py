@@ -551,9 +551,10 @@ class numeros_exteriores:
                 for layer in layers:
                     if layer.type() == QgsMapLayer.VectorLayer:
                         vlayer_count = vlayer_count + 1
-                    if "Seccion_" in layer.name():
+                    if "Seccion_" in layer.name() or layer.name() == "Manzana" or layer.name() == "Vialidad" or layer.name() == "NumerosExteriores" or layer.name() == "Seccion":
                         QgsProject.instance().removeMapLayer(layer)
 
+                vlayer_count = 0
                 numeroSeccion = str(self.dockwidget.cveSeccion.currentText())
                 numeroMunicipio = str(self.dockwidget.cveMunicipio.currentText().split(" :",1)[0])
 
@@ -605,7 +606,6 @@ class numeros_exteriores:
                     vlayerSEC = QgsVectorLayer(uri.uri(False), "Seccion", "postgres")
                     QgsProject.instance().addMapLayer(vlayerSEC)
 
-
                     #Se configura el formato de las etiquetas
                     SE_layer = QgsPalLayerSettings()
                     textFormat = QgsTextFormat()
@@ -619,6 +619,7 @@ class numeros_exteriores:
                     SE_layer.isExpression = True
                     SE_layer.enabled = True
                     SE_layer.placement = QgsPalLayerSettings.OverPoint
+                    SE_layer.fitInPolygonOnly = True
                     SElabels = QgsVectorLayerSimpleLabeling(SE_layer)
                     SElabels.drawLabels = True
                     vlayerSEC.setLabeling(SElabels)
@@ -636,12 +637,12 @@ class numeros_exteriores:
                     
                     #Muestra el 40% de avance
                     prog.setValue(40)
-
+                    query = f"SELECT m.geom as geom, m.id as id,m.seccion FROM bged.manzana as m, bged.seccion as s WHERE s.seccion = {numeroSeccion} AND ST_Contains(s.geom,m.geom)"
+                    uri.setDataSource('', f'({query})', 'geom', '', 'id')
                     #Cargar capas
-                    uri.setDataSource("bged", "manzana", "geom", "municipio=" + numeroMunicipio)
 
-                    vlayerM = QgsVectorLayer(uri.uri(False), "Manzana", "postgres")
-                    
+                    vlayerM = QgsVectorLayer(uri.uri(), "Manzana", "postgres")
+
                     QgsProject.instance().addMapLayer(vlayerM)
 
                     MZ_layer = QgsPalLayerSettings()
@@ -670,13 +671,14 @@ class numeros_exteriores:
                     myRenderer.setSymbol(mySymbol1)
                     vlayerM.triggerRepaint()
                     QtTest.QTest.qWait(1500)
-                    #E83845            prog.setValue(20)
+                    #E83845
 
                     #Muestra el 60% de avance
                     prog.setValue(60) 
 
-                    uri.setDataSource("bged", "vialidad", "geom")
-                    vlayerV = QgsVectorLayer(uri.uri(False), "Vialidad", "postgres")
+                    query = f"SELECT v.geom as geom, v.id as id, v.nombre as nombre FROM bged.vialidad as v, bged.seccion as s WHERE s.seccion = {numeroSeccion} AND ST_Intersects(v.geom,s.geom)"
+                    uri.setDataSource('', f'({query})', 'geom', '', 'id')
+                    vlayerV = QgsVectorLayer(uri.uri(), "Vialidad", "postgres")
                     QgsProject.instance().addMapLayer(vlayerV)
 
                     V_layer = QgsPalLayerSettings()
@@ -708,9 +710,11 @@ class numeros_exteriores:
                     #Muestra el 80% de avance
                     prog.setValue(80)
 
+                    query = f"SELECT ne.geom as geom, ne.id as id, ne.manzana as manzana, ne.vialidad as vialidad, ne.numext as numext FROM bged.numeros_exteriores as ne, bged.seccion as s WHERE s.seccion = {numeroSeccion} AND	ST_Contains(s.geom,ne.geom)"
+                    uri.setDataSource('', f'({query})', 'geom', '', 'id')
+
                     #Consulta de numeros exteriores con campos nulos
-                    uri.setDataSource("bged", "numeros_exteriores", "geom")
-                    vlayerNE = QgsVectorLayer(uri.uri(False), "NumerosExteriores", "postgres")
+                    vlayerNE = QgsVectorLayer(uri.uri(), "NumerosExteriores", "postgres")
                     QgsProject.instance().addMapLayer(vlayerNE)
                     QtTest.QTest.qWait(100)
 
@@ -734,7 +738,6 @@ class numeros_exteriores:
                     
                     self.ultimoMunicipio = municipioActual
 
-                
                 #Borrar campos de texto en edicion simple
                 self.dockwidget.textEdit.setText("")
                 self.dockwidget.idManzana.setText("")
