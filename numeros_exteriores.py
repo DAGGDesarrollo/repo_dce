@@ -117,6 +117,9 @@ class numeros_exteriores:
         self.SectorRFinal = ['', '', '']
         self.SectorRIntervalo = ['', '', '']
         self.flagSinIntervalo = [False,False,False]
+        
+        self.cadena_existente = ""
+        self.controlCadenaUH = 0
 
         self.Sector1 = []
         self.Sector2 = []
@@ -410,7 +413,7 @@ class numeros_exteriores:
 
             QMessageBox.information(self.iface.mainWindow(), 'Aviso', f'Se realizó la conexión con éxito...\nIP: {self.servidor}\nBase de datos: {self.baseDatos}\nBienvenido {usr.split(".")[0].title()}')
             self.logger.info(f'{datetime.now().strftime(self.timeformat)} Conexión exitosa')
-
+            QMessageBox.information(self.iface.mainWindow(), 'Aviso importante', f'Con la finalidad de mantener actualizada la cartografía de manera permanente, se deberá observar los lineamientos y normas vigentes en materia de digitalización para la incorporación de información cartográfica.')
         except psycopg2.Error as error:
             if psycopg2.errors.lookup("28P01"):
                 QMessageBox.warning(self.iface.mainWindow(), "Aviso","Credenciales incorrectas, por favor, verifique.")                    
@@ -446,6 +449,7 @@ class numeros_exteriores:
                     self.dockwidget.txtRinicial.setText("")
                     self.dockwidget.txtRfinal.setText("")
                     self.dockwidget.txtRIntervalo.setText("")
+                    self.dockwidget.textEdit.setText("")
 
                     self.dockwidget.txtServidor.setEnabled(True)
                     self.dockwidget.cveEntidad.setEnabled(True)
@@ -637,7 +641,7 @@ class numeros_exteriores:
                     
                     #Muestra el 40% de avance
                     prog.setValue(40)
-                    query = f"SELECT m.geom as geom, m.id as id,m.seccion FROM bged.manzana as m, bged.seccion as s WHERE s.seccion = {numeroSeccion} AND ST_Contains(s.geom,m.geom)"
+                    query = f"SELECT m.geom as geom, m.id as id, m.entidad as entidad, m.distrito as distrito, m.municipio as municipio, m.seccion as seccion, m.localidad as localidad, m.manzana as manzana, m.status as status, m.disperso as disperso, m.caso_captura as caso_captura FROM bged.manzana as m, bged.seccion as s WHERE s.seccion = {numeroSeccion} AND ST_Contains(s.geom,m.geom)"
                     uri.setDataSource('', f'({query})', 'geom', '', 'id')
                     #Cargar capas
 
@@ -768,8 +772,9 @@ class numeros_exteriores:
         
         try:
             if self.conectado == 1:
+                
                 #pass
-                #Probando funcion
+                #Probando función
                 self.campo01 = ""
 
                 #limpiar datos en combo idVialidad e idManzana
@@ -778,7 +783,7 @@ class numeros_exteriores:
                 
                 # Get list of vector layers
                 layers = list(QgsProject.instance().mapLayers().values())
-                # Check there is at least one vector layer. Selecting within the same layer is fine.
+                # Check if there is at least one vector layer. Selecting within the same layer is fine.
                 vlayer_count = 0
                 for layer in layers:
                     if layer.type() == QgsMapLayer.VectorLayer:
@@ -848,6 +853,7 @@ class numeros_exteriores:
                         self.dockwidget.idVialidad_original.setText(str(result04))
                     
                 conn.close()
+                self.cadena_existente = result05
             else:
                 QMessageBox.warning(self.iface.mainWindow(), "Aviso","No ha iniciado sesión. Imposible ejecutar la acción.")  
         
@@ -1065,7 +1071,15 @@ class numeros_exteriores:
 
                 IdNumeroManzana = IdNumeroManzana.strip()
                 IdNumeroVialidad = IdNumeroVialidad.strip()
-                numeroExterior = numeroExterior.upper().strip().rstrip(',')
+                
+                #Si se usa la función Cadena UH permite concatener los números exteriores existentes con los creados o los sobrescribe
+                if  self.controlCadenaUH == 1 and self.cadena_existente != "":
+                    buttonReply = QMessageBox.question(self.iface.mainWindow(), 'Atención', "Usó la función Cadena UH ¿Desea conservar los números exteriores existentes? Dé clic en «Sí» para concatenarlos o en «No» para sobreescribirlos.", QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+                    #Pregunta al usuario si quiere concatenar los datos de Cadena UH a los anteriores
+                    if buttonReply == QMessageBox.Yes:
+                        numeroExterior = f"{self.cadena_existente},{numeroExterior.upper().strip().rstrip(',')}"
+                else:
+                    numeroExterior = numeroExterior.upper().strip().rstrip(',')
 
                 data = (IdNumeroManzana,IdNumeroVialidad,numeroExterior,self.campo01)
             
@@ -1090,11 +1104,15 @@ class numeros_exteriores:
                 self.dockwidget.checkRr.setChecked(False)
                 self.dockwidget.checkSinIntervalo.setChecked(False)
                 self.control = 0
+                self.controlCadenaUH = 0
                 self.SectorNombre = ['', '', '']
                 self.SectorRInicial = ['', '', '']
                 self.SectorRFinal = ['', '', '']
                 self.SectorRIntervalo = ['', '', '']
                 self.flagSinIntervalo = [False,False,False]
+                self.Sector1 = []
+                self.Sector2 = []
+                self.Sector3 = []
 
                 #Confirmar
                 QMessageBox.information(self.iface.mainWindow(), "Aviso","Se guardaron los cambios exitosamente.")
@@ -1447,7 +1465,8 @@ class numeros_exteriores:
 
         try:
             intervalos = ""
-
+            self.controlCadenaUH = 1
+            
             #Verifica que se tengan datos en los tres sectores y que el checkbox no esté marcado, si se cumple, avanza
             if self.SectorNombre[0] != "" and self.SectorNombre[1] != "" and self.SectorNombre[2] != "":
                 for i in range(len(self.Sector1)):
