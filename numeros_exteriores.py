@@ -468,6 +468,15 @@ class numeros_exteriores:
                     self.dockwidget.btnDesconectar.setEnabled(False)
                     self.dockwidget.btnConectar.setEnabled(True)      
 
+                    # Lista las capas
+                    layers = list(QgsProject.instance().mapLayers().values())
+                    vlayer_count = 0
+                    for layer in layers:
+                        if layer.type() == QgsMapLayer.VectorLayer:
+                            vlayer_count = vlayer_count + 1
+                        #Elimina sólo las capas que usa el Plugin
+                        if "Seccion_" in layer.name() or layer.name() == "Manzana" or layer.name() == "Vialidad" or layer.name() == "NumerosExteriores" or layer.name() == "Seccion":
+                            QgsProject.instance().removeMapLayer(layer)
                     self.conectado = False
                     self.iface.mainWindow().show()
                     QMessageBox.information(self.iface.mainWindow(),'Información',f'Se ha cerrado la sesión. \nHasta pronto {usuario.split(".")[0].title()}.')
