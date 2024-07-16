@@ -1155,8 +1155,8 @@ class numeros_exteriores:
             #Crea la cadena de números exteriores usando una letra para los casos 1A, 1B,1C...
             elif(self.dockwidget.txtRinicial.text().isnumeric() == False and self.dockwidget.txtRfinal.text().isnumeric() == False):
                 #Identifica la letra que se ingresó
-                letraInicio = re.findall(r'\D',self.dockwidget.txtRinicial.text())
-                letraFinal = re.findall(r'\D',self.dockwidget.txtRfinal.text())
+                letraInicio = re.findall(r'[a-zA-Z]',self.dockwidget.txtRinicial.text())
+                letraFinal = re.findall(r'[a-zA-Z]',self.dockwidget.txtRfinal.text())
                 #Obtiene la parte numérica del texto ingresado
                 numInicio = self.dockwidget.txtRinicial.text().split(letraInicio[0])[0]
                 numFinal = self.dockwidget.txtRfinal.text().split(letraFinal[0])[0]
@@ -1198,11 +1198,11 @@ class numeros_exteriores:
                 intervalos = intervaloAlfa.rstrip(',')
             cadena1 = self.dockwidget.textEdit.toPlainText()
             if cadena1 == "":
-                self.dockwidget.textEdit.setText(intervalos)
+                self.dockwidget.textEdit.setText(intervalos.replace(" ",""))
             elif intervalos == "":
-                self.dockwidget.textEdit.setText(cadena1)
+                self.dockwidget.textEdit.setText(cadena1.replace(" ",""))
             else:
-                self.dockwidget.textEdit.setText(cadena1 + "," + intervalos)
+                self.dockwidget.textEdit.setText(cadena1.replace(" ","") + "," + intervalos.replace(" ",""))
                 
         except Exception as error:
             QMessageBox.critical(self.iface.mainWindow(), "¡Oops!",f"Ocurrió un error al crear la cadena. \nMotivo: \n{error}.\n Se escribe en el registro.")
