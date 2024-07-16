@@ -1200,9 +1200,9 @@ class numeros_exteriores:
             if cadena1 == "":
                 self.dockwidget.textEdit.setText(intervalos.replace(" ",""))
             elif intervalos == "":
-                self.dockwidget.textEdit.setText(cadena1.replace(" ",""))
+                self.dockwidget.textEdit.setText(cadena1)
             else:
-                self.dockwidget.textEdit.setText(cadena1.replace(" ","") + "," + intervalos.replace(" ",""))
+                self.dockwidget.textEdit.setText(cadena1 + "," + intervalos.replace(" ",""))
                 
         except Exception as error:
             QMessageBox.critical(self.iface.mainWindow(), "¡Oops!",f"Ocurrió un error al crear la cadena. \nMotivo: \n{error}.\n Se escribe en el registro.")
