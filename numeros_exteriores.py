@@ -300,7 +300,7 @@ class numeros_exteriores:
 
     def run(self):
         """Run method that loads and starts the plugin"""
-
+        
         if not self.pluginIsActive:
             self.pluginIsActive = True
 
@@ -622,7 +622,7 @@ class numeros_exteriores:
                     SE_layer.fieldName = '\'Sección \n\' || lpad(to_string("seccion"),4,\'0\')' #Sección a cuatro digitos, del tipo 00001
                     SE_layer.isExpression = True
                     SE_layer.enabled = True
-                    SE_layer.placement = QgsPalLayerSettings.OverPoint
+                    SE_layer.placement = QgsPalLayerSettings.AroundPoint
                     SE_layer.fitInPolygonOnly = True
                     SElabels = QgsVectorLayerSimpleLabeling(SE_layer)
                     SElabels.drawLabels = True
@@ -1169,7 +1169,9 @@ class numeros_exteriores:
                         intervaloAlfa = intervaloAlfa + (numInicio + '' + chr(i) + ',')
                 #Si los valores ingresados son del tipo 2 - 1, envía alerta
                 elif (numInicio > numFinal):
-                    QMessageBox.warning(self.iface.mainWindow(), "Aviso", "El orden numérico es descendente, por favor, verifique e intente de nuevo.")          
+                    QMessageBox.warning(self.iface.mainWindow(), "Aviso", "El orden numérico es descendente, por favor, verifique e intente de nuevo.")       
+                elif (numInicio > numFinal):
+                    QMessageBox.warning(self.iface.mainWindow(), "Aviso", "El orden numérico es descendente, por favor, verifique e intente de nuevo.")    
                 #Si los valores ingresados son del tipo 1A - 2C, crea 1A, 1B, 1C,..., 1Z, 2A, 2B, 2C
                 elif numInicio != numFinal and posInicial <= posFinal:
                     for i in range(int(numInicio),int(numInicio)+1,1):
