@@ -467,7 +467,8 @@ class numeros_exteriores:
                     self.dockwidget.checkSinIntervalo.setChecked(False)
 
                     self.dockwidget.btnDesconectar.setEnabled(False)
-                    self.dockwidget.btnConectar.setEnabled(True)   
+                    self.dockwidget.btnConectar.setEnabled(True)
+                    self.dockwidget.checkFiltroCapas.setChecked(False)   
 
                     # Lista las capas
                     layers = list(QgsProject.instance().mapLayers().values())
@@ -537,6 +538,11 @@ class numeros_exteriores:
 
         try:
             if self.conectado == 1:
+                
+                #Manda mensaje sobre el modo de carga seleccionado
+                if self.dockwidget.checkFiltroCapas.isChecked():
+                    QMessageBox.information(self.iface.mainWindow(), 'Atención', "Seleccionó la opción «Acotar Solo a la Sección», considere que en este modo de carga solo podrá editar y validar a nivel tabular.")
+
                 #Se configura la barra de progreso y se fija el valor inicial en 0 para comenzar el proceso
                 prog = QProgressDialog('Cargando capas. Un momento, por favor.', '', 0, 100)
                 prog.setWindowModality(Qt.WindowModal)
@@ -648,11 +654,15 @@ class numeros_exteriores:
                     vlayerSEC.triggerRepaint()
                     QtTest.QTest.qWait(1000)
                     #E83845
-                    
+                
                     #Muestra el 40% de avance
                     prog.setValue(40)
-                    query = f"SELECT m.geom as geom, m.id as id, m.entidad as entidad, m.distrito as distrito, m.municipio as municipio, m.seccion as seccion, m.localidad as localidad, m.manzana as manzana, m.status as status, m.disperso as disperso, m.caso_captura as caso_captura FROM bged.manzana as m, bged.seccion as s WHERE s.seccion = {numeroSeccion} AND ST_Contains(s.geom,m.geom)"
-                    uri.setDataSource('', f'({query})', 'geom', '', 'id')
+                    #Si el checkbox está marcado se cargan sólo las capas filtradas 
+                    if self.dockwidget.checkFiltroCapas.isChecked():
+                        query = f"SELECT m.geom as geom, m.id as id, m.entidad as entidad, m.distrito as distrito, m.municipio as municipio, m.seccion as seccion, m.localidad as localidad, m.manzana as manzana, m.status as status, m.disperso as disperso, m.caso_captura as caso_captura FROM bged.manzana as m, bged.seccion as s WHERE s.seccion = {numeroSeccion} AND ST_Contains(s.geom,m.geom)"
+                        uri.setDataSource('', f'({query})', 'geom', '', 'id')
+                    else:
+                        uri.setDataSource("bged", "manzana", "geom", "municipio=" + numeroMunicipio)
                     #Cargar capas
 
                     vlayerM = QgsVectorLayer(uri.uri(), "Manzana", "postgres")
@@ -690,8 +700,12 @@ class numeros_exteriores:
                     #Muestra el 60% de avance
                     prog.setValue(60) 
 
-                    query = f"SELECT v.geom as geom, v.id as id, v.nombre as nombre FROM bged.vialidad as v, bged.seccion as s WHERE s.seccion = {numeroSeccion} AND ST_Intersects(v.geom,s.geom)"
-                    uri.setDataSource('', f'({query})', 'geom', '', 'id')
+                    #Si el checkbox está marcado se cargan sólo las capas filtradas 
+                    if self.dockwidget.checkFiltroCapas.isChecked():
+                        query = f"SELECT v.geom as geom, v.id as id, v.nombre as nombre FROM bged.vialidad as v, bged.seccion as s WHERE s.seccion = {numeroSeccion} AND ST_Intersects(v.geom,s.geom)"
+                        uri.setDataSource('', f'({query})', 'geom', '', 'id')
+                    else:
+                        uri.setDataSource("bged", "vialidad", "geom")
                     vlayerV = QgsVectorLayer(uri.uri(), "Vialidad", "postgres")
                     QgsProject.instance().addMapLayer(vlayerV)
 
@@ -724,8 +738,12 @@ class numeros_exteriores:
                     #Muestra el 80% de avance
                     prog.setValue(80)
 
-                    query = f"SELECT ne.geom as geom, ne.id as id, ne.manzana as manzana, ne.vialidad as vialidad, ne.numext as numext FROM bged.numeros_exteriores as ne, bged.seccion as s WHERE s.seccion = {numeroSeccion} AND	ST_Contains(s.geom,ne.geom)"
-                    uri.setDataSource('', f'({query})', 'geom', '', 'id')
+                    #Si el checkbox está marcado se cargan sólo las capas filtradas 
+                    if self.dockwidget.checkFiltroCapas.isChecked():
+                        query = f"SELECT ne.geom as geom, ne.id as id, ne.manzana as manzana, ne.vialidad as vialidad, ne.numext as numext FROM bged.numeros_exteriores as ne, bged.seccion as s WHERE s.seccion = {numeroSeccion} AND	ST_Contains(s.geom,ne.geom)"
+                        uri.setDataSource('', f'({query})', 'geom', '', 'id')
+                    else:
+                        uri.setDataSource("bged", "numeros_exteriores", "geom")
 
                     #Consulta de numeros exteriores con campos nulos
                     vlayerNE = QgsVectorLayer(uri.uri(), "NumerosExteriores", "postgres")
@@ -760,6 +778,7 @@ class numeros_exteriores:
 
                 #Se ajusta el valor de progreso de 100% para mostrar el fin del proceso
                 prog.setValue(100) 
+                self.dockwidget.checkFiltroCapas.setChecked(False)
                 QMessageBox.information(self.iface.mainWindow(), "Aviso", "Se cargaron las capas en el área de trabajo. Continúe con la edición de los números exteriores.")
             else:
                 QMessageBox.warning(self.iface.mainWindow(), "Aviso","No ha iniciado sesión. Imposible ejecutar la acción.")   
