@@ -466,6 +466,19 @@
          <set>Qt::AlignCenter</set>
         </property>
        </widget>
+       <widget class="QCheckBox" name="checkFiltroCapas">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>170</y>
+          <width>261</width>
+          <height>41</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Acotar Solo a la Sección</string>
+        </property>
+       </widget>
       </widget>
       <widget class="QWidget" name="Edicion">
        <attribute name="title">
