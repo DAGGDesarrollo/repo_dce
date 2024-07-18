@@ -838,6 +838,7 @@ class numeros_exteriores:
                     # get the list of selected ids 
                     ids = vl.selectedFeatureIds()
                     
+                    #Si se selecciona solo un registro se muestra la información del registro
                     if len(ids) == 1:
                         # create the request with the selected ids
                         request = QgsFeatureRequest()
@@ -850,46 +851,44 @@ class numeros_exteriores:
                             attrs = [feature[field] for field in fields]
                         
                         self.campo01 = str(attrs[0])
+                        usr = self.dockwidget.txtUsuario.text()
+                        pwd = self.dockwidget.txtClave.text()
+                        
+                        #localhost
+                        #remote Samge bged 
+                        conn = psycopg2.connect(database=self.baseDatos, user=usr, password=pwd, host=self.servidor, port="5432")
+                        
+                        with conn:
+
+                            qry_c = "SELECT geom, tramo, manzana, vialidad, numext, valida from bged.numeros_exteriores where id = %s;"
+                            data_c = (self.campo01, )
+                            with conn.cursor() as curs:
+
+                                curs.execute(qry_c, data_c)
+                    
+                                
+                                results = curs.fetchone() #one row
+
+                                result01 = results[0]   #geom           tramo
+                                result02 = results[1]   #tramo          manzana
+                                result03 = results[2]   #idManzana      vialidad
+                                result04 = results[3]   #idVialidad     numext
+                                result05 = results[4]   #idNumExt       valida
+                                result06 = results[5]   #valida         pro
+                    
+                                self.dockwidget.textEdit.setText(result05)
+                                self.dockwidget.idManzana_original.setText(str(result03))
+                                self.dockwidget.idVialidad_original.setText(str(result04))
+                            
+                        conn.close()
+                        self.cadena_existente = result05
                         
                     elif len(ids) == 0: 
                         QMessageBox.warning(self.iface.mainWindow(), "Verifique","No ha seleccionado ninguna geometría de números exteriores. Imposible mostrar.")	
                     else:
-                        QMessageBox.warning(self.iface.mainWindow(), "Verifique","Debe seleccionar sólo un elemento.")	
+                        QMessageBox.warning(self.iface.mainWindow(), "Verifique",f"Debe seleccionar solo un registro. Hay {len(ids)} registros seleccionados.")	
                 else:
                     QMessageBox.warning(self.iface.mainWindow(), "Verifique","No hay capas vectoriales agregadas.")		
-                
-                
-                usr = self.dockwidget.txtUsuario.text()
-                pwd = self.dockwidget.txtClave.text()
-                
-                #localhost
-                #remote Samge bged 
-                conn = psycopg2.connect(database=self.baseDatos, user=usr, password=pwd, host=self.servidor, port="5432")
-                
-                with conn:
-
-                    qry_c = "SELECT geom, tramo, manzana, vialidad, numext, valida from bged.numeros_exteriores where id = %s;"
-                    data_c = (self.campo01, )
-                    with conn.cursor() as curs:
-
-                        curs.execute(qry_c, data_c)
-            
-                        
-                        results = curs.fetchone() #one row
-
-                        result01 = results[0]   #geom           tramo
-                        result02 = results[1]   #tramo          manzana
-                        result03 = results[2]   #idManzana      vialidad
-                        result04 = results[3]   #idVialidad     numext
-                        result05 = results[4]   #idNumExt       valida
-                        result06 = results[5]   #valida         pro
-            
-                        self.dockwidget.textEdit.setText(result05)
-                        self.dockwidget.idManzana_original.setText(str(result03))
-                        self.dockwidget.idVialidad_original.setText(str(result04))
-                    
-                conn.close()
-                self.cadena_existente = result05
             else:
                 QMessageBox.warning(self.iface.mainWindow(), "Aviso","No ha iniciado sesión. Imposible ejecutar la acción.")  
             
@@ -941,9 +940,9 @@ class numeros_exteriores:
                         
 
                     elif len(ids) == 0: 
-                        QMessageBox.warning(self.iface.mainWindow(), "Verifique","No seleccionó ningún elemento.")	
+                        QMessageBox.warning(self.iface.mainWindow(), "Verifique","No seleccionó ningún registro.")	
                     else:
-                        QMessageBox.warning(self.iface.mainWindow(), "Verifique","Debe seleccionar sólo un elemento.")	
+                        QMessageBox.warning(self.iface.mainWindow(), "Verifique","Debe seleccionar solo un registro.")	
                 else:
                     QMessageBox.warning(self.iface.mainWindow(), "Verifique","No hay capas vectoriales agregadas.")		
     
