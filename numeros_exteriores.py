@@ -121,6 +121,7 @@ class numeros_exteriores:
         self.cadena_existente = ""
         self.controlCadenaUH = 0
         self.controlMostrar = 0
+        self.controlCrearCadena = 0
 
         self.Sector1 = []
         self.Sector2 = []
@@ -763,7 +764,7 @@ class numeros_exteriores:
                     QtTest.QTest.qWait(200)
 
                     renderer = vlayerNE.renderer()
-                    symbol1 = QgsLineSymbol.createSimple({'color':'#005F00', 'width':'0.3', 'line_style':'dash'})
+                    symbol1 = QgsLineSymbol.createSimple({'color':'#005F00', 'width':'0.4', 'line_style':'dash'})
                     renderer.setSymbol(symbol1) 
                     vlayerNE.triggerRepaint()
                     QtTest.QTest.qWait(3000)
@@ -775,6 +776,9 @@ class numeros_exteriores:
                 self.dockwidget.idManzana.setText("")
                 self.dockwidget.idManzana_original.setText("")
                 self.dockwidget.idVialidad_original.setText("")  
+                
+                #Iguala a cero el control de Crear Cadena al cargar una nueva área de trabajo
+                self.controlCrearCadena = 0
 
                 #Se ajusta el valor de progreso de 100% para mostrar el fin del proceso
                 prog.setValue(100) 
@@ -887,6 +891,9 @@ class numeros_exteriores:
                 self.cadena_existente = result05
             else:
                 QMessageBox.warning(self.iface.mainWindow(), "Aviso","No ha iniciado sesión. Imposible ejecutar la acción.")  
+            
+            #Cambia a cero el Controlador de Crear Cadena
+            self.controlCrearCadena = 0
         
         #Si ocurriera un error durante la ejecución se alerta al usuario para evitar que el Plugin arroje errores de Python.
         except Exception as error:
@@ -1146,6 +1153,7 @@ class numeros_exteriores:
                 self.Sector1 = []
                 self.Sector2 = []
                 self.Sector3 = []
+                self.controlCrearCadena = 0
 
                 #Confirmar
                 QMessageBox.information(self.iface.mainWindow(), "Aviso","Se guardaron los cambios exitosamente.")
@@ -1205,6 +1213,8 @@ class numeros_exteriores:
                     QMessageBox.warning(self.iface.mainWindow(), "Aviso", "El orden numérico es descendente, por favor, verifique e intente de nuevo.")       
                 elif (numInicio > numFinal):
                     QMessageBox.warning(self.iface.mainWindow(), "Aviso", "El orden numérico es descendente, por favor, verifique e intente de nuevo.")    
+                elif (numInicio == numFinal and posInicial >= posFinal):
+                    QMessageBox.warning(self.iface.mainWindow(), "Aviso", "Ingresó el mismo valor y una letra menor en orden alfabético para el fin del rango, por favor, verifique e intente de nuevo.")
                 #Si los valores ingresados son del tipo 1A - 2C, crea 1A, 1B, 1C,..., 1Z, 2A, 2B, 2C
                 elif numInicio != numFinal and posInicial <= posFinal:
                     for i in range(int(numInicio),int(numInicio)+1,1):
@@ -1232,13 +1242,22 @@ class numeros_exteriores:
                     QMessageBox.warning(self.iface.mainWindow(), "Aviso", "Ingresó el mismo valor, por favor, verifique e intente de nuevo.")
                 intervalos = intervaloAlfa.rstrip(',')
             cadena1 = self.dockwidget.textEdit.toPlainText()
+            posicion = self.dockwidget.textEdit.textCursor().position()
             if cadena1 == "":
                 self.dockwidget.textEdit.setText(intervalos.replace(" ",""))
             elif intervalos == "":
                 self.dockwidget.textEdit.setText(cadena1)
             else:
-                self.dockwidget.textEdit.setText(cadena1 + "," + intervalos.replace(" ",""))
-                
+                #La primera vez que se usa la función se crea la cadena al final
+                if self.controlCrearCadena == 0:
+                    self.dockwidget.textEdit.setText(cadena1 + "," + intervalos.replace(" ",""))
+                #Se crea la función en la posición del cursor
+                else:
+                    cadena1 = f"{cadena1[0:posicion]}*{cadena1[posicion:]}"
+                    cadena2 = cadena1.replace("*",f"{intervalos},").replace(" ","")
+                    self.dockwidget.textEdit.setText(cadena2)
+            #Cambia cada vez que se usa el botón Crear Cadena
+            self.controlCrearCadena+=1
         except Exception as error:
             QMessageBox.critical(self.iface.mainWindow(), "¡Oops!",f"Ocurrió un error al crear la cadena. \nMotivo: \n{error}.\n Se escribe en el registro.")
             self.logger.error(f'{datetime.now().strftime(self.timeformat)} Error al crear la cadena de números exteriores: {error}')
