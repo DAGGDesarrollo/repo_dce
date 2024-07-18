@@ -1253,9 +1253,12 @@ class numeros_exteriores:
                     self.dockwidget.textEdit.setText(cadena1 + "," + intervalos.replace(" ",""))
                 #Se crea la función en la posición del cursor
                 else:
-                    cadena1 = f"{cadena1[0:posicion]}*{cadena1[posicion:]}"
-                    cadena2 = cadena1.replace("*",f"{intervalos},").replace(" ","")
-                    self.dockwidget.textEdit.setText(cadena2)
+                    if(cadena1[posicion-1]==","):
+                        cadena1 = f"{cadena1[0:posicion]}*{cadena1[posicion:]}"
+                        cadena2 = cadena1.replace("*",f"{intervalos},").replace(" ","")
+                        self.dockwidget.textEdit.setText(cadena2)
+                    else:
+                        QMessageBox.information(self.iface.mainWindow(), "Aviso",f"Verifique que el cursor esté al lado derecho de la coma.")            
             #Cambia cada vez que se usa el botón Crear Cadena
             self.controlCrearCadena+=1
         except Exception as error:
