@@ -1253,7 +1253,7 @@ class numeros_exteriores:
                     self.dockwidget.textEdit.setText(cadena1 + "," + intervalos.replace(" ",""))
                 #Se crea la función en la posición del cursor
                 else:
-                    if(cadena1[posicion-1]==","):
+                    if(cadena1[posicion-1]=="," or posicion == 0):
                         cadena1 = f"{cadena1[0:posicion]}*{cadena1[posicion:]}"
                         cadena2 = cadena1.replace("*",f"{intervalos},").replace(" ","")
                         self.dockwidget.textEdit.setText(cadena2)
