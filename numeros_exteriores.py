@@ -559,7 +559,8 @@ class numeros_exteriores:
                     # Check there is at least one vector layer. Selecting within the same layer is fine.
                     for layer in layers:
                         if layer.type() == QgsMapLayer.VectorLayer:
-                            QgsProject.instance().removeMapLayer(layer)
+                            if "Seccion_" in layer.name() or layer.name() == "Manzana" or layer.name() == "Vialidad" or layer.name() == "NumerosExteriores" or layer.name() == "Seccion":
+                                QgsProject.instance().removeMapLayer(layer)
 
                     self.ultimaEntidad = self.dockwidget.cveEntidad.currentText()
                     self.ultimoMunicipio = municipioActual
