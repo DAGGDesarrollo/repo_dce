@@ -1428,7 +1428,7 @@ class numeros_exteriores:
                 self.dockwidget.textEdit.setText(str(self.Sector3))
                 
         except Exception as error:
-            QMessageBox.critical(self.iface.mainWindow(), "¡Oops!",f"Ocurrió un error al cambiar el sector. \nMotivo: \n{error}.\n Se escribe en el registro.")
+            QMessageBox.critical(self.iface.mainWindow(), "¡Oops!",f"Ocurrió un error al cambiar el campo. \nMotivo: \n{error}.\n Se escribe en el registro.")
             self.logger.error(f'{datetime.now().strftime(self.timeformat)} Error al cambiar de sector: {error}')
             
     def btnAsignarSector_accion(self):
@@ -1441,14 +1441,14 @@ class numeros_exteriores:
             if self.flagSinIntervalo.count(True) == 2 and self.control ==2:
                 self.flagSinIntervalo[int(self.dockwidget.cveSector.currentText())-1] = False
                 self.dockwidget.checkSinIntervalo.setChecked(False)
-                QMessageBox.warning(self.iface.mainWindow(),'Aviso',f'Ya se han seleccionado {self.flagSinIntervalo.count(True)} sectores «Sin Intervalo».\nUtilice el botón «Limpiar» para este sector, ingrese un intervalo y comience nuevamente.')
+                QMessageBox.warning(self.iface.mainWindow(),'Aviso',f'Ya se han seleccionado {self.flagSinIntervalo.count(True)} campos «Sin Intervalo».\nUtilice el botón «Limpiar» para este campo, ingrese un intervalo y comience nuevamente.')
             #Si se marca el checkbox cambia el valor de la bandera
             if self.dockwidget.checkSinIntervalo.isChecked() and self.flagSinIntervalo.count(True) <= 2:
                 self.control+=1
                 #Agrega el valor "True" a flagSinIntervalo del sector seleccionado siempre y cuando no haya más de dos sectores seleccionados           
                 self.flagSinIntervalo[int(self.dockwidget.cveSector.currentText())-1] = True
                 #Se alerta que ya se han seleccionado dos sectores y no es posible seleccionar un tercero   
-                QMessageBox.information(self.iface.mainWindow(),'Aviso',f'Ya se han seleccionado {self.flagSinIntervalo.count(True)} sectores «Sin Intervalo», no podrá seleccionar más de 2.\nSi desea insertar una cadena sin intervalos puede hacerlo manualmente.')
+                QMessageBox.information(self.iface.mainWindow(),'Aviso',f'Ya se han seleccionado {self.flagSinIntervalo.count(True)} campos «Sin Intervalo», no podrá seleccionar más de 2.\nSi desea insertar una cadena sin intervalos puede hacerlo manualmente.')
                 
             #Verifica que se haya ingresado texto en la sección "Nombre de Sector"
             #Se ingresó texto, lo guarda en la lista con SectorNombre[SectorActual-1], SectorActual-1 para empezar desde la primera posición
@@ -1504,7 +1504,7 @@ class numeros_exteriores:
                 
                 #Si no se ha ingresado algún o ninún valor de inicio, fin e intervalo del rango se alerta al usuario
                 elif self.dockwidget.txtRinicial_2.text() == "" and self.dockwidget.txtRfinal_2.text() == "" and self.dockwidget.txtRIntervalo_2.text() == "" and (self.dockwidget.checkSinIntervalo.isChecked() or self.flagSinIntervalo[int(self.dockwidget.cveSector.currentText())-1] == True):
-                    QMessageBox.information(self.iface.mainWindow(), "Aviso",f"Se marcó la casilla «Sin Intervalo», se ignorarán los valores de inicio, fin e intervalo para el sector {self.dockwidget.cveSector.currentText()}.")
+                    QMessageBox.information(self.iface.mainWindow(), "Aviso",f"Se marcó la casilla «Sin Intervalo», se ignorarán los valores de inicio, fin e intervalo para el campo {self.dockwidget.cveSector.currentText()}.")
 
                     if (int(self.dockwidget.cveSector.currentText()) == 1):
                         self.Sector1 = ['']
@@ -1515,17 +1515,17 @@ class numeros_exteriores:
         
                 #Si no se han ingresado todos los datos se alerta al usuario
                 elif self.dockwidget.txtRinicial_2.text() == "" or self.dockwidget.txtRfinal_2.text() == "" or self.dockwidget.txtRIntervalo_2.text() == "" and (self.dockwidget.checkSinIntervalo.isChecked() == False or self.flagSinIntervalo[int(self.dockwidget.cveSector.currentText())-1] == False):
-                    QMessageBox.warning(self.iface.mainWindow(), "Aviso",f"Por favor, ingrese todos los datos de inicio, final e intervalo del rango para el sector {self.dockwidget.cveSector.currentText()}.")
+                    QMessageBox.warning(self.iface.mainWindow(), "Aviso",f"Por favor, ingrese todos los datos de inicio, final e intervalo del rango para el campo {self.dockwidget.cveSector.currentText()}.")
                     return
                 
             #Si no se ingesó texto en el Nombre del Sector se alerta el usuario
             else:
-                QMessageBox.warning(self.iface.mainWindow(), "Aviso",f"No ha ingresado ningún nombre para el sector {self.dockwidget.cveSector.currentText()}.")
+                QMessageBox.warning(self.iface.mainWindow(), "Aviso",f"No ha ingresado ningún nombre para el campo {self.dockwidget.cveSector.currentText()}.")
                 return
             
         except Exception as error:
-            QMessageBox.critical(self.iface.mainWindow(), "¡Oops!",f"Ocurrió un error al asignar el sector. \nMotivo: \n{error}.\n Se escribe en el registro.")
-            self.logger.error(f'{datetime.now().strftime(self.timeformat)} Error al asignar el sector: {error}')
+            QMessageBox.critical(self.iface.mainWindow(), "¡Oops!",f"Ocurrió un error al asignar el campo. \nMotivo: \n{error}.\n Se escribe en el registro.")
+            self.logger.error(f'{datetime.now().strftime(self.timeformat)} Error al asignar el campo: {error}')
     
     def btnCrearCadenaUH_accion(self): 
 
@@ -1575,7 +1575,7 @@ class numeros_exteriores:
 
             #Si no se ha ingresado ningún dato en nigún sector, se alerta al usuario
             if (self.SectorNombre[0] == "" and self.SectorNombre[1] == "" and self.SectorNombre[2] == ""):
-                QMessageBox.warning(self.iface.mainWindow(), "Aviso","No se ha ingresado ningún dato en ningún sector, por favor, capture al menos uno.")
+                QMessageBox.warning(self.iface.mainWindow(), "Aviso","No se ha ingresado ningún dato en ningún campo, por favor, capture al menos uno.")
                                 
             #Quita la coma del final de la cadena
             self.dockwidget.textEdit.setText(intervalos.rstrip(',').replace('  ',' '))
@@ -1615,8 +1615,8 @@ class numeros_exteriores:
             self.dockwidget.checkSinIntervalo.setChecked(False)  
         
         except Exception as error:
-            QMessageBox.critical(self.iface.mainWindow(), "¡Oops!",f"Ocurrió un error al limpiar el sector. \nMotivo: \n{error}.\n Se escribe en el registro.")     
-            self.logger.error(f'{datetime.now().strftime(self.timeformat)} Error al eliminar los datos del sector: {error}')
+            QMessageBox.critical(self.iface.mainWindow(), "¡Oops!",f"Ocurrió un error al limpiar el campo. \nMotivo: \n{error}.\n Se escribe en el registro.")     
+            self.logger.error(f'{datetime.now().strftime(self.timeformat)} Error al eliminar los datos del campo: {error}')
 
     def btnAgregarLiteralesEspeciales(self):
         
