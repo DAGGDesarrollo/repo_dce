@@ -937,7 +937,50 @@ class numeros_exteriores:
                             attrs = [feature[field] for field in fields]
                         
                         self.campo01 = str(attrs[0])
-                        
+                        usr = self.dockwidget.txtUsuario.text()
+                        pwd = self.dockwidget.txtClave.text()
+
+                        conn = psycopg2.connect(database=self.baseDatos, user=usr, password=pwd, host=self.servidor, port="5432") 
+                        #Configura la barra de progreso 
+                        prog = QProgressDialog('Buscando Id de Manzana. Un momento, por favor.', '', 0, 100)
+                        prog.setWindowModality(Qt.WindowModal)
+                        prog.setCancelButton(None)
+                        time.sleep(2)
+                        prog.setValue(25)
+                        #Se conecta a la BD para obtener el id del registro seleccionado de la capa de números exteriores
+                        with conn:
+
+                            qry_c = "SELECT geom, id from bged.numeros_exteriores where id = %s;"
+                            data_c = (self.campo01, )
+                            with conn.cursor() as curs:
+
+                                prog.setValue(50)
+                                curs.execute(qry_c, data_c)
+                                results = curs.fetchone() #one row
+                                result01 = results[0]   #geom           
+                                result02 = results[1]   #id
+
+                        with conn:
+
+                            #Se conecta a ala BD para obtener el id de la manzana que toca o está a 1m del número exterior selccionado
+                            qry_c = "SELECT a.id as id_mza FROM bged.manzana as a, bged.numeros_exteriores as b WHERE a.seccion = {0} AND b.id = {1} AND ST_Intersects(ST_Buffer(a.geom,1),b.geom) = 'true';".format(self.dockwidget.cveSeccion.currentText(),result02)
+                            data_c = (self.campo01, )
+                            with conn.cursor() as curs:
+
+                                prog.setValue(75)
+                                curs.execute(qry_c, data_c)
+                                results = curs.fetchone() #one row
+                                if(results is None):QMessageBox.warning(self.iface.mainWindow(), "Aviso","El segmento de número exterior está fuera de la tolerancia. Ajuste el segmento al polígono de manzana, o bien, revise la validez de la geometría.")
+                                else:idmzasug = results[0]   #id           id manzana sugerido
+
+                                if (idmzasug is None or idmzasug == ''):
+                                    QMessageBox.warning(self.iface.mainWindow(), "Aviso","No se encontró ningún id de manzana.")
+                                    
+                            self.dockwidget.idManzana.setText(str(idmzasug))
+                            
+                            prog.setValue(100)
+                        #Ajusta el valor al 100% para concluir la barra de progreso
+                        conn.close()
 
                     elif len(ids) == 0: 
                         QMessageBox.warning(self.iface.mainWindow(), "Verifique","No seleccionó ningún registro.")	
@@ -946,51 +989,6 @@ class numeros_exteriores:
                 else:
                     QMessageBox.warning(self.iface.mainWindow(), "Verifique","No hay capas vectoriales agregadas.")		
     
-            
-                usr = self.dockwidget.txtUsuario.text()
-                pwd = self.dockwidget.txtClave.text()
-
-                conn = psycopg2.connect(database=self.baseDatos, user=usr, password=pwd, host=self.servidor, port="5432") 
-                #Configura la barra de progreso 
-                prog = QProgressDialog('Buscando Id de Manzana. Un momento, por favor.', '', 0, 100)
-                prog.setWindowModality(Qt.WindowModal)
-                prog.setCancelButton(None)
-                time.sleep(2)
-                prog.setValue(25)
-                #Se conecta a la BD para obtener el id del registro seleccionado de la capa de números exteriores
-                with conn:
-
-                    qry_c = "SELECT geom, id from bged.numeros_exteriores where id = %s;"
-                    data_c = (self.campo01, )
-                    with conn.cursor() as curs:
-
-                        prog.setValue(50)
-                        curs.execute(qry_c, data_c)
-                        results = curs.fetchone() #one row
-                        result01 = results[0]   #geom           
-                        result02 = results[1]   #id
-
-                with conn:
-
-                    #Se conecta a ala BD para obtener el id de la manzana que toca o está a 1m del número exterior selccionado
-                    qry_c = "SELECT a.id as id_mza FROM bged.manzana as a, bged.numeros_exteriores as b WHERE a.seccion = {0} AND b.id = {1} AND ST_Intersects(ST_Buffer(a.geom,1),b.geom) = 'true';".format(self.dockwidget.cveSeccion.currentText(),result02)
-                    data_c = (self.campo01, )
-                    with conn.cursor() as curs:
-
-                        prog.setValue(75)
-                        curs.execute(qry_c, data_c)
-                        results = curs.fetchone() #one row
-                        if(results is None):QMessageBox.warning(self.iface.mainWindow(), "Aviso","El segmento de número exterior está fuera de la tolerancia. Ajuste el segmento al polígono de manzana, o bien, revise la validez de la geometría.")
-                        else:idmzasug = results[0]   #id           id manzana sugerido
-
-                        if (idmzasug is None or idmzasug == ''):
-                            QMessageBox.warning(self.iface.mainWindow(), "Aviso","No se encontró ningún id de manzana.")
-                            
-                    self.dockwidget.idManzana.setText(str(idmzasug))
-                    
-                    prog.setValue(100)
-                #Ajusta el valor al 100% para concluir la barra de progreso
-                conn.close()
             else:
                 QMessageBox.warning(self.iface.mainWindow(), "Aviso","No ha iniciado sesión. Imposible ejecutar la acción.")          
         #Si ocurriera un error durante la ejecución se alerta al usuario para evitar que el Plugin arroje errores de Python.
