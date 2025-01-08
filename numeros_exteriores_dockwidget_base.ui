@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>568</width>
-    <height>667</height>
+    <width>414</width>
+    <height>883</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -19,13 +19,13 @@
   <property name="font">
    <font>
     <family>Arial</family>
-    <pointsize>12</pointsize>
+    <pointsize>11</pointsize>
     <weight>50</weight>
     <bold>false</bold>
    </font>
   </property>
   <property name="windowTitle">
-   <string>Plugin de Números Exteriores INE v3.1.0</string>
+   <string>Plugin de Números Exteriores INE v1.1.0</string>
   </property>
   <widget class="QWidget" name="dockWidgetContents">
    <layout class="QGridLayout" name="gridLayout">
@@ -40,10 +40,13 @@
       <property name="font">
        <font>
         <family>Arial</family>
-        <pointsize>12</pointsize>
+        <pointsize>11</pointsize>
         <weight>50</weight>
         <bold>false</bold>
        </font>
+      </property>
+      <property name="toolTip">
+       <string/>
       </property>
       <property name="currentIndex">
        <number>0</number>
@@ -55,9 +58,9 @@
        <widget class="QPushButton" name="btnDesconectar">
         <property name="geometry">
          <rect>
-          <x>310</x>
+          <x>220</x>
           <y>230</y>
-          <width>131</width>
+          <width>141</width>
           <height>31</height>
          </rect>
         </property>
@@ -70,10 +73,13 @@
         <property name="font">
          <font>
           <family>Arial</family>
-          <pointsize>12</pointsize>
+          <pointsize>11</pointsize>
           <weight>50</weight>
           <bold>false</bold>
          </font>
+        </property>
+        <property name="toolTip">
+         <string>Terminar la conexión</string>
         </property>
         <property name="text">
          <string>Desconectar</string>
@@ -82,19 +88,22 @@
        <widget class="QLineEdit" name="txtUsuario">
         <property name="geometry">
          <rect>
-          <x>160</x>
+          <x>110</x>
           <y>130</y>
-          <width>281</width>
+          <width>251</width>
           <height>31</height>
          </rect>
         </property>
         <property name="font">
          <font>
           <family>Arial</family>
-          <pointsize>12</pointsize>
+          <pointsize>11</pointsize>
           <weight>50</weight>
           <bold>false</bold>
          </font>
+        </property>
+        <property name="toolTip">
+         <string>Ingrese su usuario, normalmente nombre.apellido</string>
         </property>
         <property name="text">
          <string/>
@@ -103,9 +112,9 @@
        <widget class="QPushButton" name="btnConectar">
         <property name="geometry">
          <rect>
-          <x>160</x>
+          <x>110</x>
           <y>230</y>
-          <width>131</width>
+          <width>91</width>
           <height>31</height>
          </rect>
         </property>
@@ -118,10 +127,13 @@
         <property name="font">
          <font>
           <family>Arial</family>
-          <pointsize>12</pointsize>
+          <pointsize>11</pointsize>
           <weight>50</weight>
           <bold>false</bold>
          </font>
+        </property>
+        <property name="toolTip">
+         <string>Establecer conexión con el servidor de su entidad</string>
         </property>
         <property name="text">
          <string>Conectar</string>
@@ -130,10 +142,10 @@
        <widget class="QLabel" name="label_2">
         <property name="geometry">
          <rect>
-          <x>50</x>
+          <x>10</x>
           <y>190</y>
-          <width>100</width>
-          <height>16</height>
+          <width>91</width>
+          <height>20</height>
          </rect>
         </property>
         <property name="sizePolicy">
@@ -145,7 +157,7 @@
         <property name="font">
          <font>
           <family>Arial</family>
-          <pointsize>12</pointsize>
+          <pointsize>11</pointsize>
           <weight>50</weight>
           <bold>false</bold>
          </font>
@@ -160,10 +172,10 @@
        <widget class="QLabel" name="label">
         <property name="geometry">
          <rect>
-          <x>70</x>
+          <x>39</x>
           <y>140</y>
-          <width>80</width>
-          <height>16</height>
+          <width>61</width>
+          <height>20</height>
          </rect>
         </property>
         <property name="sizePolicy">
@@ -175,7 +187,7 @@
         <property name="font">
          <font>
           <family>Arial</family>
-          <pointsize>12</pointsize>
+          <pointsize>11</pointsize>
           <weight>50</weight>
           <bold>false</bold>
          </font>
@@ -190,19 +202,22 @@
        <widget class="QLineEdit" name="txtServidor">
         <property name="geometry">
          <rect>
-          <x>160</x>
+          <x>110</x>
           <y>30</y>
-          <width>281</width>
+          <width>251</width>
           <height>31</height>
          </rect>
         </property>
         <property name="font">
          <font>
           <family>Arial</family>
-          <pointsize>12</pointsize>
+          <pointsize>11</pointsize>
           <weight>50</weight>
           <bold>false</bold>
          </font>
+        </property>
+        <property name="toolTip">
+         <string>Ingrese la dirección IP del tipo 0.0.0.0</string>
         </property>
         <property name="text">
          <string/>
@@ -211,10 +226,10 @@
        <widget class="QLabel" name="label_14">
         <property name="geometry">
          <rect>
-          <x>59</x>
-          <y>40</y>
+          <x>10</x>
+          <y>35</y>
           <width>91</width>
-          <height>16</height>
+          <height>21</height>
          </rect>
         </property>
         <property name="sizePolicy">
@@ -226,7 +241,7 @@
         <property name="font">
          <font>
           <family>Arial</family>
-          <pointsize>12</pointsize>
+          <pointsize>11</pointsize>
           <weight>50</weight>
           <bold>false</bold>
          </font>
@@ -241,10 +256,10 @@
        <widget class="QLabel" name="label_15">
         <property name="geometry">
          <rect>
-          <x>70</x>
+          <x>39</x>
           <y>90</y>
-          <width>80</width>
-          <height>16</height>
+          <width>61</width>
+          <height>20</height>
          </rect>
         </property>
         <property name="sizePolicy">
@@ -256,7 +271,7 @@
         <property name="font">
          <font>
           <family>Arial</family>
-          <pointsize>12</pointsize>
+          <pointsize>11</pointsize>
           <weight>50</weight>
           <bold>false</bold>
          </font>
@@ -274,19 +289,22 @@
         </property>
         <property name="geometry">
          <rect>
-          <x>160</x>
+          <x>110</x>
           <y>80</y>
-          <width>281</width>
+          <width>251</width>
           <height>30</height>
          </rect>
         </property>
         <property name="font">
          <font>
           <family>Arial</family>
-          <pointsize>12</pointsize>
+          <pointsize>11</pointsize>
           <weight>50</weight>
           <bold>false</bold>
          </font>
+        </property>
+        <property name="toolTip">
+         <string>Seleccione la clave geoelectoral de su entidad</string>
         </property>
         <property name="editable">
          <bool>false</bool>
@@ -298,9 +316,9 @@
        <widget class="QPushButton" name="btnRecomendaciones">
         <property name="geometry">
          <rect>
-          <x>160</x>
+          <x>110</x>
           <y>280</y>
-          <width>281</width>
+          <width>251</width>
           <height>31</height>
          </rect>
         </property>
@@ -313,10 +331,13 @@
         <property name="font">
          <font>
           <family>Arial</family>
-          <pointsize>12</pointsize>
+          <pointsize>11</pointsize>
           <weight>50</weight>
           <bold>false</bold>
          </font>
+        </property>
+        <property name="toolTip">
+         <string>Consulte si tiene problemas de visualización</string>
         </property>
         <property name="text">
          <string notr="true">Recomendaciones de Visualización</string>
@@ -325,11 +346,22 @@
        <widget class="QgsPasswordLineEdit" name="txtClave">
         <property name="geometry">
          <rect>
-          <x>160</x>
+          <x>110</x>
           <y>180</y>
-          <width>281</width>
+          <width>251</width>
           <height>31</height>
          </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Arial</family>
+          <pointsize>11</pointsize>
+          <weight>50</weight>
+          <bold>false</bold>
+         </font>
+        </property>
+        <property name="toolTip">
+         <string>Ingrese su contraseña. Dé clic en el ojo para verificar</string>
         </property>
        </widget>
       </widget>
@@ -340,19 +372,22 @@
        <widget class="QPushButton" name="btnObtenerArea">
         <property name="geometry">
          <rect>
-          <x>320</x>
-          <y>170</y>
-          <width>201</width>
-          <height>41</height>
+          <x>180</x>
+          <y>190</y>
+          <width>181</width>
+          <height>31</height>
          </rect>
         </property>
         <property name="font">
          <font>
           <family>Arial</family>
-          <pointsize>12</pointsize>
+          <pointsize>11</pointsize>
           <weight>50</weight>
           <bold>false</bold>
          </font>
+        </property>
+        <property name="toolTip">
+         <string>Cargar la información cartográfica de su selección</string>
         </property>
         <property name="text">
          <string>Cargar Capas Vectoriales</string>
@@ -363,7 +398,7 @@
          <rect>
           <x>5</x>
           <y>37</y>
-          <width>241</width>
+          <width>221</width>
           <height>21</height>
          </rect>
         </property>
@@ -376,7 +411,7 @@
         <property name="font">
          <font>
           <family>Arial</family>
-          <pointsize>12</pointsize>
+          <pointsize>11</pointsize>
           <weight>50</weight>
           <bold>false</bold>
          </font>
@@ -393,17 +428,20 @@
          <rect>
           <x>10</x>
           <y>60</y>
-          <width>511</width>
+          <width>351</width>
           <height>30</height>
          </rect>
         </property>
         <property name="font">
          <font>
           <family>Arial</family>
-          <pointsize>12</pointsize>
+          <pointsize>11</pointsize>
           <weight>50</weight>
           <bold>false</bold>
          </font>
+        </property>
+        <property name="toolTip">
+         <string>Lista de municipios o alcaldías</string>
         </property>
         <property name="editable">
          <bool>false</bool>
@@ -417,17 +455,20 @@
          <rect>
           <x>10</x>
           <y>118</y>
-          <width>511</width>
+          <width>351</width>
           <height>30</height>
          </rect>
         </property>
         <property name="font">
          <font>
           <family>Arial</family>
-          <pointsize>12</pointsize>
+          <pointsize>11</pointsize>
           <weight>50</weight>
           <bold>false</bold>
          </font>
+        </property>
+        <property name="toolTip">
+         <string>Lista de secciones</string>
         </property>
         <property name="editable">
          <bool>false</bool>
@@ -454,7 +495,7 @@
         <property name="font">
          <font>
           <family>Arial</family>
-          <pointsize>12</pointsize>
+          <pointsize>11</pointsize>
           <weight>50</weight>
           <bold>false</bold>
          </font>
@@ -470,10 +511,13 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>170</y>
+          <y>150</y>
           <width>261</width>
           <height>41</height>
          </rect>
+        </property>
+        <property name="toolTip">
+         <string>Restrinja la información cartográfica a la extensión de la sección seleccionada</string>
         </property>
         <property name="text">
          <string>Acotar Solo a la Sección</string>
@@ -487,9 +531,9 @@
        <widget class="QPushButton" name="btnMostrar">
         <property name="geometry">
          <rect>
-          <x>450</x>
+          <x>290</x>
           <y>30</y>
-          <width>81</width>
+          <width>71</width>
           <height>31</height>
          </rect>
         </property>
@@ -502,10 +546,13 @@
         <property name="font">
          <font>
           <family>Arial</family>
-          <pointsize>12</pointsize>
+          <pointsize>11</pointsize>
           <weight>50</weight>
           <bold>false</bold>
          </font>
+        </property>
+        <property name="toolTip">
+         <string>Mostrar la información tabular del segmento de número exterior seleccionado</string>
         </property>
         <property name="text">
          <string>Mostrar</string>
@@ -514,9 +561,9 @@
        <widget class="QPushButton" name="tmedFont">
         <property name="geometry">
          <rect>
-          <x>450</x>
+          <x>290</x>
           <y>140</y>
-          <width>81</width>
+          <width>71</width>
           <height>31</height>
          </rect>
         </property>
@@ -534,6 +581,9 @@
           <bold>false</bold>
          </font>
         </property>
+        <property name="toolTip">
+         <string>Fijar el tamaño original de fuente para el texto de número exterior</string>
+        </property>
         <property name="text">
          <string>A</string>
         </property>
@@ -541,9 +591,9 @@
        <widget class="QPushButton" name="tmaxFont">
         <property name="geometry">
          <rect>
-          <x>450</x>
+          <x>290</x>
           <y>100</y>
-          <width>81</width>
+          <width>71</width>
           <height>31</height>
          </rect>
         </property>
@@ -561,6 +611,9 @@
           <bold>false</bold>
          </font>
         </property>
+        <property name="toolTip">
+         <string>Fijar el tamaño máximo de fuente para el texto de número exterior</string>
+        </property>
         <property name="text">
          <string>A</string>
         </property>
@@ -568,9 +621,9 @@
        <widget class="QPushButton" name="tminFont">
         <property name="geometry">
          <rect>
-          <x>450</x>
+          <x>290</x>
           <y>180</y>
-          <width>81</width>
+          <width>71</width>
           <height>31</height>
          </rect>
         </property>
@@ -588,6 +641,9 @@
           <bold>false</bold>
          </font>
         </property>
+        <property name="toolTip">
+         <string>Fijar el tamaño mínimo de fuente para el texto de número exterior</string>
+        </property>
         <property name="text">
          <string>A</string>
         </property>
@@ -597,17 +653,20 @@
          <rect>
           <x>10</x>
           <y>32</y>
-          <width>431</width>
+          <width>271</width>
           <height>221</height>
          </rect>
         </property>
         <property name="font">
          <font>
           <family>Arial</family>
-          <pointsize>12</pointsize>
+          <pointsize>11</pointsize>
           <weight>50</weight>
           <bold>false</bold>
          </font>
+        </property>
+        <property name="toolTip">
+         <string>Consulta de los números exteriores del segmento seleccionado</string>
         </property>
         <property name="verticalScrollBarPolicy">
          <enum>Qt::ScrollBarAlwaysOn</enum>
@@ -621,14 +680,14 @@
          <rect>
           <x>10</x>
           <y>8</y>
-          <width>431</width>
+          <width>271</width>
           <height>20</height>
          </rect>
         </property>
         <property name="font">
          <font>
           <family>Arial</family>
-          <pointsize>12</pointsize>
+          <pointsize>11</pointsize>
           <weight>75</weight>
           <bold>true</bold>
          </font>
@@ -648,14 +707,14 @@
          <rect>
           <x>10</x>
           <y>260</y>
-          <width>551</width>
-          <height>321</height>
+          <width>371</width>
+          <height>541</height>
          </rect>
         </property>
         <property name="font">
          <font>
           <family>Arial</family>
-          <pointsize>13</pointsize>
+          <pointsize>11</pointsize>
           <weight>50</weight>
           <bold>false</bold>
          </font>
@@ -693,9 +752,9 @@
          <widget class="QPushButton" name="btnIdentificar20">
           <property name="geometry">
            <rect>
-            <x>180</x>
+            <x>160</x>
             <y>40</y>
-            <width>161</width>
+            <width>81</width>
             <height>31</height>
            </rect>
           </property>
@@ -708,21 +767,24 @@
           <property name="font">
            <font>
             <family>Arial</family>
-            <pointsize>12</pointsize>
+            <pointsize>11</pointsize>
             <weight>75</weight>
             <bold>true</bold>
            </font>
           </property>
+          <property name="toolTip">
+           <string>Identificar las vialidades a 20 metros del segmento seleccionado</string>
+          </property>
           <property name="text">
-           <string>Vialidad a 20m</string>
+           <string>A 20m</string>
           </property>
          </widget>
          <widget class="QPushButton" name="btnIdentificar60">
           <property name="geometry">
            <rect>
-            <x>360</x>
+            <x>260</x>
             <y>40</y>
-            <width>161</width>
+            <width>91</width>
             <height>31</height>
            </rect>
           </property>
@@ -735,13 +797,16 @@
           <property name="font">
            <font>
             <family>Arial</family>
-            <pointsize>12</pointsize>
+            <pointsize>11</pointsize>
             <weight>75</weight>
             <bold>true</bold>
            </font>
           </property>
+          <property name="toolTip">
+           <string>Identificar las vialidades a 60 metros del segmento seleccionado</string>
+          </property>
           <property name="text">
-           <string>Vialidad a 60m</string>
+           <string>A 60m</string>
           </property>
          </widget>
          <widget class="QComboBox" name="idVialidad">
@@ -749,17 +814,20 @@
            <rect>
             <x>10</x>
             <y>170</y>
-            <width>511</width>
+            <width>341</width>
             <height>31</height>
            </rect>
           </property>
           <property name="font">
            <font>
             <family>Arial</family>
-            <pointsize>12</pointsize>
+            <pointsize>11</pointsize>
             <weight>50</weight>
             <bold>false</bold>
            </font>
+          </property>
+          <property name="toolTip">
+           <string>Seleccione de la lista la vialidad asociada al número exterior</string>
           </property>
           <property name="editable">
            <bool>false</bool>
@@ -773,7 +841,7 @@
            <rect>
             <x>10</x>
             <y>120</y>
-            <width>511</width>
+            <width>341</width>
             <height>51</height>
            </rect>
           </property>
@@ -786,7 +854,7 @@
           <property name="font">
            <font>
             <family>Arial</family>
-            <pointsize>12</pointsize>
+            <pointsize>11</pointsize>
             <weight>50</weight>
             <bold>false</bold>
            </font>
@@ -803,7 +871,7 @@
            <rect>
             <x>10</x>
             <y>10</y>
-            <width>151</width>
+            <width>131</width>
             <height>31</height>
            </rect>
           </property>
@@ -816,7 +884,7 @@
           <property name="font">
            <font>
             <family>Arial</family>
-            <pointsize>12</pointsize>
+            <pointsize>11</pointsize>
             <weight>50</weight>
             <bold>false</bold>
            </font>
@@ -836,17 +904,20 @@
            <rect>
             <x>10</x>
             <y>40</y>
-            <width>151</width>
+            <width>131</width>
             <height>31</height>
            </rect>
           </property>
           <property name="font">
            <font>
             <family>Arial</family>
-            <pointsize>12</pointsize>
+            <pointsize>11</pointsize>
             <weight>50</weight>
             <bold>false</bold>
            </font>
+          </property>
+          <property name="toolTip">
+           <string>Consulte el Id de Vialidad asociado en la BGED al número exterior seleccionado</string>
           </property>
           <property name="text">
            <string/>
@@ -855,9 +926,9 @@
          <widget class="QLabel" name="label_16">
           <property name="geometry">
            <rect>
-            <x>180</x>
+            <x>160</x>
             <y>10</y>
-            <width>341</width>
+            <width>191</width>
             <height>31</height>
            </rect>
           </property>
@@ -870,13 +941,13 @@
           <property name="font">
            <font>
             <family>Arial</family>
-            <pointsize>12</pointsize>
+            <pointsize>11</pointsize>
             <weight>50</weight>
             <bold>false</bold>
            </font>
           </property>
           <property name="text">
-           <string>Identificar Vialidad más Cercana</string>
+           <string>Vialidad más Cercana</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
@@ -885,7 +956,7 @@
          <widget class="QLabel" name="label_4">
           <property name="geometry">
            <rect>
-            <x>360</x>
+            <x>180</x>
             <y>210</y>
             <width>161</width>
             <height>31</height>
@@ -900,7 +971,7 @@
           <property name="font">
            <font>
             <family>Arial</family>
-            <pointsize>12</pointsize>
+            <pointsize>11</pointsize>
             <weight>50</weight>
             <bold>false</bold>
            </font>
@@ -915,19 +986,22 @@
          <widget class="QLineEdit" name="idManzana">
           <property name="geometry">
            <rect>
-            <x>360</x>
+            <x>180</x>
             <y>240</y>
-            <width>161</width>
+            <width>171</width>
             <height>31</height>
            </rect>
           </property>
           <property name="font">
            <font>
             <family>Arial</family>
-            <pointsize>12</pointsize>
+            <pointsize>11</pointsize>
             <weight>50</weight>
             <bold>false</bold>
            </font>
+          </property>
+          <property name="toolTip">
+           <string>Id de Manzana asociado al segmento seleccionado</string>
           </property>
           <property name="text">
            <string/>
@@ -951,7 +1025,7 @@
           <property name="font">
            <font>
             <family>Arial</family>
-            <pointsize>12</pointsize>
+            <pointsize>11</pointsize>
             <weight>50</weight>
             <bold>false</bold>
            </font>
@@ -978,10 +1052,13 @@
           <property name="font">
            <font>
             <family>Arial</family>
-            <pointsize>12</pointsize>
+            <pointsize>11</pointsize>
             <weight>50</weight>
             <bold>false</bold>
            </font>
+          </property>
+          <property name="toolTip">
+           <string>Consulte el Id de la Manzana asociado en la BGED al número exterior seleccionado</string>
           </property>
           <property name="text">
            <string/>
@@ -990,19 +1067,22 @@
          <widget class="QLineEdit" name="distUsuario">
           <property name="geometry">
            <rect>
-            <x>270</x>
+            <x>220</x>
             <y>90</y>
-            <width>251</width>
+            <width>131</width>
             <height>31</height>
            </rect>
           </property>
           <property name="font">
            <font>
             <family>Arial</family>
-            <pointsize>13</pointsize>
+            <pointsize>11</pointsize>
             <weight>75</weight>
             <bold>true</bold>
            </font>
+          </property>
+          <property name="toolTip">
+           <string>Ingrese una distancia en metros</string>
           </property>
          </widget>
          <widget class="QPushButton" name="btndistUsuario">
@@ -1010,38 +1090,44 @@
            <rect>
             <x>10</x>
             <y>90</y>
-            <width>241</width>
+            <width>191</width>
             <height>31</height>
            </rect>
           </property>
           <property name="font">
            <font>
             <family>Arial</family>
-            <pointsize>13</pointsize>
+            <pointsize>11</pointsize>
             <weight>75</weight>
             <bold>true</bold>
            </font>
           </property>
+          <property name="toolTip">
+           <string>Identificar las vialidades a la distancia ingresada del segmento seleccionado</string>
+          </property>
           <property name="text">
-           <string>Distancia Mayor a 60m</string>
+           <string>Distancia Personalizada</string>
           </property>
          </widget>
          <widget class="QPushButton" name="btnSugerir">
           <property name="geometry">
            <rect>
             <x>180</x>
-            <y>240</y>
-            <width>161</width>
+            <y>290</y>
+            <width>171</width>
             <height>31</height>
            </rect>
           </property>
           <property name="font">
            <font>
             <family>Arial</family>
-            <pointsize>13</pointsize>
+            <pointsize>11</pointsize>
             <weight>75</weight>
             <bold>true</bold>
            </font>
+          </property>
+          <property name="toolTip">
+           <string>Búsqueda automática del Id de Manzana asociado</string>
           </property>
           <property name="text">
            <string>Sugerir Id</string>
@@ -1078,7 +1164,7 @@
           <property name="font">
            <font>
             <family>Arial</family>
-            <pointsize>12</pointsize>
+            <pointsize>11</pointsize>
             <weight>50</weight>
             <bold>false</bold>
            </font>
@@ -1095,7 +1181,7 @@
            <rect>
             <x>10</x>
             <y>0</y>
-            <width>131</width>
+            <width>151</width>
             <height>41</height>
            </rect>
           </property>
@@ -1108,7 +1194,7 @@
           <property name="font">
            <font>
             <family>Arial</family>
-            <pointsize>10</pointsize>
+            <pointsize>11</pointsize>
             <weight>75</weight>
             <bold>true</bold>
            </font>
@@ -1138,7 +1224,7 @@
           <property name="font">
            <font>
             <family>Arial</family>
-            <pointsize>12</pointsize>
+            <pointsize>11</pointsize>
             <weight>50</weight>
             <bold>false</bold>
            </font>
@@ -1162,10 +1248,13 @@
           <property name="font">
            <font>
             <family>Arial</family>
-            <pointsize>12</pointsize>
+            <pointsize>11</pointsize>
             <weight>50</weight>
             <bold>false</bold>
            </font>
+          </property>
+          <property name="toolTip">
+           <string>Valor de inicio del rango. Ingrese número o número y letra</string>
           </property>
           <property name="text">
            <string/>
@@ -1174,9 +1263,9 @@
          <widget class="QPushButton" name="btnCrearCadena">
           <property name="geometry">
            <rect>
-            <x>400</x>
-            <y>60</y>
-            <width>121</width>
+            <x>10</x>
+            <y>100</y>
+            <width>111</width>
             <height>31</height>
            </rect>
           </property>
@@ -1189,10 +1278,13 @@
           <property name="font">
            <font>
             <family>Arial</family>
-            <pointsize>12</pointsize>
+            <pointsize>11</pointsize>
             <weight>75</weight>
             <bold>true</bold>
            </font>
+          </property>
+          <property name="toolTip">
+           <string>Crear la cadena con los datos ingresados</string>
           </property>
           <property name="text">
            <string>Crear Cadena</string>
@@ -1210,10 +1302,13 @@
           <property name="font">
            <font>
             <family>Arial</family>
-            <pointsize>12</pointsize>
+            <pointsize>11</pointsize>
             <weight>50</weight>
             <bold>false</bold>
            </font>
+          </property>
+          <property name="toolTip">
+           <string>Valor de fin del rango. Ingrese número o número y letra</string>
           </property>
           <property name="text">
            <string/>
@@ -1224,17 +1319,20 @@
            <rect>
             <x>270</x>
             <y>60</y>
-            <width>111</width>
+            <width>81</width>
             <height>31</height>
            </rect>
           </property>
           <property name="font">
            <font>
             <family>Arial</family>
-            <pointsize>12</pointsize>
+            <pointsize>11</pointsize>
             <weight>50</weight>
             <bold>false</bold>
            </font>
+          </property>
+          <property name="toolTip">
+           <string>Ingrese el intervalo deseado, siempre es numérico</string>
           </property>
           <property name="text">
            <string/>
@@ -1245,7 +1343,7 @@
            <rect>
             <x>270</x>
             <y>40</y>
-            <width>111</width>
+            <width>81</width>
             <height>21</height>
            </rect>
           </property>
@@ -1258,7 +1356,7 @@
           <property name="font">
            <font>
             <family>Arial</family>
-            <pointsize>12</pointsize>
+            <pointsize>11</pointsize>
             <weight>50</weight>
             <bold>false</bold>
            </font>
@@ -1273,9 +1371,9 @@
          <widget class="QPushButton" name="btnInvertir">
           <property name="geometry">
            <rect>
-            <x>400</x>
+            <x>140</x>
             <y>100</y>
-            <width>121</width>
+            <width>111</width>
             <height>31</height>
            </rect>
           </property>
@@ -1288,10 +1386,13 @@
           <property name="font">
            <font>
             <family>Arial</family>
-            <pointsize>12</pointsize>
+            <pointsize>11</pointsize>
             <weight>50</weight>
             <bold>false</bold>
            </font>
+          </property>
+          <property name="toolTip">
+           <string>Invertir el orden de la cadena de a,b,c -&gt; c,b,a</string>
           </property>
           <property name="text">
            <string>Invertir Cadena</string>
@@ -1300,19 +1401,22 @@
          <widget class="QPushButton" name="btnLimpiarIntervalo">
           <property name="geometry">
            <rect>
-            <x>400</x>
-            <y>140</y>
-            <width>121</width>
+            <x>270</x>
+            <y>100</y>
+            <width>81</width>
             <height>31</height>
            </rect>
           </property>
           <property name="font">
            <font>
             <family>Arial</family>
-            <pointsize>12</pointsize>
+            <pointsize>11</pointsize>
             <weight>50</weight>
             <bold>false</bold>
            </font>
+          </property>
+          <property name="toolTip">
+           <string>Elimine los datos que ingresó a los campos de esta sección</string>
           </property>
           <property name="text">
            <string>Limpiar</string>
@@ -1322,8 +1426,8 @@
           <property name="geometry">
            <rect>
             <x>10</x>
-            <y>100</y>
-            <width>151</width>
+            <y>140</y>
+            <width>131</width>
             <height>31</height>
            </rect>
           </property>
@@ -1336,7 +1440,7 @@
           <property name="font">
            <font>
             <family>Arial</family>
-            <pointsize>12</pointsize>
+            <pointsize>11</pointsize>
             <weight>50</weight>
             <bold>false</bold>
            </font>
@@ -1352,7 +1456,7 @@
           <property name="geometry">
            <rect>
             <x>10</x>
-            <y>170</y>
+            <y>210</y>
             <width>111</width>
             <height>31</height>
            </rect>
@@ -1360,10 +1464,13 @@
           <property name="font">
            <font>
             <family>Arial</family>
-            <pointsize>12</pointsize>
+            <pointsize>11</pointsize>
             <weight>50</weight>
             <bold>false</bold>
            </font>
+          </property>
+          <property name="toolTip">
+           <string>Inserte a la cadena las letras seleccionadas</string>
           </property>
           <property name="text">
            <string>Agregar</string>
@@ -1373,10 +1480,21 @@
           <property name="geometry">
            <rect>
             <x>10</x>
-            <y>130</y>
+            <y>170</y>
             <width>41</width>
             <height>31</height>
            </rect>
+          </property>
+          <property name="font">
+           <font>
+            <family>Arial</family>
+            <pointsize>11</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="toolTip">
+           <string>Marque si desea ingresar esta letra</string>
           </property>
           <property name="text">
            <string>LL</string>
@@ -1386,10 +1504,21 @@
           <property name="geometry">
            <rect>
             <x>60</x>
-            <y>130</y>
+            <y>170</y>
             <width>41</width>
             <height>31</height>
            </rect>
+          </property>
+          <property name="font">
+           <font>
+            <family>Arial</family>
+            <pointsize>11</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="toolTip">
+           <string>Marque si desea ingresar esta letra</string>
           </property>
           <property name="text">
            <string>Ñ</string>
@@ -1399,10 +1528,21 @@
           <property name="geometry">
            <rect>
             <x>110</x>
-            <y>130</y>
+            <y>170</y>
             <width>51</width>
             <height>31</height>
            </rect>
+          </property>
+          <property name="font">
+           <font>
+            <family>Arial</family>
+            <pointsize>11</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="toolTip">
+           <string>Marque si desea ingresar esta letra</string>
           </property>
           <property name="text">
            <string>RR</string>
@@ -1428,18 +1568,21 @@
           <property name="geometry">
            <rect>
             <x>10</x>
-            <y>110</y>
-            <width>121</width>
+            <y>120</y>
+            <width>101</width>
             <height>31</height>
            </rect>
           </property>
           <property name="font">
            <font>
             <family>Arial</family>
-            <pointsize>12</pointsize>
+            <pointsize>11</pointsize>
             <weight>50</weight>
             <bold>false</bold>
            </font>
+          </property>
+          <property name="toolTip">
+           <string>Valor de inicio del rango. Ingrese un número</string>
           </property>
           <property name="text">
            <string/>
@@ -1448,8 +1591,8 @@
          <widget class="QPushButton" name="btnCrearCadenaUH">
           <property name="geometry">
            <rect>
-            <x>390</x>
-            <y>210</y>
+            <x>10</x>
+            <y>220</y>
             <width>131</width>
             <height>31</height>
            </rect>
@@ -1463,10 +1606,13 @@
           <property name="font">
            <font>
             <family>Arial</family>
-            <pointsize>12</pointsize>
+            <pointsize>11</pointsize>
             <weight>75</weight>
             <bold>true</bold>
            </font>
+          </property>
+          <property name="toolTip">
+           <string>Crear la cadena con los datos ingresados</string>
           </property>
           <property name="text">
            <string>Crear Cadena</string>
@@ -1477,7 +1623,7 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>141</width>
+            <width>231</width>
             <height>41</height>
            </rect>
           </property>
@@ -1490,13 +1636,13 @@
           <property name="font">
            <font>
             <family>Arial</family>
-            <pointsize>10</pointsize>
+            <pointsize>11</pointsize>
             <weight>75</weight>
             <bold>true</bold>
            </font>
           </property>
           <property name="text">
-           <string>Cadena por Campos</string>
+           <string>Creación de Cadenas Complejas</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
@@ -1505,19 +1651,22 @@
          <widget class="QLineEdit" name="txtRIntervalo_2">
           <property name="geometry">
            <rect>
-            <x>260</x>
-            <y>110</y>
-            <width>111</width>
+            <x>250</x>
+            <y>120</y>
+            <width>101</width>
             <height>31</height>
            </rect>
           </property>
           <property name="font">
            <font>
             <family>Arial</family>
-            <pointsize>12</pointsize>
+            <pointsize>11</pointsize>
             <weight>50</weight>
             <bold>false</bold>
            </font>
+          </property>
+          <property name="toolTip">
+           <string>Ingrese el interalo deseado, siempre es numérico</string>
           </property>
           <property name="text">
            <string/>
@@ -1526,19 +1675,22 @@
          <widget class="QLineEdit" name="txtRfinal_2">
           <property name="geometry">
            <rect>
-            <x>150</x>
-            <y>110</y>
-            <width>91</width>
+            <x>130</x>
+            <y>120</y>
+            <width>101</width>
             <height>31</height>
            </rect>
           </property>
           <property name="font">
            <font>
             <family>Arial</family>
-            <pointsize>12</pointsize>
+            <pointsize>11</pointsize>
             <weight>50</weight>
             <bold>false</bold>
            </font>
+          </property>
+          <property name="toolTip">
+           <string>Valor de fin del rango. Ingrese un número</string>
           </property>
           <property name="text">
            <string/>
@@ -1547,10 +1699,10 @@
          <widget class="QLabel" name="label_20">
           <property name="geometry">
            <rect>
-            <x>150</x>
-            <y>90</y>
-            <width>91</width>
-            <height>20</height>
+            <x>130</x>
+            <y>100</y>
+            <width>101</width>
+            <height>21</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -1562,7 +1714,7 @@
           <property name="font">
            <font>
             <family>Arial</family>
-            <pointsize>12</pointsize>
+            <pointsize>11</pointsize>
             <weight>50</weight>
             <bold>false</bold>
            </font>
@@ -1578,8 +1730,8 @@
           <property name="geometry">
            <rect>
             <x>10</x>
-            <y>90</y>
-            <width>121</width>
+            <y>100</y>
+            <width>101</width>
             <height>21</height>
            </rect>
           </property>
@@ -1592,7 +1744,7 @@
           <property name="font">
            <font>
             <family>Arial</family>
-            <pointsize>12</pointsize>
+            <pointsize>11</pointsize>
             <weight>50</weight>
             <bold>false</bold>
            </font>
@@ -1607,9 +1759,9 @@
          <widget class="QLabel" name="label_17">
           <property name="geometry">
            <rect>
-            <x>260</x>
-            <y>90</y>
-            <width>111</width>
+            <x>250</x>
+            <y>100</y>
+            <width>101</width>
             <height>21</height>
            </rect>
           </property>
@@ -1622,7 +1774,7 @@
           <property name="font">
            <font>
             <family>Arial</family>
-            <pointsize>12</pointsize>
+            <pointsize>11</pointsize>
             <weight>50</weight>
             <bold>false</bold>
            </font>
@@ -1641,18 +1793,21 @@
           <property name="geometry">
            <rect>
             <x>70</x>
-            <y>50</y>
-            <width>61</width>
-            <height>30</height>
+            <y>60</y>
+            <width>71</width>
+            <height>31</height>
            </rect>
           </property>
           <property name="font">
            <font>
             <family>Arial</family>
-            <pointsize>12</pointsize>
+            <pointsize>11</pointsize>
             <weight>50</weight>
             <bold>false</bold>
            </font>
+          </property>
+          <property name="toolTip">
+           <string>Seleccione un número de cadena</string>
           </property>
           <property name="editable">
            <bool>false</bool>
@@ -1665,7 +1820,7 @@
           <property name="geometry">
            <rect>
             <x>4</x>
-            <y>49</y>
+            <y>59</y>
             <width>61</width>
             <height>31</height>
            </rect>
@@ -1679,7 +1834,7 @@
           <property name="font">
            <font>
             <family>Arial</family>
-            <pointsize>12</pointsize>
+            <pointsize>11</pointsize>
             <weight>50</weight>
             <bold>false</bold>
            </font>
@@ -1694,10 +1849,10 @@
          <widget class="QLabel" name="label_22">
           <property name="geometry">
            <rect>
-            <x>140</x>
-            <y>30</y>
-            <width>381</width>
-            <height>20</height>
+            <x>160</x>
+            <y>40</y>
+            <width>191</width>
+            <height>21</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -1709,13 +1864,13 @@
           <property name="font">
            <font>
             <family>Arial</family>
-            <pointsize>12</pointsize>
+            <pointsize>11</pointsize>
             <weight>50</weight>
             <bold>false</bold>
            </font>
           </property>
           <property name="text">
-           <string>Nombre de Campo:</string>
+           <string>Cadena</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
@@ -1724,19 +1879,22 @@
          <widget class="QLineEdit" name="txtNombreSector">
           <property name="geometry">
            <rect>
-            <x>150</x>
-            <y>50</y>
-            <width>371</width>
+            <x>160</x>
+            <y>60</y>
+            <width>191</width>
             <height>31</height>
            </rect>
           </property>
           <property name="font">
            <font>
             <family>Arial</family>
-            <pointsize>12</pointsize>
+            <pointsize>11</pointsize>
             <weight>50</weight>
             <bold>false</bold>
            </font>
+          </property>
+          <property name="toolTip">
+           <string>Ingrese el texto de la cadena</string>
           </property>
           <property name="text">
            <string/>
@@ -1745,9 +1903,9 @@
          <widget class="QPushButton" name="btnEliminarSector">
           <property name="geometry">
            <rect>
-            <x>260</x>
-            <y>160</y>
-            <width>111</width>
+            <x>250</x>
+            <y>220</y>
+            <width>101</width>
             <height>31</height>
            </rect>
           </property>
@@ -1760,10 +1918,13 @@
           <property name="font">
            <font>
             <family>Arial</family>
-            <pointsize>12</pointsize>
+            <pointsize>11</pointsize>
             <weight>50</weight>
             <bold>false</bold>
            </font>
+          </property>
+          <property name="toolTip">
+           <string>Elimine los datos que ingresó a los campos de esta sección. Repita para cada sector</string>
           </property>
           <property name="text">
            <string>Limpiar</string>
@@ -1772,11 +1933,22 @@
          <widget class="QCheckBox" name="checkSinIntervalo">
           <property name="geometry">
            <rect>
-            <x>390</x>
-            <y>110</y>
-            <width>131</width>
+            <x>230</x>
+            <y>170</y>
+            <width>121</width>
             <height>31</height>
            </rect>
+          </property>
+          <property name="font">
+           <font>
+            <family>Arial</family>
+            <pointsize>11</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="toolTip">
+           <string>Marque si desea omitir los datos de inicio, fin e intervalo</string>
           </property>
           <property name="text">
            <string>Sin intervalo</string>
@@ -1785,8 +1957,8 @@
          <widget class="QPushButton" name="btnAsignarSector">
           <property name="geometry">
            <rect>
-            <x>390</x>
-            <y>160</y>
+            <x>10</x>
+            <y>170</y>
             <width>131</width>
             <height>31</height>
            </rect>
@@ -1800,13 +1972,16 @@
           <property name="font">
            <font>
             <family>Arial</family>
-            <pointsize>12</pointsize>
+            <pointsize>11</pointsize>
             <weight>50</weight>
             <bold>false</bold>
            </font>
           </property>
+          <property name="toolTip">
+           <string>Asigne los datos ingresados a la memoria, consulte el intervalo deseado</string>
+          </property>
           <property name="text">
-           <string>Asignar a Campo</string>
+           <string>Asignar a Cadena</string>
           </property>
          </widget>
         </widget>
@@ -1814,9 +1989,9 @@
        <widget class="QPushButton" name="btnGuardar">
         <property name="geometry">
          <rect>
-          <x>450</x>
+          <x>290</x>
           <y>220</y>
-          <width>81</width>
+          <width>71</width>
           <height>31</height>
          </rect>
         </property>
@@ -1829,10 +2004,13 @@
         <property name="font">
          <font>
           <family>Arial</family>
-          <pointsize>12</pointsize>
+          <pointsize>11</pointsize>
           <weight>50</weight>
           <bold>false</bold>
          </font>
+        </property>
+        <property name="toolTip">
+         <string>Guarde los cambios en la BGED</string>
         </property>
         <property name="text">
          <string>Guardar</string>
@@ -1841,9 +2019,9 @@
        <widget class="QLabel" name="label_23">
         <property name="geometry">
          <rect>
-          <x>450</x>
+          <x>290</x>
           <y>60</y>
-          <width>81</width>
+          <width>71</width>
           <height>41</height>
          </rect>
         </property>
@@ -1856,7 +2034,7 @@
         <property name="font">
          <font>
           <family>Arial</family>
-          <pointsize>12</pointsize>
+          <pointsize>11</pointsize>
           <weight>50</weight>
           <bold>false</bold>
          </font>
