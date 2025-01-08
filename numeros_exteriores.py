@@ -13,7 +13,7 @@ Números Exteriores - INE
         copyright            : (C) 2023 by INE, Direccion de Cartografia Electoral, 
                                 Luis Enrique Cortés
         email                : enrique.cortes@ine.mx
-        version              : 3.1.0
+        version              : 1.0.0
  ***************************************************************************/
 
 /***************************************************************************
@@ -57,6 +57,7 @@ from datetime import datetime
 import psycopg2
 # load the psycopg extras module
 import psycopg2.extras
+from PyQt5.QtWidgets import QProgressDialog
 
 from qgis.core import QgsApplication;
 from qgis.gui import QgsMapCanvas;
@@ -808,9 +809,6 @@ class numeros_exteriores:
             if self.conectado == 1:
                 
                 self.controlMostrar = 1
-                
-                #pass
-                #Probando función
                 self.campo01 = ""
 
                 #limpiar datos en combo idVialidad e idManzana
@@ -860,28 +858,23 @@ class numeros_exteriores:
                         
                         with conn:
 
-                            qry_c = "SELECT geom, tramo, manzana, vialidad, numext, valida from bged.numeros_exteriores where id = %s;"
+                            qry_c = "SELECT manzana, vialidad, numext from bged.numeros_exteriores where id = %s;"
                             data_c = (self.campo01, )
                             with conn.cursor() as curs:
 
                                 curs.execute(qry_c, data_c)
-                    
-                                
-                                results = curs.fetchone() #one row
+                                results = curs.fetchone()
 
-                                result01 = results[0]   #geom           tramo
-                                result02 = results[1]   #tramo          manzana
-                                result03 = results[2]   #idManzana      vialidad
-                                result04 = results[3]   #idVialidad     numext
-                                result05 = results[4]   #idNumExt       valida
-                                result06 = results[5]   #valida         pro
-                    
-                                self.dockwidget.textEdit.setText(result05)
-                                self.dockwidget.idManzana_original.setText(str(result03))
-                                self.dockwidget.idVialidad_original.setText(str(result04))
+                                idManzana = results[0]   
+                                idVialidad = results[1]   
+                                numExt = results[2]   
+
+                                self.dockwidget.textEdit.setText(numExt)
+                                self.dockwidget.idManzana_original.setText(str(idManzana))
+                                self.dockwidget.idVialidad_original.setText(str(idVialidad))
                             
                         conn.close()
-                        self.cadena_existente = result05
+                        self.cadena_existente = numExt
                         
                     elif len(ids) == 0: 
                         QMessageBox.warning(self.iface.mainWindow(), "Verifique","No ha seleccionado ninguna geometría de números exteriores. Imposible mostrar.")	
@@ -925,18 +918,10 @@ class numeros_exteriores:
 
                     ids = vl.selectedFeatureIds()
         
-                    if len(ids) == 1:
-        
-                        request = QgsFeatureRequest()
-                        request.setFilterFids(ids)
-
-                        fields = ['id']
-
-                        features = vl.getFeatures(request)
-                        for feature in features:
-                            attrs = [feature[field] for field in fields]
+                    if len(ids) == 1 and capaactiva == "NumerosExteriores":
                         
-                        self.campo01 = str(attrs[0])
+                        self.campo01 = ids[0]
+
                         usr = self.dockwidget.txtUsuario.text()
                         pwd = self.dockwidget.txtClave.text()
 
@@ -950,21 +935,20 @@ class numeros_exteriores:
                         #Se conecta a la BD para obtener el id del registro seleccionado de la capa de números exteriores
                         with conn:
 
-                            qry_c = "SELECT geom, id from bged.numeros_exteriores where id = %s;"
-                            data_c = (self.campo01, )
+                            qry_c = "SELECT id from bged.numeros_exteriores where id = %s;"
+                            data_c = (self.campo01,)
                             with conn.cursor() as curs:
 
                                 prog.setValue(50)
                                 curs.execute(qry_c, data_c)
-                                results = curs.fetchone() #one row
-                                result01 = results[0]   #geom           
-                                result02 = results[1]   #id
+                                results = curs.fetchone() #one row       
+                                idNumExt = results[0]   #id
 
                         with conn:
 
                             #Se conecta a ala BD para obtener el id de la manzana que toca o está a 1m del número exterior selccionado
-                            qry_c = "SELECT a.id as id_mza FROM bged.manzana as a, bged.numeros_exteriores as b WHERE a.seccion = {0} AND b.id = {1} AND ST_Intersects(ST_Buffer(a.geom,1),b.geom) = 'true';".format(self.dockwidget.cveSeccion.currentText(),result02)
-                            data_c = (self.campo01, )
+                            qry_c = "SELECT a.id as id_mza FROM bged.manzana as a, bged.numeros_exteriores as b WHERE a.seccion = %s AND b.id = %s AND ST_Intersects(ST_Buffer(a.geom,1),b.geom) = 'true';"
+                            data_c = (self.dockwidget.cveSeccion.currentText(), idNumExt,)
                             with conn.cursor() as curs:
 
                                 prog.setValue(75)
@@ -981,6 +965,7 @@ class numeros_exteriores:
                             prog.setValue(100)
                         #Ajusta el valor al 100% para concluir la barra de progreso
                         conn.close()
+                        
 
                     elif len(ids) == 0: 
                         QMessageBox.warning(self.iface.mainWindow(), "Verifique","No seleccionó ningún registro.")	
