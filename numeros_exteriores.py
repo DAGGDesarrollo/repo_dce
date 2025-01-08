@@ -486,6 +486,9 @@ class numeros_exteriores:
                     QMessageBox.information(self.iface.mainWindow(),'Información',f'Se ha cerrado la sesión. \nHasta pronto {usuario.split(".")[0].title()}.')
                     self.iface.messageBar().pushSuccess('Despedida', f' Hasta luego {usuario.split(".")[0].title()} que tengas buen día.')
                     self.logger.info(f'{datetime.now().strftime(self.timeformat)} Se cerró exitósamente la conexión')
+                    #Se refresca el canvas para que se vea la eliminación de las capas
+                    canvas = iface.mapCanvas()
+                    canvas.refresh()
             else:
                 self.iface.messageBar().pushMessage('Información', f' De acuerdo {usuario.split(".")[0].title()} la sesión continua.')
             
@@ -1268,31 +1271,39 @@ class numeros_exteriores:
             
             if self.conectado == 1:
                 if self.controlMostrar == 1:
-                    #limpiar datos en combo mediante consulta
-                    self.dockwidget.idVialidad.clear()
-
-                    #Abrir base
-                    usr = self.dockwidget.txtUsuario.text()
-                    pwd = self.dockwidget.txtClave.text()
                     
-                    #localhost
-                    conn = psycopg2.connect(database=self.baseDatos, user=usr, password=pwd, host=self.servidor, port="5432")
-                
-                    with conn:
+                    vl = iface.activeLayer()
+                    ids = vl.selectedFeatureIds()
+                    
+                    #Si se selecciona solo un registro se muestra la información del registro
+                    if len(ids) == 1:
+                        #limpiar datos en combo mediante consulta
+                        self.dockwidget.idVialidad.clear()
 
-                        qry_c = "SELECT via.id, via.nombre, ROUND(ST_Distance(numext.geom,via.geom)::numeric,2) as distancia FROM bged.numeros_exteriores numext, bged.vialidad via WHERE numext.id = %s AND ST_DWithin(numext.geom,via.geom,20) ORDER BY distancia ASC;"
-                        data_c = (self.campo01, )
-                        with conn.cursor() as curs:
+                        #Abrir base
+                        usr = self.dockwidget.txtUsuario.text()
+                        pwd = self.dockwidget.txtClave.text()
+                        
+                        #localhost
+                        conn = psycopg2.connect(database=self.baseDatos, user=usr, password=pwd, host=self.servidor, port="5432")
+                    
+                        with conn:
 
-                            curs.execute(qry_c, data_c)              
-                            rows = curs.fetchall() #one row
+                            qry_c = "SELECT via.id, via.nombre, ROUND(ST_Distance(numext.geom,via.geom)::numeric,2) as distancia FROM bged.numeros_exteriores numext, bged.vialidad via WHERE numext.id = %s AND ST_DWithin(numext.geom,via.geom,20) ORDER BY distancia ASC;"
+                            data_c = (self.campo01, )
+                            with conn.cursor() as curs:
 
-                            for row in rows:
+                                curs.execute(qry_c, data_c)              
+                                rows = curs.fetchall() #one row
 
-                                idname = f'{row[0]} : {row[1].title()} a {row[2]} m.'
-                                self.dockwidget.idVialidad.addItem(idname)
+                                for row in rows:
 
-                    conn.close()
+                                    idname = f'{row[0]} : {row[1].title()} a {row[2]} m.'
+                                    self.dockwidget.idVialidad.addItem(idname)
+
+                        conn.close()
+                    else:
+                        QMessageBox.warning(self.iface.mainWindow(), "Verifique","Debe seleccionar solo un registro.")
                 else:
                     QMessageBox.warning(self.iface.mainWindow(), "Aviso","No ha usado el botón «Mostrar». No hay Ids para identificar vialidades.")     
             else:
@@ -1307,31 +1318,39 @@ class numeros_exteriores:
         try:
             if self.conectado == 1:
                 if self.controlMostrar == 1:
-                    #limpiar datos en combo mediante consulta
-                    self.dockwidget.idVialidad.clear()
                     
-                    #Abrir base
-                    usr = self.dockwidget.txtUsuario.text()
-                    pwd = self.dockwidget.txtClave.text()
+                    vl = iface.activeLayer()
+                    ids = vl.selectedFeatureIds()
                     
-                    #localhost
-                    conn = psycopg2.connect(database=self.baseDatos, user=usr, password=pwd, host=self.servidor, port="5432")
-                
-                    with conn:
+                    #Si se selecciona solo un registro se muestra la información del registro
+                    if len(ids) == 1:
+                        #limpiar datos en combo mediante consulta
+                        self.dockwidget.idVialidad.clear()
+                        
+                        #Abrir base
+                        usr = self.dockwidget.txtUsuario.text()
+                        pwd = self.dockwidget.txtClave.text()
+                        
+                        #localhost
+                        conn = psycopg2.connect(database=self.baseDatos, user=usr, password=pwd, host=self.servidor, port="5432")
+                    
+                        with conn:
 
-                        qry_c = "SELECT via.id, via.nombre, ROUND(ST_Distance(numext.geom,via.geom)::numeric,2) as distancia FROM bged.numeros_exteriores numext, bged.vialidad via WHERE numext.id = %s AND ST_DWithin(numext.geom,via.geom,60) ORDER BY distancia ASC;"
-                        data_c = (self.campo01, )
-                        with conn.cursor() as curs:
+                            qry_c = "SELECT via.id, via.nombre, ROUND(ST_Distance(numext.geom,via.geom)::numeric,2) as distancia FROM bged.numeros_exteriores numext, bged.vialidad via WHERE numext.id = %s AND ST_DWithin(numext.geom,via.geom,60) ORDER BY distancia ASC;"
+                            data_c = (self.campo01, )
+                            with conn.cursor() as curs:
 
-                            curs.execute(qry_c, data_c)        
-                            rows = curs.fetchall() #one row
+                                curs.execute(qry_c, data_c)        
+                                rows = curs.fetchall() #one row
 
-                            for row in rows:
+                                for row in rows:
 
-                                idname = f'{row[0]} : {row[1].title()} a {row[2]} m.'
-                                self.dockwidget.idVialidad.addItem(idname)
+                                    idname = f'{row[0]} : {row[1].title()} a {row[2]} m.'
+                                    self.dockwidget.idVialidad.addItem(idname)
 
-                    conn.close()
+                        conn.close()
+                    else:
+                        QMessageBox.warning(self.iface.mainWindow(), "Verifique","Debe seleccionar solo un registro.")
                 else:
                     QMessageBox.warning(self.iface.mainWindow(), "Aviso","No ha usado el botón «Mostrar». No hay Ids para identificar vialidades.")  
             else:
@@ -1346,42 +1365,50 @@ class numeros_exteriores:
         try:
             if self.conectado == 1:
                 if self.controlMostrar == 1:
-                    #Abrir base
-                    usr = self.dockwidget.txtUsuario.text()
-                    pwd = self.dockwidget.txtClave.text()
-                    distUsuario = self.dockwidget.distUsuario.text()
-
-                    #localhost
-                    #remote Samge bged 
-                    if distUsuario == '':
-                        QMessageBox.warning(self.iface.mainWindow(),"Alerta","No se ha ingresado una distancia, por favor, ingrese una. \nConsidere que esta debe ser mayor que 60m.")
-
-                    elif distUsuario.isnumeric() == False:
-                        QMessageBox.warning(self.iface.mainWindow(),"Alerta","Eso no es un valor, por favor, ingrese uno.\nConsidere que el valor de distancia debe ser mayor que 60m.")
                     
-                    elif float(distUsuario) <= 60:
-                        QMessageBox.warning(self.iface.mainWindow(),"Alerta","La distancia ingresada es igual o menor que 60m.")
+                    vl = iface.activeLayer()
+                    ids = vl.selectedFeatureIds()
                     
-                    elif len(distUsuario) >= 2 and float(distUsuario) > 60:
+                    #Si se selecciona solo un registro se muestra la información del registro
+                    if len(ids) == 1:
+                        #Abrir base
+                        usr = self.dockwidget.txtUsuario.text()
+                        pwd = self.dockwidget.txtClave.text()
+                        distUsuario = self.dockwidget.distUsuario.text()
 
-                        conn = psycopg2.connect(database=self.baseDatos, user=usr, password=pwd, host=self.servidor, port="5432")
+                        #localhost
+                        #remote Samge bged 
+                        if distUsuario == '':
+                            QMessageBox.warning(self.iface.mainWindow(),"Alerta","No se ha ingresado una distancia, por favor, ingrese una. \nConsidere que esta debe ser mayor que 60m.")
 
-                        with conn:
+                        elif distUsuario.isnumeric() == False:
+                            QMessageBox.warning(self.iface.mainWindow(),"Alerta","Eso no es un valor, por favor, ingrese uno.\nConsidere que el valor de distancia debe ser mayor que 60m.")
+                        
+                        elif float(distUsuario) <= 60:
+                            QMessageBox.warning(self.iface.mainWindow(),"Alerta","La distancia ingresada es igual o menor que 60m.")
+                        
+                        elif len(distUsuario) >= 2 and float(distUsuario) > 60:
 
-                            qry_c = "SELECT via.id, via.nombre, ROUND(ST_Distance(numext.geom,via.geom)::numeric,2) as distancia FROM bged.numeros_exteriores numext, bged.vialidad via WHERE numext.id = %s AND ST_DWithin(numext.geom,via.geom,{0}) ORDER BY distancia ASC;".format(distUsuario)
-                            data_c = (self.campo01, )
-                            with conn.cursor() as curs:
+                            conn = psycopg2.connect(database=self.baseDatos, user=usr, password=pwd, host=self.servidor, port="5432")
 
-                                curs.execute(qry_c, data_c)
-                                rows = curs.fetchall() #one row
-                                if len(rows) == 0:
-                                    QMessageBox.warning(self.iface.mainWindow(),"Aviso","La distancia no arrojó ningún resultado. Por favor, intente con una mayor o verifique que la cartografía esté actualizada.")
-                                else:
-                                    for row in rows:
-                
-                                        idname = f'{row[0]} : {row[1].title()} a {row[2]} m.'
-                                        self.dockwidget.idVialidad.addItem(idname)
-                        conn.close()
+                            with conn:
+
+                                qry_c = "SELECT via.id, via.nombre, ROUND(ST_Distance(numext.geom,via.geom)::numeric,2) as distancia FROM bged.numeros_exteriores numext, bged.vialidad via WHERE numext.id = %s AND ST_DWithin(numext.geom,via.geom,{0}) ORDER BY distancia ASC;".format(distUsuario)
+                                data_c = (self.campo01, )
+                                with conn.cursor() as curs:
+
+                                    curs.execute(qry_c, data_c)
+                                    rows = curs.fetchall() #one row
+                                    if len(rows) == 0:
+                                        QMessageBox.warning(self.iface.mainWindow(),"Aviso","La distancia no arrojó ningún resultado. Por favor, intente con una mayor o verifique que la cartografía esté actualizada.")
+                                    else:
+                                        for row in rows:
+                    
+                                            idname = f'{row[0]} : {row[1].title()} a {row[2]} m.'
+                                            self.dockwidget.idVialidad.addItem(idname)
+                            conn.close()
+                    else:
+                        QMessageBox.warning(self.iface.mainWindow(), "Verifique","Debe seleccionar solo un registro.")
                 else:
                     QMessageBox.warning(self.iface.mainWindow(), "Aviso","No ha usado el botón «Mostrar». No hay Ids para identificar vialidades.")  
             else:
