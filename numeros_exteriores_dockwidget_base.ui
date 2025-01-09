@@ -1082,7 +1082,7 @@
            </font>
           </property>
           <property name="toolTip">
-           <string>Ingrese una distancia en metros</string>
+           <string>Ingrese una distancia en metros mayor que 60</string>
           </property>
          </widget>
          <widget class="QPushButton" name="btndistUsuario">
@@ -1427,7 +1427,7 @@
            <rect>
             <x>10</x>
             <y>140</y>
-            <width>131</width>
+            <width>141</width>
             <height>31</height>
            </rect>
           </property>
@@ -1593,7 +1593,7 @@
            <rect>
             <x>10</x>
             <y>220</y>
-            <width>131</width>
+            <width>121</width>
             <height>31</height>
            </rect>
           </property>
@@ -1951,7 +1951,7 @@
            <string>Marque si desea omitir los datos de inicio, fin e intervalo</string>
           </property>
           <property name="text">
-           <string>Sin intervalo</string>
+           <string>Sin intervalo </string>
           </property>
          </widget>
          <widget class="QPushButton" name="btnAsignarSector">
@@ -1959,7 +1959,7 @@
            <rect>
             <x>10</x>
             <y>170</y>
-            <width>131</width>
+            <width>121</width>
             <height>31</height>
            </rect>
           </property>
@@ -1981,7 +1981,7 @@
            <string>Asigne los datos ingresados a la memoria, consulte el intervalo deseado</string>
           </property>
           <property name="text">
-           <string>Asignar a Cadena</string>
+           <string>Asignar a Campo</string>
           </property>
          </widget>
         </widget>
