@@ -1393,8 +1393,8 @@ class numeros_exteriores:
 
                             with conn:
 
-                                qry_c = "SELECT via.id, via.nombre, ROUND(ST_Distance(numext.geom,via.geom)::numeric,2) as distancia FROM bged.numeros_exteriores numext, bged.vialidad via WHERE numext.id = %s AND ST_DWithin(numext.geom,via.geom,{0}) ORDER BY distancia ASC;".format(distUsuario)
-                                data_c = (self.campo01, )
+                                qry_c = "SELECT via.id, via.nombre, ROUND(ST_Distance(numext.geom,via.geom)::numeric,2) as distancia FROM bged.numeros_exteriores numext, bged.vialidad via WHERE numext.id = %s AND ST_DWithin(numext.geom,via.geom,%s) ORDER BY distancia ASC;"
+                                data_c = (self.campo01,distUsuario,)
                                 with conn.cursor() as curs:
 
                                     curs.execute(qry_c, data_c)
