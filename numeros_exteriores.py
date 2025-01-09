@@ -13,7 +13,7 @@ Números Exteriores - INE
         copyright            : (C) 2023 by INE, Direccion de Cartografia Electoral, 
                                 Luis Enrique Cortés
         email                : enrique.cortes@ine.mx
-        version              : 3.2.0
+        version              : 1.1.0
  ***************************************************************************/
 
 /***************************************************************************
@@ -44,14 +44,20 @@ from .numeros_exteriores_dockwidget import numeros_exterioresDockWidget
 import os
 import os.path
 
-
 #Importa módulo regex para expresiones regulares
 import re
+
+#Importa módulo para el archivo log
+import logging
+
+#Importa módulo para las fechas
+from datetime import datetime
 
 # load the adapter
 import psycopg2
 # load the psycopg extras module
 import psycopg2.extras
+from PyQt5.QtWidgets import QProgressDialog
 
 from qgis.core import QgsApplication;
 from qgis.gui import QgsMapCanvas;
@@ -89,9 +95,10 @@ class numeros_exteriores:
         # Declare instance attributes
         self.actions = []
         self.menu = self.tr(u'&Números Exteriores')
-        # TODO: We are going to let the user set this up in a future iteration
         self.toolbar = self.iface.addToolBar(u'Números Exteriores')
         self.toolbar.setObjectName(u'Números Exteriores')
+        
+        self.timeformat = '%Y-%m-%d %H:%M:%S'
 
         self.campo01 = ""
         self.conectado = False
@@ -111,6 +118,11 @@ class numeros_exteriores:
         self.SectorRFinal = ['', '', '']
         self.SectorRIntervalo = ['', '', '']
         self.flagSinIntervalo = [False,False,False]
+        
+        self.cadena_existente = ""
+        self.controlCadenaUH = 0
+        self.controlMostrar = 0
+        self.controlCrearCadena = 0
 
         self.Sector1 = []
         self.Sector2 = []
@@ -181,8 +193,6 @@ class numeros_exteriores:
             added to self.actions list.
         :rtype: QAction
         """
-
-
 
         #linea agregada al codigo original
         self.dockwidget = numeros_exterioresDockWidget() #Se instancia la clase del cuadro de dialogo
@@ -293,7 +303,7 @@ class numeros_exteriores:
 
     def run(self):
         """Run method that loads and starts the plugin"""
-
+        
         if not self.pluginIsActive:
             self.pluginIsActive = True
 
@@ -331,32 +341,37 @@ class numeros_exteriores:
 
     #lineas agregadas al codigo original
     def btnConectar_accion(self):
-
-        self.conectadoflag = 1
-        #Esconde la contraseña al momento de establecerse la conexión, en caso de que el usuario la haya dejado visible
-        self.dockwidget.txtClave.setPasswordVisibility(False)
-        if self.conectado == True:
-            return
-           
-        usr = self.dockwidget.txtUsuario.text()
-        pwd = self.dockwidget.txtClave.text()
         
-        self.baseDatos = "bged" + self.dockwidget.cveEntidad.currentText()
-        self.servidor = self.dockwidget.txtServidor.text()
-
-        
-        if usr is NULL or usr == "" or usr.isspace():
-
-            QMessageBox.warning(self.iface.mainWindow(), "Aviso", "No fue posible ingresar a la base, por favor, revise sus credenciales.")
-            return None     #Realmente sale de la funcion
-            
-        if pwd is NULL or pwd == "" or pwd.isspace():
-
-            QMessageBox.warning(self.iface.mainWindow(), "Aviso", "No fue posible ingresar a la base, por favor, revise sus credenciales.")
-            return None
- 
-                
         try:
+            self.controlMostrar = 0
+            #Se crea el logger y se configura según el usuario ingresado
+            logging.basicConfig(filename=f'{os.path.dirname(os.path.realpath(__file__))}/plugin_numext_{self.dockwidget.cveEntidad.currentText()}_{self.dockwidget.txtUsuario.text()}.log', filemode='a', level=logging.INFO)
+            self.logger = logging.getLogger(f'{self.dockwidget.cveEntidad.currentText()}_{self.dockwidget.txtUsuario.text()}')
+            #Se crea el handler y el nivel de INFO
+            ch = logging.StreamHandler()
+            
+            #Se crea el formato
+            formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s',datefmt=self.timeformat)
+            ch.setFormatter(formatter)
+            self.logger.addHandler(ch)  
+                     
+            #Bandera que establece el valor cuando se conecta
+            self.conectadoflag = 1
+            #Esconde la contraseña al momento de establecerse la conexión, en caso de que el usuario la haya dejado visible
+            self.dockwidget.txtClave.setPasswordVisibility(False)
+            if self.conectado == True:
+                return
+            
+            usr = self.dockwidget.txtUsuario.text()
+            pwd = self.dockwidget.txtClave.text()
+            
+            self.baseDatos = "bged" + self.dockwidget.cveEntidad.currentText()
+            self.servidor = self.dockwidget.txtServidor.text()
+            
+            #Sección que valida que se hayan ingresado todos los datos para la conexión
+            if usr is NULL or usr == "" or usr.isspace(): QMessageBox.warning(self.iface.mainWindow(), "Aviso", "No ingresó nombre de usuario, por favor, ingrese uno.")
+            if pwd is NULL or pwd == "" or pwd.isspace(): QMessageBox.warning(self.iface.mainWindow(), "Aviso", "No ingresó una contraseña, por favor, ingrese una.")
+            if self.servidor is NULL or self.servidor == "" or self.servidor.isspace(): QMessageBox.warning(self.iface.mainWindow(), "Aviso", "No ingresó una dirección IP, por favor, ingrese una.")
             
             usr = self.dockwidget.txtUsuario.text()
             pwd = self.dockwidget.txtClave.text()
@@ -389,7 +404,7 @@ class numeros_exteriores:
                 curs.close()
 
             conn.close()
-
+            
             self.dockwidget.btnDesconectar.setEnabled(True)
             self.dockwidget.btnConectar.setEnabled(False)
             self.conectado = True
@@ -400,71 +415,92 @@ class numeros_exteriores:
             self.dockwidget.txtClave.setEnabled(False)
 
             QMessageBox.information(self.iface.mainWindow(), 'Aviso', f'Se realizó la conexión con éxito...\nIP: {self.servidor}\nBase de datos: {self.baseDatos}\nBienvenido {usr.split(".")[0].title()}')
+            self.logger.info(f'{datetime.now().strftime(self.timeformat)} Conexión exitosa')
+            QMessageBox.information(self.iface.mainWindow(), 'Aviso importante', f'Con la finalidad de mantener actualizada la cartografía de manera permanente, se deberá observar los lineamientos y normas vigentes en materia de digitalización para la incorporación de información cartográfica.')
+        except psycopg2.Error as error:
+            if psycopg2.errors.lookup("28P01"):
+                QMessageBox.warning(self.iface.mainWindow(), "Aviso","Credenciales incorrectas, por favor, verifique.")                    
+            else:
+                self.iface.messageBar().pushMessage("Mensaje", "No se logró ingresar a la Base. Si el error persiste levante un caso CAU para recibir asistencia.")
+                QMessageBox.critical(self.iface.mainWindow(), "¡Oops!",f"Ocurrió un error al establecer la conexión.\nMotivo: \n{error}.\n Se escribe en el registro.")
+                self.logger.error(f'{datetime.now().strftime(self.timeformat)} Error al establecer la conexión: {error}')
 
-            return None
-        except:
-            self.iface.messageBar().pushMessage("Mensaje", "No se logró ingresar a la Base.")
-            QMessageBox.warning(self.iface.mainWindow(), "Aviso", "No fue posible ingresar a la base, revise los datos, su conexión de red o sus credenciales.")
-            return None
-        
-    
-         
+
     def btnDesconectar_accion(self):
 
-        #Pregunta al usuario si desea cerrar su sesión
-        usuario = self.dockwidget.txtUsuario.text()
-        buttonReply = QMessageBox.question(self.iface.mainWindow(), 'Atención', "¿Confirma que desea cerrar su sesión?", QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
-        
-        #Si se cierra la sesión se limpian todos los cuadros de textos y se desbloquean nuevamente los cuadros de texto de la pestaña "Acceso"
-        if buttonReply == QMessageBox.Yes:
-            if self.conectado == True:
+        try:
+            #Pregunta al usuario si desea cerrar su sesión
+            usuario = self.dockwidget.txtUsuario.text()
+            buttonReply = QMessageBox.question(self.iface.mainWindow(), 'Atención', "¿Confirma que desea cerrar su sesión?", QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+            
+            #Si se cierra la sesión se limpian todos los cuadros de textos y se desbloquean nuevamente los cuadros de texto de la pestaña "Acceso"
+            if buttonReply == QMessageBox.Yes:
+                if self.conectado == True:
 
-                self.ultimaEntidad = self.dockwidget.cveEntidad.currentText()
+                    self.ultimaEntidad = self.dockwidget.cveEntidad.currentText()
 
-                self.dockwidget.txtServidor.setText("")
-                self.dockwidget.txtUsuario.setText("")
-                self.dockwidget.txtClave.setText("")
+                    self.dockwidget.txtServidor.setText("")
+                    self.dockwidget.txtUsuario.setText("")
+                    self.dockwidget.txtClave.setText("")
 
-                self.dockwidget.idVialidad_original.setText("")
-                self.dockwidget.idManzana_original.setText("")
-                self.dockwidget.idVialidad.clear()
-                self.dockwidget.idManzana.clear()
+                    self.dockwidget.idVialidad_original.setText("")
+                    self.dockwidget.idManzana_original.setText("")
+                    self.dockwidget.idVialidad.clear()
+                    self.dockwidget.idManzana.clear()
 
+                    self.dockwidget.txtRinicial.setText("")
+                    self.dockwidget.txtRfinal.setText("")
+                    self.dockwidget.txtRIntervalo.setText("")
+                    self.dockwidget.textEdit.setText("")
 
-                self.dockwidget.txtRinicial.setText("")
-                self.dockwidget.txtRfinal.setText("")
-                self.dockwidget.txtRIntervalo.setText("")
+                    self.dockwidget.txtServidor.setEnabled(True)
+                    self.dockwidget.cveEntidad.setEnabled(True)
+                    self.dockwidget.txtUsuario.setEnabled(True)
+                    self.dockwidget.txtClave.setEnabled(True)
 
-                self.dockwidget.txtServidor.setEnabled(True)
-                self.dockwidget.cveEntidad.setEnabled(True)
-                self.dockwidget.txtUsuario.setEnabled(True)
-                self.dockwidget.txtClave.setEnabled(True)
+                    self.dockwidget.cveMunicipio.clear()
+                    self.dockwidget.cveSeccion.clear()
 
-                self.dockwidget.cveMunicipio.clear()
-                self.dockwidget.cveSeccion.clear()
+                    self.dockwidget.distUsuario.setText("")
+                    self.dockwidget.checkLl.setChecked(False)
+                    self.dockwidget.checkEnne.setChecked(False)
+                    self.dockwidget.checkRr.setChecked(False)
+                    self.dockwidget.checkSinIntervalo.setChecked(False)
 
-                self.dockwidget.distUsuario.setText("")
-                self.dockwidget.checkLl.setChecked(False)
-                self.dockwidget.checkEnne.setChecked(False)
-                self.dockwidget.checkRr.setChecked(False)
-                self.dockwidget.checkSinIntervalo.setChecked(False)
+                    self.dockwidget.btnDesconectar.setEnabled(False)
+                    self.dockwidget.btnConectar.setEnabled(True)
+                    self.dockwidget.checkFiltroCapas.setChecked(False)   
 
-                self.dockwidget.btnDesconectar.setEnabled(False)
-                self.dockwidget.btnConectar.setEnabled(True)      
+                    # Lista las capas
+                    layers = list(QgsProject.instance().mapLayers().values())
+                    vlayer_count = 0
+                    for layer in layers:
+                        if layer.type() == QgsMapLayer.VectorLayer:
+                            vlayer_count = vlayer_count + 1
+                        #Elimina sólo las capas que usa el Plugin
+                        if "Seccion_" in layer.name() or layer.name() == "Manzana" or layer.name() == "Vialidad" or layer.name() == "NumerosExteriores" or layer.name() == "Seccion":
+                            QgsProject.instance().removeMapLayer(layer)
+                    self.conectado = False
+                    self.iface.mainWindow().show()
+                    QMessageBox.information(self.iface.mainWindow(),'Información',f'Se ha cerrado la sesión. \nHasta pronto {usuario.split(".")[0].title()}.')
+                    self.iface.messageBar().pushSuccess('Despedida', f' Hasta luego {usuario.split(".")[0].title()} que tengas buen día.')
+                    self.logger.info(f'{datetime.now().strftime(self.timeformat)} Se cerró exitósamente la conexión')
+                    #Se refresca el canvas para que se vea la eliminación de las capas
+                    canvas = iface.mapCanvas()
+                    canvas.refresh()
+            else:
+                self.iface.messageBar().pushMessage('Información', f' De acuerdo {usuario.split(".")[0].title()} la sesión continua.')
+            
 
-                self.conectado = False
-                self.iface.mainWindow().show()
-                QMessageBox.information(self.iface.mainWindow(),'Información',f'Se ha cerrado la sesión. \nHasta pronto {usuario.split(".")[0].title()}.')
-                self.iface.messageBar().pushSuccess('Despedida', f' Hasta luego {usuario.split(".")[0].title()} que tengas buen día.')
-        else:
-            self.iface.messageBar().pushMessage('Información', f' De acuerdo {usuario.split(".")[0].title()} la sesión continua.')
+        except Exception as error:
+            QMessageBox.critical(self.iface.mainWindow(), "¡Oops!",f"Ocurrió un error al terminar la conexión. \nMotivo: \n{error}.\n Se escribe en el registro.")
+            self.logger.error(f'{datetime.now().strftime(self.timeformat)} Error al cerrar la conexión: {error}')
 
     def on_cveMunicipio_changed(self, value):      
         
         self.dockwidget.cveSeccion.clear()   
        
         try:
-        
             if self.dockwidget.cveMunicipio.count() == 0:
                 return
     
@@ -477,11 +513,7 @@ class numeros_exteriores:
             uri = QgsDataSourceUri()
             # set host name, port, database name, username and password
             uri.setConnection(self.servidor, "5432", self.baseDatos, usr, pwd)
-          
-            #localhost
-            #remote Samge bged 
-            connectDB = psycopg2.connect(database=self.baseDatos, user=usr, password=pwd, host=self.servidor, port="5432")
-     
+            
             conn = psycopg2.connect(database=self.baseDatos, user=usr, password=pwd, host=self.servidor, port="5432")
             with conn:
 
@@ -499,449 +531,506 @@ class numeros_exteriores:
 
                 curs.close()    
             conn.close()
-            return None
-
-        except:
             
-            QMessageBox.warning(self.iface.mainWindow(), "Aviso", "No se logró obtener los datos de las secciones de acuerdo con el municipio seleccionado, revise sus credenciales o su conexión a internet.")
-
-            return None
+        except Exception as error:
+            QMessageBox.critical(self.iface.mainWindow(), "¡Oops!",f"Ocurrió un error al cambiar el municipio. \nMotivo: \n{error}.\n Se escribe en el registro.")
+            self.logger.error(f'{datetime.now().strftime(self.timeformat)} Error al cambiar de municipio: {error}')
+            conn.close()
 
 
     def btnObtenerArea_accion(self):
 
         try:
+            if self.conectado == 1:
+                
+                #Manda mensaje sobre el modo de carga seleccionado
+                if self.dockwidget.checkFiltroCapas.isChecked():
+                    QMessageBox.information(self.iface.mainWindow(), 'Atención', "Seleccionó la opción «Acotar Solo a la Sección», considere que en este modo de carga solo podrá editar y validar a nivel tabular.")
 
-            #Se configura la barra de progreso y se fija el valor inicial en 0 para comenzar el proceso
-            prog = QProgressDialog('Cargando capas. Un momento, por favor.', '', 0, 100)
-            prog.setWindowModality(Qt.WindowModal)
-            prog.setCancelButton(None)
-            time.sleep(1)
+                #Se configura la barra de progreso y se fija el valor inicial en 0 para comenzar el proceso
+                prog = QProgressDialog('Cargando capas. Un momento, por favor.', '', 0, 100)
+                prog.setWindowModality(Qt.WindowModal)
+                prog.setCancelButton(None)
+                time.sleep(1)
 
-            #Borrar capas si hubo cambio de entidad
-            municipioActual = str(self.dockwidget.cveMunicipio.currentText().split(" :",1)[0])
-            if self.dockwidget.cveEntidad.currentText() != self.ultimaEntidad  or self.ultimoMunicipio != municipioActual:
-                #borrar capas
+                #Borrar capas si hubo cambio de entidad
+                municipioActual = str(self.dockwidget.cveMunicipio.currentText().split(" :",1)[0])
+                if self.dockwidget.cveEntidad.currentText() != self.ultimaEntidad  or self.ultimoMunicipio != municipioActual:
+                    #borrar capas
+                    # Get list of vector layers
+                    layers = list(QgsProject.instance().mapLayers().values())
+                    # Check there is at least one vector layer. Selecting within the same layer is fine.
+                    for layer in layers:
+                        if layer.type() == QgsMapLayer.VectorLayer:
+                            if "Seccion_" in layer.name() or layer.name() == "Manzana" or layer.name() == "Vialidad" or layer.name() == "NumerosExteriores" or layer.name() == "Seccion":
+                                QgsProject.instance().removeMapLayer(layer)
+
+                    self.ultimaEntidad = self.dockwidget.cveEntidad.currentText()
+                    self.ultimoMunicipio = municipioActual
+
+                
                 # Get list of vector layers
                 layers = list(QgsProject.instance().mapLayers().values())
                 # Check there is at least one vector layer. Selecting within the same layer is fine.
+                vlayer_count = 0
                 for layer in layers:
                     if layer.type() == QgsMapLayer.VectorLayer:
+                        vlayer_count = vlayer_count + 1
+                    if "Seccion_" in layer.name() or layer.name() == "Manzana" or layer.name() == "Vialidad" or layer.name() == "NumerosExteriores" or layer.name() == "Seccion":
                         QgsProject.instance().removeMapLayer(layer)
 
-                self.ultimaEntidad = self.dockwidget.cveEntidad.currentText()
-                self.ultimoMunicipio = municipioActual
+                vlayer_count = 0
+                numeroSeccion = str(self.dockwidget.cveSeccion.currentText())
+                numeroMunicipio = str(self.dockwidget.cveMunicipio.currentText().split(" :",1)[0])
 
-            
-            # Get list of vector layers
-            layers = list(QgsProject.instance().mapLayers().values())
-            # Check there is at least one vector layer. Selecting within the same layer is fine.
-            vlayer_count = 0
-            for layer in layers:
-                if layer.type() == QgsMapLayer.VectorLayer:
-                    vlayer_count = vlayer_count + 1
-                if layer.name() == "SeccionUnica":
-                    QgsProject.instance().removeMapLayer(layer)
+                usr = self.dockwidget.txtUsuario.text()
+                pwd = self.dockwidget.txtClave.text()
+                
+                uri = QgsDataSourceUri()
+                # set host name, port, database name, username and password
+                uri.setConnection(self.servidor, "5432", self.baseDatos, usr, pwd)
+                # set database schema, table name, geometry column and optionally
+                # subset (WHERE clause)
 
-            numeroSeccion = str(self.dockwidget.cveSeccion.currentText())
-            numeroMunicipio = str(self.dockwidget.cveMunicipio.currentText().split(" :",1)[0])
+                #Capa auxiliar para reconocer la seccion a trabajar
+                QtTest.QTest.qWait(100)
+                #Consulta de seccion mediante seccion (una seccion para emular zoom en ella)
+                uri.setDataSource("bged", "seccion", "geom", f'seccion={numeroSeccion}')
+                vlayer1SEC = QgsVectorLayer(uri.uri(False), f'Seccion_{numeroSeccion.zfill(4)}', "postgres")
+                QgsProject.instance().addMapLayer(vlayer1SEC)
 
-            usr = self.dockwidget.txtUsuario.text()
-            pwd = self.dockwidget.txtClave.text()
-            
-            uri = QgsDataSourceUri()
-            # set host name, port, database name, username and password
-            uri.setConnection(self.servidor, "5432", self.baseDatos, usr, pwd)
-            # set database schema, table name, geometry column and optionally
-            # subset (WHERE clause)
+                QtTest.QTest.qWait(700)
 
-            #Capa auxiliar para reconocer la seccion a trabajar
-            QtTest.QTest.qWait(100)
-            #Consulta de seccion mediante seccion (una seccion para emular zoom en ella)
-            uri.setDataSource("bged", "seccion", "geom", "seccion=" + numeroSeccion)
-            vlayer1SEC = QgsVectorLayer(uri.uri(False), "SeccionUnica", "postgres")
-            QgsProject.instance().addMapLayer(vlayer1SEC)
+                #funciona para el zoom
+                iface.setActiveLayer(vlayer1SEC)
+                iface.zoomToActiveLayer()
 
-            QtTest.QTest.qWait(700)
-
-            #funciona para el zoom
-            iface.setActiveLayer(vlayer1SEC)
-            iface.zoomToActiveLayer()
-
-            #	232	56	69
-            QtTest.QTest.qWait(200)
-
-            vlayer1SEC.setOpacity(0.3)
-
-            mySymbol1 = QgsFillSymbol.createSimple({'color':'red', 'color_border':'red', 'width_border':'0.3', 'style':'solid'})
-            myRenderer = vlayer1SEC.renderer()
-            myRenderer.setSymbol(mySymbol1)
-
-            #Muestra el 20% de avance
-            prog.setValue(20)
-
-            vlayer1SEC.triggerRepaint()
-            QtTest.QTest.qWait(100)
-
-            #se elimina capa de la unica seccion solo se agrego para emular zoom, ya no se elimina se usa como transparencia
-            QtTest.QTest.qWait(200)
-
-            #Estas capas se cargan una sola vez, Seccion, Manzana, Vialidad, Num Ext
-            if vlayer_count == 0:
-
-                #Consulta de seccion mediante municipio/seccion
-                uri.setDataSource("bged", "seccion", "geom", "municipio=" + numeroMunicipio)
-                vlayerSEC = QgsVectorLayer(uri.uri(False), "Seccion", "postgres")
-                QgsProject.instance().addMapLayer(vlayerSEC)
-
-
-                #Se configura el formato de las etiquetas
-                SE_layer = QgsPalLayerSettings()
-                textFormat = QgsTextFormat()
-                textFormat.setColor(Qt.darkRed)
-                textFormat.setSize(15)
-                textFormat.buffer().setEnabled(True)
-                textFormat.buffer().setSize(0.7)
-                textFormat.buffer().setColor(QColor('#FFFFFF'))
-                SE_layer.setFormat(textFormat)
-                SE_layer.fieldName = '\'Sección \n\' || lpad(to_string("seccion"),4,\'0\')' #Sección a cuatro digitos, del tipo 0000
-                SE_layer.isExpression = True
-                SE_layer.enabled = True
-                SE_layer.placement = QgsPalLayerSettings.OverPoint
-                SElabels = QgsVectorLayerSimpleLabeling(SE_layer)
-                SElabels.drawLabels = True
-                vlayerSEC.setLabeling(SElabels)
-                vlayerSEC.setLabelsEnabled(True)
-                vlayerSEC.setCustomProperty("labeling/drawLabels",  "True") 
-                vlayerSEC.triggerRepaint()
+                #	232	56	69
                 QtTest.QTest.qWait(200)
 
-                mySymbol1 = QgsFillSymbol.createSimple({'color':'red', 'color_border':'red', 'width_border':'0.4', 'style':'no'})
-                myRenderer = vlayerSEC.renderer()
+                vlayer1SEC.setOpacity(0.3)
+
+                mySymbol1 = QgsFillSymbol.createSimple({'color':'red', 'color_border':'red', 'width_border':'0.3', 'style':'solid'})
+                myRenderer = vlayer1SEC.renderer()
                 myRenderer.setSymbol(mySymbol1)
-                vlayerSEC.triggerRepaint()
-                QtTest.QTest.qWait(1000)
-                #E83845
-                
-                #Muestra el 40% de avance
-                prog.setValue(40)
 
-                #Cargar capas
-                qry_c =  'SELECT * FROM bged.manzana mza, bged.municipio mun where mun.municipio={}.format(numeroMunicipio) and st_intersects(mun.geom, mza.geom)'
-                uri.setDataSource("bged", "manzana", "geom", "municipio=" + numeroMunicipio)
+                #Muestra el 20% de avance
+                prog.setValue(20)
 
-                vlayerM = QgsVectorLayer(uri.uri(False), "Manzana", "postgres")
-                
-                QgsProject.instance().addMapLayer(vlayerM)
-
-                MZ_layer = QgsPalLayerSettings()
-                textFormat = QgsTextFormat()
-                textFormat.setColor(QColor('#464646')) 
-                textFormat.setSize(11) 
-                textFormat.buffer().setEnabled(True)
-                textFormat.buffer().setColor(QColor('#FFFFFF'))
-                textFormat.buffer().setSize(0.7)
-                MZ_layer.setFormat(textFormat)
-                MZ_layer.fieldName = '\'Mz \nId \' || "id"'
-                MZ_layer.isExpression = True
-                MZ_layer.enabled = True
-                MZ_layer.placement = QgsPalLayerSettings.AroundPoint
-                MZlabels = QgsVectorLayerSimpleLabeling(MZ_layer)
-                MZlabels.drawLabels = True
-                vlayerM.setLabeling(MZlabels)
-                vlayerM.setLabelsEnabled(True)
-                vlayerM.setCustomProperty("labeling/drawLabels",  "True")
-                vlayerM.triggerRepaint()
-                QtTest.QTest.qWait(200)
-
-                mySymbol1 = QgsFillSymbol.createSimple({'color':'#289E26', 'color_border':'#237E21', 'width_border':'0.2', 'style':'dense6'})
-                myRenderer = vlayerM.renderer()
-                myRenderer.setSymbol(mySymbol1)
-                vlayerM.triggerRepaint()
-                QtTest.QTest.qWait(1500)
-                #E83845            prog.setValue(20)
-
-                #Muestra el 60% de avance
-                prog.setValue(60) 
-
-                uri.setDataSource("bged", "vialidad", "geom")
-                vlayerV = QgsVectorLayer(uri.uri(False), "Vialidad", "postgres")
-                QgsProject.instance().addMapLayer(vlayerV)
-
-                V_layer = QgsPalLayerSettings()
-                textFormat = QgsTextFormat()
-                textFormat.setColor(QColor('#22243B')) 
-                textFormat.setSize(11) 
-                textFormat.buffer().setEnabled(True)
-                textFormat.buffer().setColor(QColor('#FFFFFF'))
-                textFormat.buffer().setSize(0.7)
-                V_layer.setFormat(textFormat)
-                V_layer.fieldName = '\'Id \'||"id" || \' \' || title("nombre")'
-                V_layer.isExpression = True
-                V_layer.enabled = True
-                V_layer.placement = QgsPalLayerSettings.Curved
-                Vlabels = QgsVectorLayerSimpleLabeling(V_layer)
-                Vlabels.drawLabels = True
-                vlayerV.setLabeling(Vlabels)
-                vlayerV.setLabelsEnabled(True)
-                vlayerV.setCustomProperty("labeling/drawLabels",  "True")
-                vlayerV.triggerRepaint()
-                QtTest.QTest.qWait(500)
-
-                renderer = vlayerV.renderer()
-                symbol1 = QgsLineSymbol.createSimple({'color': '#000000','width':'.3'})
-                renderer.setSymbol(symbol1) 
-                vlayerV.triggerRepaint()
-                QtTest.QTest.qWait(3000)
-
-                #Muestra el 80% de avance
-                prog.setValue(80)
-
-                #Consulta de numeros exteriores con campos nulos
-                uri.setDataSource("bged", "numeros_exteriores", "geom")
-                vlayerNE = QgsVectorLayer(uri.uri(False), "NumerosExteriores", "postgres")
-                QgsProject.instance().addMapLayer(vlayerNE)
+                vlayer1SEC.triggerRepaint()
                 QtTest.QTest.qWait(100)
 
-                NE_layer = QgsPalLayerSettings()
-                NE_layer.fieldName = 'id'
-                NE_layer.enabled = True
-                NE_layer.placement = QgsPalLayerSettings.Free
-                NElabels = QgsVectorLayerSimpleLabeling(NE_layer)
-                NElabels.drawLabels = True
-                vlayerNE.setLabeling(NElabels)
-                vlayerNE.setLabelsEnabled(True)
-                vlayerNE.setCustomProperty("labeling/drawLabels",  "True")
-                vlayerNE.triggerRepaint()
+                #se elimina capa de la unica seccion solo se agrego para emular zoom, ya no se elimina se usa como transparencia
                 QtTest.QTest.qWait(200)
 
-                renderer = vlayerNE.renderer()
-                symbol1 = QgsLineSymbol.createSimple({'color':'#005F00', 'width':'0.3', 'line_style':'dash'})
-                renderer.setSymbol(symbol1) 
-                vlayerNE.triggerRepaint()
-                QtTest.QTest.qWait(3000)
+                #Estas capas se cargan una sola vez, Seccion, Manzana, Vialidad, Num Ext
+                if vlayer_count == 0:
 
-                self.ultimoMunicipio = municipioActual
+                    #Consulta de seccion mediante municipio/seccion
+                    uri.setDataSource("bged", "seccion", "geom", "municipio=" + numeroMunicipio)
+                    vlayerSEC = QgsVectorLayer(uri.uri(False), "Seccion", "postgres")
+                    QgsProject.instance().addMapLayer(vlayerSEC)
 
-            
-            #Borrar campos de texto en edicion simple
-            self.dockwidget.textEdit.setText("")
-            self.dockwidget.idManzana.setText("")
-            self.dockwidget.idManzana_original.setText("")
-            self.dockwidget.idVialidad_original.setText("")  
+                    #Se configura el formato de las etiquetas
+                    SE_layer = QgsPalLayerSettings()
+                    textFormat = QgsTextFormat()
+                    textFormat.setColor(Qt.darkRed)
+                    textFormat.setSize(15)
+                    textFormat.buffer().setEnabled(True)
+                    textFormat.buffer().setSize(0.7)
+                    textFormat.buffer().setColor(QColor('#FFFFFF'))
+                    SE_layer.setFormat(textFormat)
+                    SE_layer.fieldName = '\'Sección \n\' || lpad(to_string("seccion"),4,\'0\')' #Sección a cuatro digitos, del tipo 00001
+                    SE_layer.isExpression = True
+                    SE_layer.enabled = True
+                    SE_layer.placement = QgsPalLayerSettings.AroundPoint
+                    SE_layer.fitInPolygonOnly = True
+                    SElabels = QgsVectorLayerSimpleLabeling(SE_layer)
+                    SElabels.drawLabels = True
+                    vlayerSEC.setLabeling(SElabels)
+                    vlayerSEC.setLabelsEnabled(True)
+                    vlayerSEC.setCustomProperty("labeling/drawLabels",  "True") 
+                    vlayerSEC.triggerRepaint()
+                    QtTest.QTest.qWait(200)
 
-            #Se ajusta el valor de progreso de 100% para mostrar el fin del proceso
+                    mySymbol1 = QgsFillSymbol.createSimple({'color':'red', 'color_border':'red', 'width_border':'0.4', 'style':'no'})
+                    myRenderer = vlayerSEC.renderer()
+                    myRenderer.setSymbol(mySymbol1)
+                    vlayerSEC.triggerRepaint()
+                    QtTest.QTest.qWait(1000)
+                
+                    #Muestra el 40% de avance
+                    prog.setValue(40)
+                    #Si el checkbox está marcado se cargan sólo las capas filtradas 
+                    if self.dockwidget.checkFiltroCapas.isChecked():
+                        query = f"SELECT m.geom as geom, m.id as id, m.entidad as entidad, m.distrito as distrito, m.municipio as municipio, m.seccion as seccion, m.localidad as localidad, m.manzana as manzana, m.status as status, m.disperso as disperso, m.caso_captura as caso_captura FROM bged.manzana as m, bged.seccion as s WHERE s.seccion = {numeroSeccion} AND ST_Contains(s.geom,m.geom)"
+                        uri.setDataSource('', f'({query})', 'geom', '', 'id')
+                    else:
+                        uri.setDataSource("bged", "manzana", "geom", "municipio=" + numeroMunicipio)
+                    #Cargar capas
+
+                    vlayerM = QgsVectorLayer(uri.uri(), "Manzana", "postgres")
+
+                    QgsProject.instance().addMapLayer(vlayerM)
+
+                    MZ_layer = QgsPalLayerSettings()
+                    textFormat = QgsTextFormat()
+                    textFormat.setColor(QColor('#464646')) 
+                    textFormat.setSize(11) 
+                    textFormat.buffer().setEnabled(True)
+                    textFormat.buffer().setColor(QColor('#FFFFFF'))
+                    textFormat.buffer().setSize(0.7)
+                    MZ_layer.setFormat(textFormat)
+                    MZ_layer.fieldName = '\'Mz \nId \' || "id"'
+                    MZ_layer.isExpression = True
+                    MZ_layer.enabled = True
+                    MZ_layer.placement = QgsPalLayerSettings.AroundPoint
+                    MZ_layer.fitInPolygonOnly = True
+                    MZlabels = QgsVectorLayerSimpleLabeling(MZ_layer)
+                    MZlabels.drawLabels = True
+                    vlayerM.setLabeling(MZlabels)
+                    vlayerM.setLabelsEnabled(True)
+                    vlayerM.setCustomProperty("labeling/drawLabels",  "True")
+                    vlayerM.triggerRepaint()
+                    QtTest.QTest.qWait(200)
+
+                    mySymbol1 = QgsFillSymbol.createSimple({'color':'#289E26', 'color_border':'#237E21', 'width_border':'0.2', 'style':'dense6'})
+                    myRenderer = vlayerM.renderer()
+                    myRenderer.setSymbol(mySymbol1)
+                    vlayerM.triggerRepaint()
+                    QtTest.QTest.qWait(1500)
+
+                    #Muestra el 60% de avance
+                    prog.setValue(60) 
+
+                    #Si el checkbox está marcado se cargan sólo las capas filtradas 
+                    if self.dockwidget.checkFiltroCapas.isChecked():
+                        query = f"SELECT v.geom as geom, v.id as id, v.nombre as nombre FROM bged.vialidad as v, bged.seccion as s WHERE s.seccion = {numeroSeccion} AND ST_Intersects(v.geom,s.geom)"
+                        uri.setDataSource('', f'({query})', 'geom', '', 'id')
+                    else:
+                        uri.setDataSource("bged", "vialidad", "geom")
+                    vlayerV = QgsVectorLayer(uri.uri(), "Vialidad", "postgres")
+                    QgsProject.instance().addMapLayer(vlayerV)
+
+                    V_layer = QgsPalLayerSettings()
+                    textFormat = QgsTextFormat()
+                    textFormat.setColor(QColor('#22243B')) 
+                    textFormat.setSize(11) 
+                    textFormat.buffer().setEnabled(True)
+                    textFormat.buffer().setColor(QColor('#FFFFFF'))
+                    textFormat.buffer().setSize(0.7)
+                    V_layer.setFormat(textFormat)
+                    V_layer.fieldName = '\'Id \'||"id" || \' \' || title("nombre")'
+                    V_layer.isExpression = True
+                    V_layer.enabled = True
+                    V_layer.placement = QgsPalLayerSettings.Curved
+                    Vlabels = QgsVectorLayerSimpleLabeling(V_layer)
+                    Vlabels.drawLabels = True
+                    vlayerV.setLabeling(Vlabels)
+                    vlayerV.setLabelsEnabled(True)
+                    vlayerV.setCustomProperty("labeling/drawLabels",  "True")
+                    vlayerV.triggerRepaint()
+                    QtTest.QTest.qWait(500)
+
+                    renderer = vlayerV.renderer()
+                    symbol1 = QgsLineSymbol.createSimple({'color': '#000000','width':'.3'})
+                    renderer.setSymbol(symbol1) 
+                    vlayerV.triggerRepaint()
+                    QtTest.QTest.qWait(3000)
+
+                    #Muestra el 80% de avance
+                    prog.setValue(80)
+
+                    #Si el checkbox está marcado se cargan sólo las capas filtradas 
+                    if self.dockwidget.checkFiltroCapas.isChecked():
+                        query = f"SELECT ne.geom as geom, ne.id as id, ne.manzana as manzana, ne.vialidad as vialidad, ne.numext as numext FROM bged.numeros_exteriores as ne, bged.seccion as s WHERE s.seccion = {numeroSeccion} AND	ST_Contains(s.geom,ne.geom)"
+                        uri.setDataSource('', f'({query})', 'geom', '', 'id')
+                    else:
+                        uri.setDataSource("bged", "numeros_exteriores", "geom")
+
+                    #Consulta de numeros exteriores con campos nulos
+                    vlayerNE = QgsVectorLayer(uri.uri(), "NumerosExteriores", "postgres")
+                    QgsProject.instance().addMapLayer(vlayerNE)
+                    QtTest.QTest.qWait(100)
+
+                    NE_layer = QgsPalLayerSettings()
+                    NE_layer.fieldName = 'id'
+                    NE_layer.enabled = True
+                    NE_layer.placement = QgsPalLayerSettings.Free
+                    NElabels = QgsVectorLayerSimpleLabeling(NE_layer)
+                    NElabels.drawLabels = True
+                    vlayerNE.setLabeling(NElabels)
+                    vlayerNE.setLabelsEnabled(True)
+                    vlayerNE.setCustomProperty("labeling/drawLabels",  "True")
+                    vlayerNE.triggerRepaint()
+                    QtTest.QTest.qWait(200)
+
+                    renderer = vlayerNE.renderer()
+                    symbol1 = QgsLineSymbol.createSimple({'color':'#005F00', 'width':'0.4', 'line_style':'dash'})
+                    renderer.setSymbol(symbol1) 
+                    vlayerNE.triggerRepaint()
+                    QtTest.QTest.qWait(3000)
+                    
+                    self.ultimoMunicipio = municipioActual
+
+                #Borrar campos de texto en edicion simple
+                self.dockwidget.textEdit.setText("")
+                self.dockwidget.idManzana.setText("")
+                self.dockwidget.idManzana_original.setText("")
+                self.dockwidget.idVialidad_original.setText("")  
+                
+                #Iguala a cero el control de Crear Cadena al cargar una nueva área de trabajo
+                self.controlCrearCadena = 0
+
+                #Se ajusta el valor de progreso de 100% para mostrar el fin del proceso
+                prog.setValue(100) 
+                self.dockwidget.checkFiltroCapas.setChecked(False)
+                QMessageBox.information(self.iface.mainWindow(), "Aviso", "Se cargaron las capas en el área de trabajo. Continúe con la edición de los números exteriores.")
+            else:
+                QMessageBox.warning(self.iface.mainWindow(), "Aviso","No ha iniciado sesión. Imposible ejecutar la acción.")   
+        except Exception as error:
+            QMessageBox.critical(self.iface.mainWindow(), "¡Oops!",f"Ocurrió un error al cargar las capas. \nMotivo: \n{error}.\n Se escribe en el registro.")
+            self.logger.error(f'{datetime.now().strftime(self.timeformat)} Error al cargar las capas: {error}')
             prog.setValue(100) 
-            QMessageBox.information(self.iface.mainWindow(), "Aviso", "Listo, se cargaron las capas del área de trabajo exitosamente.")
-
-        except:
-
-            QMessageBox.warning(self.iface.mainWindow(), "Aviso", "No se logró cargar las capas adecuadamente, revise su conexión a internet.")
-
             return None
     
     def btnRecomendaciones_accion(self):
-        QMessageBox.information(self.iface.mainWindow(), "Aviso", "Para visualizar adecuadamente este Plugin en su pantalla se recomienda utilzar cualquiera de las siguientes resoluciones de pantalla:\n \n-1920 x 1080 \n-2048 x 1152 \n-2560 x 1600.")
-        return
+        
+        try:
+            QMessageBox.information(self.iface.mainWindow(), "Aviso", "Para visualizar adecuadamente este Plugin en su pantalla se recomienda utilzar cualquiera de las siguientes resoluciones de pantalla:\n \n-1920 x 1080 \n-2048 x 1152 \n-2560 x 1600.\n\nAdemás, para completar la configuración, por favor, seleccione el 100% para 'Escala y Diseño' en la configuración.")
+        
+        except Exception as error:
+            QMessageBox.critical(self.iface.mainWindow(), "¡Oops!",f"Ocurrió un error al mostrar las recomendaciones. \nMotivo: \n{error}.\n Se escribe en el registro.")
+            self.logger.error(f'{datetime.now().strftime(self.timeformat)} Error al mostrar las recomendaciones: {error}')
         
     def btnMostrar_accion(self):
-    
-        #pass
-        #Probando funcion
-        self.campo01 = ""
-
-        #limpiar datos en combo idVialidad e idManzana
-        self.dockwidget.idVialidad.clear()
-        self.dockwidget.idManzana.setText("")
         
-        # Get list of vector layers
-        layers = list(QgsProject.instance().mapLayers().values())
-        # Check there is at least one vector layer. Selecting within the same layer is fine.
-        vlayer_count = 0
-        for layer in layers:
-            if layer.type() == QgsMapLayer.VectorLayer:
-                vlayer_count = vlayer_count + 1
-
-        if vlayer_count > 0:
-        
-            #Obtener Datos, modificar para activar el layer de numero exteriores, Importante!!! se evita error de seleccion de tramo
-            vl = iface.activeLayer()
-            capaactiva = vl.name()
-
-            if capaactiva != "NumerosExteriores":
-                QMessageBox.warning(self.iface.mainWindow(), "Alerta", f"Por favor, seleccione la capa NumerosExteriores, la capa actual es {capaactiva}")
-                return
-
-            # get the list of selected ids 
-            ids = vl.selectedFeatureIds()
-            
-            if len(ids) == 1:
-                # create the request with the selected ids
-                request = QgsFeatureRequest()
-                request.setFilterFids(ids)
-
-                fields = ['id']
-
-                features = vl.getFeatures(request)
-                for feature in features:
-                    attrs = [feature[field] for field in fields]
+        try:
+            if self.conectado == 1:
                 
-                self.campo01 = str(attrs[0])
+                self.controlMostrar = 1
+                self.campo01 = ""
+
+                #limpiar datos en combo idVialidad e idManzana
+                self.dockwidget.idVialidad.clear()
+                self.dockwidget.idManzana.setText("")
                 
-            elif len(ids) == 0: 
-                QMessageBox.warning(self.iface.mainWindow(), "Verifique","No seleccionó ningún elemento.")	
+                # Get list of vector layers
+                layers = list(QgsProject.instance().mapLayers().values())
+                # Check if there is at least one vector layer. Selecting within the same layer is fine.
+                vlayer_count = 0
+                for layer in layers:
+                    if layer.type() == QgsMapLayer.VectorLayer:
+                        vlayer_count = vlayer_count + 1
+
+                if vlayer_count > 0:
+                
+                    #Obtener Datos, modificar para activar el layer de numero exteriores, Importante!!! se evita error de seleccion de tramo
+                    vl = iface.activeLayer()
+                    capaactiva = vl.name()
+
+                    if capaactiva != "NumerosExteriores":
+                        QMessageBox.warning(self.iface.mainWindow(), "Alerta", f"No ha seleccionado la capa NumerosExteriores. Imposible mostrar. \nLa capa seleccionada actual es {capaactiva}. ")
+                        return
+
+                    # get the list of selected ids 
+                    ids = vl.selectedFeatureIds()
+                    
+                    #Si se selecciona solo un registro se muestra la información del registro
+                    if len(ids) == 1:
+                        # create the request with the selected ids
+                        request = QgsFeatureRequest()
+                        request.setFilterFids(ids)
+
+                        fields = ['id']
+
+                        features = vl.getFeatures(request)
+                        for feature in features:
+                            attrs = [feature[field] for field in fields]
+                        
+                        self.campo01 = str(attrs[0])
+                        usr = self.dockwidget.txtUsuario.text()
+                        pwd = self.dockwidget.txtClave.text()
+                        
+                        #localhost
+                        #remote Samge bged 
+                        conn = psycopg2.connect(database=self.baseDatos, user=usr, password=pwd, host=self.servidor, port="5432")
+                        
+                        with conn:
+
+                            qry_c = "SELECT manzana, vialidad, numext from bged.numeros_exteriores where id = %s;"
+                            data_c = (self.campo01, )
+                            with conn.cursor() as curs:
+
+                                curs.execute(qry_c, data_c)
+                                results = curs.fetchone()
+
+                                idManzana = results[0]   
+                                idVialidad = results[1]   
+                                numExt = results[2]   
+
+                                self.dockwidget.textEdit.setText(numExt)
+                                self.dockwidget.idManzana_original.setText(str(idManzana))
+                                self.dockwidget.idVialidad_original.setText(str(idVialidad))
+                            
+                        conn.close()
+                        self.cadena_existente = numExt
+                        
+                    elif len(ids) == 0: 
+                        QMessageBox.warning(self.iface.mainWindow(), "Verifique","No ha seleccionado ninguna geometría de números exteriores. Imposible mostrar.")	
+                    else:
+                        QMessageBox.warning(self.iface.mainWindow(), "Verifique",f"Debe seleccionar solo un registro. Hay {len(ids)} registros seleccionados.")	
+                else:
+                    QMessageBox.warning(self.iface.mainWindow(), "Verifique","No hay capas vectoriales agregadas.")		
             else:
-                QMessageBox.warning(self.iface.mainWindow(), "Verifique","Debe seleccionar sólo un elemento.")	
-        else:
-            QMessageBox.warning(self.iface.mainWindow(), "Verifique","No hay capas vectoriales agregadas.")		
+                QMessageBox.warning(self.iface.mainWindow(), "Aviso","No ha iniciado sesión. Imposible ejecutar la acción.")  
+            
+            #Cambia a cero el Controlador de Crear Cadena
+            self.controlCrearCadena = 0
         
-        
-        usr = self.dockwidget.txtUsuario.text()
-        pwd = self.dockwidget.txtClave.text()
-        
-        #localhost
-        #remote Samge bged 
-        conn = psycopg2.connect(database=self.baseDatos, user=usr, password=pwd, host=self.servidor, port="5432")
-          
-        with conn:
-
-            qry_c = "SELECT geom, tramo, manzana, vialidad, numext, valida from bged.numeros_exteriores where id = %s;"
-            data_c = (self.campo01, )
-            with conn.cursor() as curs:
-
-                curs.execute(qry_c, data_c)
-      
-                
-                results = curs.fetchone() #one row
-
-                result01 = results[0]   #geom           tramo
-                result02 = results[1]   #tramo          manzana
-                result03 = results[2]   #idManzana      vialidad
-                result04 = results[3]   #idVialidad     numext
-                result05 = results[4]   #idNumExt       valida
-                result06 = results[5]   #valida         pro
-    
-                self.dockwidget.textEdit.setText(result05)
-                self.dockwidget.idManzana_original.setText(str(result03))
-                self.dockwidget.idVialidad_original.setText(str(result04))
-                
-        conn.close()
+        #Si ocurriera un error durante la ejecución se alerta al usuario para evitar que el Plugin arroje errores de Python.
+        except Exception as error:
+            self.controlMostrar = 0
+            conn.close()
+            QMessageBox.critical(self.iface.mainWindow(), "¡Oops!",f"Ocurrió un error al mostrar la información del registro seleccionado. \nMotivo: \n{error}.\n Se escribe en el registro.")
+            self.logger.error(f'{datetime.now().strftime(self.timeformat)} Error al mostrar la información del registro seleccionado: {error}')
 
     def btnSugerir_accion(self):
+        try:
+            self.campo01 = ""
+            if self.conectadoflag == 1:
+                layers = list(QgsProject.instance().mapLayers().values())
 
-        self.campo01 = ""
-
-        layers = list(QgsProject.instance().mapLayers().values())
-
-        vlayer_count = 0
-        for layer in layers:
-            if layer.type() == QgsMapLayer.VectorLayer:
-                vlayer_count = vlayer_count + 1
+                vlayer_count = 0
+                for layer in layers:
+                    if layer.type() == QgsMapLayer.VectorLayer:
+                        vlayer_count = vlayer_count + 1
 
 
-        if vlayer_count > 0:
+                if vlayer_count > 0:
+                
+                    vl = iface.activeLayer()
+                    capaactiva = vl.name()
+
+                    if capaactiva != "NumerosExteriores":
+                        QMessageBox.warning(self.iface.mainWindow(), "Alerta", f"Por favor seleccione la capa NumerosExteriores, la capa actual es {capaactiva}")
+                        return
+
+                    ids = vl.selectedFeatureIds()
         
-            vl = iface.activeLayer()
-            capaactiva = vl.name()
+                    if len(ids) == 1 and capaactiva == "NumerosExteriores":
+                        
+                        self.campo01 = ids[0]
 
-            if capaactiva != "NumerosExteriores":
-                QMessageBox.warning(self.iface.mainWindow(), "Alerta", f"Por favor seleccione la capa NumerosExteriores, la capa actual es {capaactiva}")
-                return
+                        usr = self.dockwidget.txtUsuario.text()
+                        pwd = self.dockwidget.txtClave.text()
 
-            ids = vl.selectedFeatureIds()
- 
-            if len(ids) == 1:
-   
-                request = QgsFeatureRequest()
-                request.setFilterFids(ids)
+                        conn = psycopg2.connect(database=self.baseDatos, user=usr, password=pwd, host=self.servidor, port="5432") 
+                        #Configura la barra de progreso 
+                        prog = QProgressDialog('Buscando Id de Manzana. Un momento, por favor.', '', 0, 100)
+                        prog.setWindowModality(Qt.WindowModal)
+                        prog.setCancelButton(None)
+                        time.sleep(2)
+                        prog.setValue(25)
+                        #Se conecta a la BD para obtener el id del registro seleccionado de la capa de números exteriores
+                        with conn:
 
-                fields = ['id']
+                            qry_c = "SELECT id from bged.numeros_exteriores where id = %s;"
+                            data_c = (self.campo01,)
+                            with conn.cursor() as curs:
 
-                features = vl.getFeatures(request)
-                for feature in features:
-                    attrs = [feature[field] for field in fields]
-                
-                self.campo01 = str(attrs[0])
-                
+                                prog.setValue(50)
+                                curs.execute(qry_c, data_c)
+                                results = curs.fetchone() #one row       
+                                idNumExt = results[0]   #id
 
-            elif len(ids) == 0: 
-                QMessageBox.warning(self.iface.mainWindow(), "Verifique","No seleccionó ningún elemento.")	
+                        with conn:
+
+                            #Se conecta a ala BD para obtener el id de la manzana que toca o está a 1m del número exterior selccionado
+                            qry_c = "SELECT a.id as id_mza FROM bged.manzana as a, bged.numeros_exteriores as b WHERE a.seccion = %s AND b.id = %s AND ST_Intersects(ST_Buffer(a.geom,1),b.geom) = 'true';"
+                            data_c = (self.dockwidget.cveSeccion.currentText(), idNumExt,)
+                            with conn.cursor() as curs:
+
+                                prog.setValue(75)
+                                curs.execute(qry_c, data_c)
+                                results = curs.fetchone() #one row
+                                if(results is None):QMessageBox.warning(self.iface.mainWindow(), "Aviso","El segmento de número exterior está fuera de la tolerancia. Ajuste el segmento al polígono de manzana, o bien, revise la validez de la geometría.")
+                                else:idmzasug = results[0]   #id           id manzana sugerido
+
+                                if (idmzasug is None or idmzasug == ''):
+                                    QMessageBox.warning(self.iface.mainWindow(), "Aviso","No se encontró ningún id de manzana.")
+                                    
+                            self.dockwidget.idManzana.setText(str(idmzasug))
+                            
+                            prog.setValue(100)
+                        #Ajusta el valor al 100% para concluir la barra de progreso
+                        conn.close()
+                        
+                    elif len(ids) == 0: 
+                        QMessageBox.warning(self.iface.mainWindow(), "Verifique","No seleccionó ningún registro.")	
+                    else:
+                        QMessageBox.warning(self.iface.mainWindow(), "Verifique","Debe seleccionar solo un registro.")	
+                else:
+                    QMessageBox.warning(self.iface.mainWindow(), "Verifique","No hay capas vectoriales agregadas.")		
+    
             else:
-                QMessageBox.warning(self.iface.mainWindow(), "Verifique","Debe seleccionar sólo un elemento.")	
-        else:
-            QMessageBox.warning(self.iface.mainWindow(), "Verifique","No hay capas vectoriales agregadas.")		
- 
-        usr = self.dockwidget.txtUsuario.text()
-        pwd = self.dockwidget.txtClave.text()
-
-        conn = psycopg2.connect(database=self.baseDatos, user=usr, password=pwd, host=self.servidor, port="5432") 
-        #Configura la barra de progreso 
-        prog = QProgressDialog('Buscando Id de Manzana. Un momento, por favor.', '', 0, 100)
-        prog.setWindowModality(Qt.WindowModal)
-        prog.setCancelButton(None)
-        time.sleep(2)
-        prog.setValue(25)
-        #Se conecta a la BD para obtener el id del registro seleccionado de la capa de números exteriores
-        with conn:
-
-            qry_c = "SELECT geom, id from bged.numeros_exteriores where id = %s;"
-            data_c = (self.campo01, )
-            with conn.cursor() as curs:
-
-                prog.setValue(50)
-                curs.execute(qry_c, data_c)
-                results = curs.fetchone() #one row
-                result01 = results[0]   #geom           
-                result02 = results[1]   #id
-
-        with conn:
-
-            #Se conecta a ala BD para obtener el id de la manzana que toca o está a 1m del número exterior selccionado
-            qry_c = "SELECT a.id as id_mza FROM bged.manzana as a, bged.numeros_exteriores as b WHERE b.id = {0} AND ST_Intersects(ST_Buffer(a.geom,1),b.geom) = 'true';".format(result02)
-            data_c = (self.campo01, )
-            with conn.cursor() as curs:
-
-                prog.setValue(75)
-                curs.execute(qry_c, data_c)
-                results = curs.fetchone() #one row
-                idmzasug = results[0]   #id           id manzana sugerido
-
-                if (idmzasug is None or idmzasug == ''):
-                    QMessageBox.warning(self.iface.mainWindow(), "Aviso","No se encontró ningún id de manzana.")
-                      
-            self.dockwidget.idManzana.setText(str(idmzasug))
-            
+                QMessageBox.warning(self.iface.mainWindow(), "Aviso","No ha iniciado sesión. Imposible ejecutar la acción.")          
+        #Si ocurriera un error durante la ejecución se alerta al usuario para evitar que el Plugin arroje errores de Python.
+        except Exception as error:
             prog.setValue(100)
-        #Ajusta el valor al 100% para concluir la barra de progreso
-        conn.close()
+            QMessageBox.critical(self.iface.mainWindow(), "¡Oops!",f"Ocurrió un error durante la ejecución. \nMotivo: \n{error}.\n Se escribe en el registro.")
+            self.logger.error(f'{datetime.now().strftime(self.timeformat)} Error al obtener un Id de manzana sugerido: {error}')
+            conn.close()
+            
         
     #Aumenta el tamaño del texto en el cuadro de texto de números exteriores al máximo
     def tmaxFont(self):
 
-        f = self.dockwidget.textEdit.font()
-        f.setPointSize(18)
-        self.dockwidget.textEdit.setFont(f)
+        try:
+            f = self.dockwidget.textEdit.font()
+            f.setPointSize(18)
+            self.dockwidget.textEdit.setFont(f)
+            
+        except Exception as error:
+            QMessageBox.critical(self.iface.mainWindow(), "¡Oops!",f"Ocurrió un error al ajustar el tamaño de fuente. \nMotivo: \n{error}.\n Se escribe en el registro.")
+            self.logger.error(f'{datetime.now().strftime(self.timeformat)} Error al aumentar el tamaño de fuente: {error}')
+
 
     #Regresa el tamaño del texto en el cuadro de texto de números exteriores al valor original
     def tmedFont(self):
 
-        f = self.dockwidget.textEdit.font()
-        f.setPointSize(14)
-        self.dockwidget.textEdit.setFont(f)
+        try:
+            f = self.dockwidget.textEdit.font()
+            f.setPointSize(14)
+            self.dockwidget.textEdit.setFont(f)
+            
+        except Exception as error:
+            QMessageBox.critical(self.iface.mainWindow(), "¡Oops!",f"Ocurrió un error al ajustar el tamaño de fuente. \nMotivo: \n{error}.\n Se escribe en el registro.")
+            self.logger.error(f'{datetime.now().strftime(self.timeformat)} Error al fijar el tamaño de fuente medio: {error}')
 
     #Disminuye el tamaño del texto en el cuadro de texto de números exteriores al mínimo
     def tminFont(self):
-
-        f = self.dockwidget.textEdit.font()
-        f.setPointSize(12)
-        self.dockwidget.textEdit.setFont(f)
+        
+        try:
+            f = self.dockwidget.textEdit.font()
+            f.setPointSize(12)
+            self.dockwidget.textEdit.setFont(f)
+            
+        except Exception as error:
+            QMessageBox.critical(self.iface.mainWindow(), "¡Oops!",f"Ocurrió un error al ajustar el tamaño de fuente. \nMotivo: \n{error}.\n Se escribe en el registro.")
+            self.logger.error(f'{datetime.now().strftime(self.timeformat)} Error al disminuir el tamaño de fuente: {error}')
 
     #Invierte el orden de la cadena del texto en el cuadro de texto de números exteriores   
     def btnInvertir(self):
-    
-        cadena = self.dockwidget.textEdit.toPlainText()
-        invertida = ','.join((cadena.split(",")[::-1]))
-        self.dockwidget.textEdit.setText(invertida)
+        
+        try:    
+            cadena = self.dockwidget.textEdit.toPlainText()
+            invertida = ','.join((cadena.split(",")[::-1]))
+            self.dockwidget.textEdit.setText(invertida)
+            
+        except Exception as error:
+            QMessageBox.critical(self.iface.mainWindow(), "¡Oops!",f"Ocurrió un error al invertir la cadena. \nMotivo: \n{error}.\n Se escribe en el registro.")
+            self.logger.error(f'{datetime.now().strftime(self.timeformat)} Error al invertir el orden de la cadena: {error}')
         
         #btnInvertir
       
@@ -950,478 +1039,622 @@ class numeros_exteriores:
         #pass
  
         try:
-
-            usr = self.dockwidget.txtUsuario.text()
-            pwd = self.dockwidget.txtClave.text()
+            if self.conectado == 1:
+                usr = self.dockwidget.txtUsuario.text()
+                pwd = self.dockwidget.txtClave.text()
+            
+                #localhost
+                conn = psycopg2.connect(database=self.baseDatos, user=usr, password=pwd, host=self.servidor, port="5432")
         
-            #localhost
-            conn = psycopg2.connect(database=self.baseDatos, user=usr, password=pwd, host=self.servidor, port="5432")
-    
-            #Grabar a Postgres
-            cursor = conn.cursor()
-        
-            qry = "UPDATE bged.numeros_exteriores set manzana = %s, vialidad = %s, numext = %s where id = %s;"
-        
-
-            Id_manzana_actual = self.dockwidget.idManzana_original.text()
-            Id_vialidad_actual = self.dockwidget.idVialidad_original.text()
-            numeroExterior = self.dockwidget.textEdit.toPlainText()
-
-            #Mostrar variables de datos actuales del numero exterior
-            IdNumeroManzana = self.dockwidget.idManzana.text()
-            if ' : ' in self.dockwidget.idVialidad.currentText():
-                IdNumeroVialidad = str(self.dockwidget.idVialidad.currentText().split(" :",1)[0])
-            else:
-                IdNumeroVialidad = self.dockwidget.idVialidad.currentText()
-           
-            if IdNumeroManzana == "":
-                if (Id_manzana_actual and not Id_manzana_actual.isspace()) and not Id_manzana_actual == "None":
-                    # the string is non-empty
-                    QMessageBox.information(self.iface.mainWindow(), "Aviso",f"No se actualizó el dato de Id manzana, se conserva el actual: {Id_manzana_actual}")
-                    IdNumeroManzana = Id_manzana_actual
-                else:
-                    # the string is empty
-                    QMessageBox.warning(self.iface.mainWindow(), "Aviso","Debe ingresar el dato Id manzana actualizado para guardar los cambios.")
-                    return
-            elif IdNumeroManzana.isnumeric == False:
-                QMessageBox.information(self.iface.mainWindow(), "Aviso",f"Ingrese un Id valido, caracteres especiales o letras no permitidos.\nNo se actualizó el dato de Id manzana, se conserva el actual: {Id_manzana_actual}")
-            if IdNumeroVialidad == "":
-                if (Id_vialidad_actual and not Id_vialidad_actual.isspace()) and not Id_vialidad_actual == "None":
-                    # the string is non-empty
-                    QMessageBox.information(self.iface.mainWindow(), "Aviso",f"No se actualizó el dato de Identificador de Vialidad más cercano, se conserva el actual: {Id_vialidad_actual}")
-                    IdNumeroVialidad = Id_vialidad_actual
-                else:
-                    # the string is empty
-                    QMessageBox.warning(self.iface.mainWindow(), "Aviso","Debe ingresar el dato de Identificador de Vialidad más cercano para guardar los cambios.")
-                    return
+                #Grabar a Postgres
+                cursor = conn.cursor()
+            
+                qry = "UPDATE bged.numeros_exteriores set manzana = %s, vialidad = %s, numext = %s where id = %s;"
             
 
-            if numeroExterior == "" or numeroExterior == "None":
-                # the string is empty
-                QMessageBox.warning(self.iface.mainWindow(), "Aviso","Debe ingresar el dato de Número Exterior para guardar los cambios.")
-                return
+                Id_manzana_actual = self.dockwidget.idManzana_original.text()
+                Id_vialidad_actual = self.dockwidget.idVialidad_original.text()
+                numeroExterior = self.dockwidget.textEdit.toPlainText()
 
-            IdNumeroManzana = IdNumeroManzana.strip()
-            IdNumeroVialidad = IdNumeroVialidad.strip()
-            numeroExterior = numeroExterior.strip().rstrip(',')
+                #Mostrar variables de datos actuales del numero exterior
+                IdNumeroManzana = self.dockwidget.idManzana.text()
+                if ' : ' in self.dockwidget.idVialidad.currentText():
+                    IdNumeroVialidad = str(self.dockwidget.idVialidad.currentText().split(" :",1)[0])
+                else:
+                    IdNumeroVialidad = self.dockwidget.idVialidad.currentText()
+            
+                if IdNumeroManzana == "":
+                    if (Id_manzana_actual and not Id_manzana_actual.isspace()) and not Id_manzana_actual == "None":
+                        # the string is non-empty
+                        QMessageBox.information(self.iface.mainWindow(), "Aviso",f"No se actualizó el dato de Id manzana, se conserva el actual: {Id_manzana_actual}")
+                        IdNumeroManzana = Id_manzana_actual
+                    else:
+                        # the string is empty
+                        QMessageBox.warning(self.iface.mainWindow(), "Aviso","Debe ingresar el dato Id manzana actualizado para guardar los cambios.")
+                        return
+                elif IdNumeroManzana.isnumeric == False:
+                    QMessageBox.information(self.iface.mainWindow(), "Aviso",f"Ingrese un Id valido, caracteres especiales o letras no permitidos.\nNo se actualizó el dato de Id manzana, se conserva el actual: {Id_manzana_actual}")
+                if IdNumeroVialidad == "":
+                    if (Id_vialidad_actual and not Id_vialidad_actual.isspace()) and not Id_vialidad_actual == "None":
+                        # the string is non-empty
+                        QMessageBox.information(self.iface.mainWindow(), "Aviso",f"No se actualizó el dato de Identificador de Vialidad más cercano, se conserva el actual: {Id_vialidad_actual}")
+                        IdNumeroVialidad = Id_vialidad_actual
+                    else:
+                        # the string is empty
+                        QMessageBox.warning(self.iface.mainWindow(), "Aviso","Debe ingresar el dato de Identificador de Vialidad más cercano para guardar los cambios.")
+                        return
+                
 
-            data = (IdNumeroManzana,IdNumeroVialidad,numeroExterior,self.campo01)
-        
-        
-            cursor.execute(qry,data) 
-            conn.commit()
-            cursor.close()
-            conn.close()         
+                if numeroExterior == "" or numeroExterior == "None":
+                    # the string is empty
+                    QMessageBox.warning(self.iface.mainWindow(), "Aviso","Debe ingresar el dato de Número Exterior para guardar los cambios.")
+                    return
 
-            #Confirmar
-            QMessageBox.information(self.iface.mainWindow(), "Aviso","Se guardaron los cambios exitosamente.")
+                IdNumeroManzana = IdNumeroManzana.strip()
+                IdNumeroVialidad = IdNumeroVialidad.strip()
+                
+                #Si se usa la función Cadena UH permite concatener los números exteriores existentes con los creados o los sobrescribe
+                if  self.controlCadenaUH == 1 and self.cadena_existente != "":
+                    buttonReply = QMessageBox.question(self.iface.mainWindow(), 'Atención', "Usó la función Cadena UH ¿Desea conservar los números exteriores existentes? Dé clic en «Sí» para concatenarlos o en «No» para sobreescribirlos.", QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+                    #Pregunta al usuario si quiere concatenar los datos de Cadena UH a los anteriores
+                    if buttonReply == QMessageBox.Yes:
+                        numeroExterior = f"{self.cadena_existente},{numeroExterior.upper().strip().rstrip(',')}"
+                else:
+                    numeroExterior = numeroExterior.upper().strip().rstrip(',')
 
-        except:
+                data = (IdNumeroManzana,IdNumeroVialidad,numeroExterior,self.campo01)
+            
+            
+                cursor.execute(qry,data) 
+                conn.commit()
+                cursor.close()
+                conn.close()         
 
-            QMessageBox.warning(self.iface.mainWindow(), "Aviso", "No se logró guardar la información, revise los datos capturados, sus credenciales o su conexión a internet.")
-            return None
+                #Se limpian los distintos campos al guardar
+                self.dockwidget.textEdit.setText("")
+                self.dockwidget.idVialidad_original.setText("")
+                self.dockwidget.idManzana_original.setText("")
+                self.dockwidget.idVialidad.clear()
+                self.dockwidget.idManzana.clear()
+                self.dockwidget.txtRinicial.setText("")
+                self.dockwidget.txtRfinal.setText("")
+                self.dockwidget.txtRIntervalo.setText("")
+                self.dockwidget.distUsuario.setText("")
+                self.dockwidget.checkLl.setChecked(False)
+                self.dockwidget.checkEnne.setChecked(False)
+                self.dockwidget.checkRr.setChecked(False)
+                self.dockwidget.checkSinIntervalo.setChecked(False)
+                self.control = 0
+                self.controlCadenaUH = 0
+                self.controlMostrar = 0
+                self.SectorNombre = ['', '', '']
+                self.SectorRInicial = ['', '', '']
+                self.SectorRFinal = ['', '', '']
+                self.SectorRIntervalo = ['', '', '']
+                self.flagSinIntervalo = [False,False,False]
+                self.Sector1 = []
+                self.Sector2 = []
+                self.Sector3 = []
+                self.controlCrearCadena = 0
+
+                #Confirmar
+                QMessageBox.information(self.iface.mainWindow(), "Aviso","Se guardaron los cambios exitosamente.")
+            else:
+                QMessageBox.warning(self.iface.mainWindow(), "Aviso","No ha iniciado sesión. Imposible ejecutar la acción.")  
+
+        except Exception as error:
+            QMessageBox.critical(self.iface.mainWindow(), "¡Oops!",f"Ocurrió un error al guardar los cambios. Por favor, revise el estado de red o su conexión \nMotivo: \n{error}.\n Se escribe en el registro.")
+            self.logger.error(f'{datetime.now().strftime(self.timeformat)} Error al guardar los cambios: {error}')
 
         
     def btnCrearCadena(self):
         
-        intervalos = ""
-        puntoInicio = 0
-        intervaloAlfa = ""
-        #btnCrearCadena
-        if (self.dockwidget.txtRinicial.text().isnumeric() == True and self.dockwidget.txtRfinal.text().isnumeric() == True and self.dockwidget.txtRIntervalo.text().isnumeric()):
-            for x in range(int(self.dockwidget.txtRinicial.text()), int(self.dockwidget.txtRfinal.text())+1, int(self.dockwidget.txtRIntervalo.text())):
-                if puntoInicio == 0:
-                    intervalos = intervalos + str(x)
-                    puntoInicio = 1
-                else:
-                    intervalos = intervalos + "," + str(x)
-        #Verifica que se hayan ingresado todos los datos para gnerar la cadena
-        elif (self.dockwidget.txtRinicial.text() == '' or self.dockwidget.txtRfinal.text() == '' or self.dockwidget.txtRIntervalo.text() == ''):
-            QMessageBox.warning(self.iface.mainWindow(), "Aviso", "No ha ingresado valor de inicio, final o rango, por favor, ingrese los tres.")
-        elif ('ñ' in self.dockwidget.txtRinicial.text() or 'Ñ' in self.dockwidget.txtRinicial.text() or 'ñ' in self.dockwidget.txtRfinal.text() or 'Ñ' in self.dockwidget.txtRfinal.text()):
-            QMessageBox.warning(self.iface.mainWindow(), "Aviso", "Si desea incluir la letra 'Ñ', por favor, hágalo desde la sección de literarles especiales.")
-        #Verifica que el valor ingresado como intervalo sea un número
-        elif(self.dockwidget.txtRIntervalo.text().isnumeric() == False):
-            QMessageBox.warning(self.iface.mainWindow(), "Aviso", "Ingrese un intervalo numérico.")
-        #Alerta sobre la necesidad de usar una letra en el primer valor del intervalo
-        elif(self.dockwidget.txtRinicial.text().isnumeric() == False and self.dockwidget.txtRfinal.text().isnumeric() == True):
-            QMessageBox.warning(self.iface.mainWindow(), "Aviso", "Si desea crea una cadena de números exteriores con letras consecutivas, por favor, ingrese letra de inicio y fin en orden alfabético.")
-        #Alerta sobre la necesidad de usar una letra en el segundo valor del intervalo
-        elif(self.dockwidget.txtRinicial.text().isnumeric() == True and self.dockwidget.txtRfinal.text().isnumeric() == False):
-            QMessageBox.warning(self.iface.mainWindow(), "Aviso", "Si desea crea una cadena de números exteriores con letras consecutivas, por favor, ingrese letra de inicio y fin en orden alfabético.")
-        #Crea la cadena de números exteriores usando una letra para los casos 1A, 1B,1C...
-        elif(self.dockwidget.txtRinicial.text().isnumeric() == False and self.dockwidget.txtRfinal.text().isnumeric() == False):
-            #Identifica la letra que se ingresó
-            letraInicio = re.findall(r'\D',self.dockwidget.txtRinicial.text())
-            letraFinal = re.findall(r'\D',self.dockwidget.txtRfinal.text())
-            #Obtiene la parte numérica del texto ingresado
-            numInicio = self.dockwidget.txtRinicial.text().split(letraInicio[0])[0]
-            numFinal = self.dockwidget.txtRfinal.text().split(letraFinal[0])[0]
-            #Cambia a mayúscula las letras ingresadas
-            posInicial = ord(letraInicio[0].upper())
-            posFinal = ord(letraFinal[0].upper())
-            #Si los valores ingresados son del tipo 1A - 1C, crea 1A,1B,1C
-            if numInicio == numFinal and posInicial < posFinal:
-                for i in range(posInicial, posFinal + 1, 1):
-                    intervaloAlfa = intervaloAlfa + (numInicio + '' + chr(i) + ',')
-            #Si los valores ingresados son del tipo 2 - 1, envía alerta
-            elif (numInicio > numFinal):
-                QMessageBox.warning(self.iface.mainWindow(), "Aviso", "El orden numérico es descendente, por favor, verifique e intente de nuevo.")          
-            #Si los valores ingresados son del tipo 1A - 2C, crea 1A, 1B, 1C,..., 1Z, 2A, 2B, 2C
-            elif numInicio != numFinal and posInicial <= posFinal:
-                for i in range(int(numInicio),int(numInicio)+1,1):
-                    for j in range(posInicial, 91, 1):
-                        intervaloAlfa = intervaloAlfa + (str(i) + '' + chr(j) + ',')
-                for i in range(int(numInicio)+1,int(numFinal),1):
-                    for j in range(65, 91, 1):
-                        intervaloAlfa = intervaloAlfa + (str(i) + '' + chr(j) + ',')
-                for i in range(int(numFinal),int(numFinal)+1,1):
-                    for j in range(int(65), posFinal + 1, 1):
-                        intervaloAlfa = intervaloAlfa + (str(i) + '' + chr(j) + ',')
-            #Si los valores ingresados son del tipo 1X - 2C, crea 1X, 1Y, 1Z, 2A, 2B, 2C
-            elif numInicio <= numFinal and posInicial > posFinal:
-                for i in range(int(numInicio),int(numInicio)+1,1):
-                    for j in range(posInicial, 91, 1):
-                        intervaloAlfa = intervaloAlfa + (str(i) + '' + chr(j) + ',')
-                for i in range(int(numInicio)+1,int(numFinal),1):
-                    for j in range(65, 91, 1):
-                        intervaloAlfa = intervaloAlfa + (str(i) + '' + chr(j) + ',')
-                for i in range(int(numFinal),int(numFinal)+1,1):
-                    for j in range(int(65), posFinal + 1, 1):
-                        intervaloAlfa = intervaloAlfa + (str(i) + '' + chr(j) + ',')
-            #Si los valores ingresados son iguales, es decir 1A - 1A, envía alerta
-            elif (numInicio == numFinal and posInicial == posFinal):
-                QMessageBox.warning(self.iface.mainWindow(), "Aviso", "Ingresó el mismo valor, por favor, verifique e intente de nuevo.")
-            intervalos = intervaloAlfa.rstrip(',')
-        cadena1 = self.dockwidget.textEdit.toPlainText()
-        if cadena1 == "":
-            self.dockwidget.textEdit.setText(intervalos)
-        elif intervalos == "":
-            self.dockwidget.textEdit.setText(cadena1)
-        else:
-            self.dockwidget.textEdit.setText(cadena1 + "," + intervalos)
-
-    def btnLimpiarIntervalo(self):
-        
-        #Permite limpiar los cuadros de texto y los checkboxes
-        self.dockwidget.txtRinicial.setText("")
-        self.dockwidget.txtRfinal.setText("")
-        self.dockwidget.txtRIntervalo.setText("")
-        self.dockwidget.checkLl.setChecked(False)
-        self.dockwidget.checkEnne.setChecked(False)
-        self.dockwidget.checkRr.setChecked(False)       
-       
-    def btnIdentificar20_accion(self):
-        
-        #limpiar datos en combo mediante consulta
-        self.dockwidget.idVialidad.clear()
-
-        #Abrir base
-        usr = self.dockwidget.txtUsuario.text()
-        pwd = self.dockwidget.txtClave.text()
-        
-        #localhost
-        conn = psycopg2.connect(database=self.baseDatos, user=usr, password=pwd, host=self.servidor, port="5432")
-    
-        with conn:
-
-            qry_c = "select via.id, via.nombre from bged.numeros_exteriores numext, bged.vialidad via where numext.id = %s and st_intersects(st_buffer(numext.geom, 20, 'side=both'), via.geom);"
-            data_c = (self.campo01, )
-            with conn.cursor() as curs:
-
-                curs.execute(qry_c, data_c)              
-                rows = curs.fetchall() #one row
-
-                for row in rows:
-
-                    idname = str(row[0]) + " : " + row[1].title()
-                    self.dockwidget.idVialidad.addItem(idname)
-
-        conn.close()
-
-    def btnIdentificar60_accion(self):
-        
-        #limpiar datos en combo mediante consulta
-        self.dockwidget.idVialidad.clear()
-        
-        #Abrir base
-        usr = self.dockwidget.txtUsuario.text()
-        pwd = self.dockwidget.txtClave.text()
-        
-        #localhost
-        conn = psycopg2.connect(database=self.baseDatos, user=usr, password=pwd, host=self.servidor, port="5432")
-    
-        with conn:
-
-            qry_c = "select via.id, via.nombre from bged.numeros_exteriores numext, bged.vialidad via where numext.id = %s and st_intersects(st_buffer(numext.geom, 60, 'side=both'), via.geom);"
-            data_c = (self.campo01, )
-            with conn.cursor() as curs:
-
-                curs.execute(qry_c, data_c)        
-                rows = curs.fetchall() #one row
-
-                for row in rows:
-
-                    idname = str(row[0]) + " : " + row[1].title()
-                    self.dockwidget.idVialidad.addItem(idname)
-
-
-        conn.close()
-
-    def btndistUsuario_accion(self):
-        
-        #Abrir base
-        usr = self.dockwidget.txtUsuario.text()
-        pwd = self.dockwidget.txtClave.text()
-        distUsuario = self.dockwidget.distUsuario.text()
-
-        #localhost
-        #remote Samge bged 
-        if distUsuario == '':
-            QMessageBox.warning(self.iface.mainWindow(),"Alerta","No se ha ingresado una distancia, por favor, ingrese una. \nConsidere que esta debe ser mayor que 60m.")
-
-        elif distUsuario.isnumeric() == False:
-            QMessageBox.warning(self.iface.mainWindow(),"Alerta","Eso no es un valor, por favor, ingrese uno.\nConsidere que el valor de distancia debe ser mayor que 60m.")
-        
-        elif float(distUsuario) <= 60:
-            QMessageBox.warning(self.iface.mainWindow(),"Alerta","La distancia ingresada es igual o menor que 60m.")
-        
-        elif len(distUsuario) >= 2 and float(distUsuario) > 60:
-
-            conn = psycopg2.connect(database=self.baseDatos, user=usr, password=pwd, host=self.servidor, port="5432")
-
-            with conn:
-
-                qry_c = "select via.id, via.nombre from bged.numeros_exteriores numext, bged.vialidad via where numext.id = %s and st_intersects(st_buffer(numext.geom, {0}, 'side=both'), via.geom);".format(distUsuario)
-                data_c = (self.campo01, )
-                with conn.cursor() as curs:
-
-                    curs.execute(qry_c, data_c)
-                    rows = curs.fetchall() #one row
-                    if len(rows) == 0:
-                        QMessageBox.warning(self.iface.mainWindow(),"Aviso","La distancia no arrojó ningún resultado. Por favor, intente con una mayor o verifique que la cartografía esté actualizada.")
-                    else:
-                        for row in rows:
-      
-                            idname = str(row[0]) + " : " + row[1].title()
-                            self.dockwidget.idVialidad.addItem(idname)
-            conn.close()
-
-    def cveSector_changed(self):
-
-        #Función para el cambio de sector en el combobox
-        #Carga los datos en pantalla según lo que se tenga guardado en memoria
-        self.dockwidget.txtNombreSector.setText(self.SectorNombre[int(self.dockwidget.cveSector.currentText())-1])
-        self.dockwidget.txtRinicial_2.setText(self.SectorRInicial[int(self.dockwidget.cveSector.currentText())-1])
-        self.dockwidget.txtRfinal_2.setText(self.SectorRFinal[int(self.dockwidget.cveSector.currentText())-1])
-        self.dockwidget.txtRIntervalo_2.setText(self.SectorRIntervalo[int(self.dockwidget.cveSector.currentText())-1])
-        self.dockwidget.checkSinIntervalo.setChecked(self.flagSinIntervalo[int(self.dockwidget.cveSector.currentText())-1])
-
-        #Carga el contenido de la cadena generada
-        if (int(self.dockwidget.cveSector.currentText()) == 1):
-            self.dockwidget.textEdit.setText(str(self.Sector1))
-        if (int(self.dockwidget.cveSector.currentText()) == 2):
-            self.dockwidget.textEdit.setText(str(self.Sector2))
-        if (int(self.dockwidget.cveSector.currentText()) == 3):
-            self.dockwidget.textEdit.setText(str(self.Sector3))
-
-    def btnAsignarSector_accion(self):
-        intervalos = ""
-        puntoInicio = 0
-        
-        #verifica que se haya asignado un sector sin intervalo sólo dos veces.
-        if self.flagSinIntervalo.count(True) == 2 and self.control ==2:
-            self.flagSinIntervalo[int(self.dockwidget.cveSector.currentText())-1] = False
-            self.dockwidget.checkSinIntervalo.setChecked(False)
-            QMessageBox.warning(self.iface.mainWindow(),'Aviso',f'Ya se han seleccionado {self.flagSinIntervalo.count(True)} sectores «Sin Intervalo».\nUtilice el botón «Limpiar» para este sector, ingrese un intervalo y comience nuevamente.')
-        #Si se marca el checkbox cambia el valor de la bandera
-        if self.dockwidget.checkSinIntervalo.isChecked() and self.flagSinIntervalo.count(True) <= 2:
-            self.control+=1
-            #Agrega el valor "True" a flagSinIntervalo del sector seleccionado siempre y cuando no haya más de dos sectores seleccionados           
-            self.flagSinIntervalo[int(self.dockwidget.cveSector.currentText())-1] = True
-            #Se alerta que ya se han seleccionado dos sectores y no es posible seleccionar un tercero   
-            QMessageBox.information(self.iface.mainWindow(),'Aviso',f'Ya se han seleccionado {self.flagSinIntervalo.count(True)} sectores «Sin Intervalo», no podrá seleccionar más de 2.\nSi desea insertar una cadena sin intervalos puede hacerlo manualmente.')
-            
-        #Verifica que se haya ingresado texto en la sección "Nombre de Sector"
-        #Se ingresó texto, lo guarda en la lista con SectorNombre[SectorActual-1], SectorActual-1 para empezar desde la primera posición
-        if self.dockwidget.txtNombreSector.text() != "":
-            self.SectorNombre[int(self.dockwidget.cveSector.currentText())-1] = self.dockwidget.txtNombreSector.text()
-            
-            #Si se ingresaron todos los datos de inicio, final e intervalo del rango se guargan en la lista de cada rango, en la posición del sector actual menos uno para empezar desde la primera posición
-            if self.dockwidget.txtRinicial_2.text() != "" and self.dockwidget.txtRinicial_2.text().isnumeric() and self.dockwidget.txtRfinal_2.text() != "" and self.dockwidget.txtRfinal_2.text().isnumeric and self.dockwidget.txtRIntervalo_2.text() != "" and self.dockwidget.txtRIntervalo_2.text().isnumeric():
-
-                self.SectorRInicial[int(self.dockwidget.cveSector.currentText())-1] = self.dockwidget.txtRinicial_2.text()
-                self.SectorRFinal[int(self.dockwidget.cveSector.currentText())-1] = self.dockwidget.txtRfinal_2.text()
-                self.SectorRIntervalo[int(self.dockwidget.cveSector.currentText())-1] = self.dockwidget.txtRIntervalo_2.text()
-
-                #Se crea la cadena de numeros con los valores ingresados por el usuario
-                for x in range(int(self.dockwidget.txtRinicial_2.text()), int(self.dockwidget.txtRfinal_2.text())+1, int(self.dockwidget.txtRIntervalo_2.text())):
-                    
-                    #Si no existe cadena de números exteriores en el cuadro de texto, se crea
+        try:        
+            intervalos = ""
+            puntoInicio = 0
+            intervaloAlfa = ""
+            #btnCrearCadena
+            if (self.dockwidget.txtRinicial.text().isnumeric() == True and self.dockwidget.txtRfinal.text().isnumeric() == True and self.dockwidget.txtRIntervalo.text().isnumeric()):
+                for x in range(int(self.dockwidget.txtRinicial.text()), int(self.dockwidget.txtRfinal.text())+1, int(self.dockwidget.txtRIntervalo.text())):
                     if puntoInicio == 0:
                         intervalos = intervalos + str(x)
                         puntoInicio = 1
-
-                        #Dependiendo el sector se agrega el valor
-                        if (int(self.dockwidget.cveSector.currentText()) == 1):
-                            self.Sector1.append(str(x))
-                        if (int(self.dockwidget.cveSector.currentText()) == 2):
-                            self.Sector2.append(str(x))
-                        if (int(self.dockwidget.cveSector.currentText()) == 3):
-                            self.Sector3.append(str(x))
-                    
-                    #Si existe una cadena de números exteriores se crea y se pega al final de la existente según sea el sector
                     else:
                         intervalos = intervalos + "," + str(x)
-                        appendString = "," + str(x)
+            #Verifica que se hayan ingresado todos los datos para gnerar la cadena
+            elif (self.dockwidget.txtRinicial.text() == '' or self.dockwidget.txtRfinal.text() == '' or self.dockwidget.txtRIntervalo.text() == ''):
+                QMessageBox.warning(self.iface.mainWindow(), "Aviso", "No ha ingresado valor de inicio, final o rango, por favor, ingrese los tres.")
+            elif ('ñ' in self.dockwidget.txtRinicial.text() or 'Ñ' in self.dockwidget.txtRinicial.text() or 'ñ' in self.dockwidget.txtRfinal.text() or 'Ñ' in self.dockwidget.txtRfinal.text()):
+                QMessageBox.warning(self.iface.mainWindow(), "Aviso", "Si desea incluir la letra 'Ñ', por favor, hágalo desde la sección de literarles especiales.")
+            #Verifica que el valor ingresado como intervalo sea un número
+            elif(self.dockwidget.txtRIntervalo.text().isnumeric() == False):
+                QMessageBox.warning(self.iface.mainWindow(), "Aviso", "Ingrese un intervalo numérico.")
+            #Alerta sobre la necesidad de usar una letra en el primer valor del intervalo
+            elif(self.dockwidget.txtRinicial.text().isnumeric() == False and self.dockwidget.txtRfinal.text().isnumeric() == True):
+                QMessageBox.warning(self.iface.mainWindow(), "Aviso", "Si desea crea una cadena de números exteriores con letras consecutivas, por favor, ingrese letra de inicio y fin en orden alfabético.")
+            #Alerta sobre la necesidad de usar una letra en el segundo valor del intervalo
+            elif(self.dockwidget.txtRinicial.text().isnumeric() == True and self.dockwidget.txtRfinal.text().isnumeric() == False):
+                QMessageBox.warning(self.iface.mainWindow(), "Aviso", "Si desea crea una cadena de números exteriores con letras consecutivas, por favor, ingrese letra de inicio y fin en orden alfabético.")
+            #Crea la cadena de números exteriores usando una letra para los casos 1A, 1B,1C...
+            elif(self.dockwidget.txtRinicial.text().isnumeric() == False and self.dockwidget.txtRfinal.text().isnumeric() == False):
+                #Identifica la letra que se ingresó
+                letraInicio = re.findall(r'[a-zA-Z]',self.dockwidget.txtRinicial.text())
+                letraFinal = re.findall(r'[a-zA-Z]',self.dockwidget.txtRfinal.text())
+                #Obtiene la parte numérica del texto ingresado
+                numInicio = self.dockwidget.txtRinicial.text().split(letraInicio[0])[0]
+                numFinal = self.dockwidget.txtRfinal.text().split(letraFinal[0])[0]
+                #Cambia a mayúscula las letras ingresadas
+                posInicial = ord(letraInicio[0].upper())
+                posFinal = ord(letraFinal[0].upper())
+                #Si los valores ingresados son del tipo 1A - 1C, crea 1A,1B,1C
+                if numInicio == numFinal and posInicial < posFinal:
+                    for i in range(posInicial, posFinal + 1, 1):
+                        intervaloAlfa = intervaloAlfa + (numInicio + '' + chr(i) + ',')
+                #Si los valores ingresados son del tipo 2 - 1, envía alerta
+                elif (numInicio > numFinal):
+                    QMessageBox.warning(self.iface.mainWindow(), "Aviso", "El orden numérico es descendente, por favor, verifique e intente de nuevo.")       
+                elif (numInicio > numFinal):
+                    QMessageBox.warning(self.iface.mainWindow(), "Aviso", "El orden numérico es descendente, por favor, verifique e intente de nuevo.")    
+                elif (numInicio == numFinal and posInicial >= posFinal):
+                    QMessageBox.warning(self.iface.mainWindow(), "Aviso", "Ingresó el mismo valor y una letra menor en orden alfabético para el fin del rango, por favor, verifique e intente de nuevo.")
+                #Si los valores ingresados son del tipo 1A - 2C, crea 1A, 1B, 1C,..., 1Z, 2A, 2B, 2C
+                elif numInicio != numFinal and posInicial <= posFinal:
+                    for i in range(int(numInicio),int(numInicio)+1,1):
+                        for j in range(posInicial, 91, 1):
+                            intervaloAlfa = intervaloAlfa + (str(i) + '' + chr(j) + ',')
+                    for i in range(int(numInicio)+1,int(numFinal),1):
+                        for j in range(65, 91, 1):
+                            intervaloAlfa = intervaloAlfa + (str(i) + '' + chr(j) + ',')
+                    for i in range(int(numFinal),int(numFinal)+1,1):
+                        for j in range(int(65), posFinal + 1, 1):
+                            intervaloAlfa = intervaloAlfa + (str(i) + '' + chr(j) + ',')
+                #Si los valores ingresados son del tipo 1X - 2C, crea 1X, 1Y, 1Z, 2A, 2B, 2C
+                elif numInicio <= numFinal and posInicial > posFinal:
+                    for i in range(int(numInicio),int(numInicio)+1,1):
+                        for j in range(posInicial, 91, 1):
+                            intervaloAlfa = intervaloAlfa + (str(i) + '' + chr(j) + ',')
+                    for i in range(int(numInicio)+1,int(numFinal),1):
+                        for j in range(65, 91, 1):
+                            intervaloAlfa = intervaloAlfa + (str(i) + '' + chr(j) + ',')
+                    for i in range(int(numFinal),int(numFinal)+1,1):
+                        for j in range(int(65), posFinal + 1, 1):
+                            intervaloAlfa = intervaloAlfa + (str(i) + '' + chr(j) + ',')
+                #Si los valores ingresados son iguales, es decir 1A - 1A, envía alerta
+                elif (numInicio == numFinal and posInicial == posFinal):
+                    QMessageBox.warning(self.iface.mainWindow(), "Aviso", "Ingresó el mismo valor, por favor, verifique e intente de nuevo.")
+                intervalos = intervaloAlfa.rstrip(',')
+            cadena1 = self.dockwidget.textEdit.toPlainText()
+            posicion = self.dockwidget.textEdit.textCursor().position()
+            if cadena1 == "":
+                self.dockwidget.textEdit.setText(intervalos.replace(" ",""))
+            elif intervalos == "":
+                self.dockwidget.textEdit.setText(cadena1)
+            else:
+                #La primera vez que se usa la función se crea la cadena al final
+                if self.controlCrearCadena == 0:
+                    self.dockwidget.textEdit.setText(cadena1 + "," + intervalos.replace(" ",""))
+                #Se crea la función en la posición del cursor
+                else:
+                    if(cadena1[posicion-1]=="," or posicion == 0):
+                        cadena1 = f"{cadena1[0:posicion]}*{cadena1[posicion:]}"
+                        cadena2 = cadena1.replace("*",f"{intervalos},").replace(" ","")
+                        self.dockwidget.textEdit.setText(cadena2)
+                    else:
+                        QMessageBox.information(self.iface.mainWindow(), "Aviso",f"Verifique que el cursor esté al lado derecho de la coma.")            
+            #Cambia cada vez que se usa el botón Crear Cadena
+            self.controlCrearCadena+=1
+        except Exception as error:
+            QMessageBox.critical(self.iface.mainWindow(), "¡Oops!",f"Ocurrió un error al crear la cadena. \nMotivo: \n{error}.\n Se escribe en el registro.")
+            self.logger.error(f'{datetime.now().strftime(self.timeformat)} Error al crear la cadena de números exteriores: {error}')
 
-                        if (int(self.dockwidget.cveSector.currentText()) == 1):
-                            self.Sector1.append(appendString)
-                        if (int(self.dockwidget.cveSector.currentText()) == 2):
-                            self.Sector2.append(appendString)
-                        if (int(self.dockwidget.cveSector.currentText()) == 3):
-                            self.Sector3.append(appendString)
-
-                #Dependiendo el sector en turno, se agregan los datos a la pantalla
-                if (int(self.dockwidget.cveSector.currentText()) == 1):
-                    self.dockwidget.textEdit.setText(str(self.Sector1))
-                if (int(self.dockwidget.cveSector.currentText()) == 2):
-                    self.dockwidget.textEdit.setText(str(self.Sector2))
-                if (int(self.dockwidget.cveSector.currentText()) == 3):
-                    self.dockwidget.textEdit.setText(str(self.Sector3))
+    def btnLimpiarIntervalo(self):
+        
+        try:        
+            #Permite limpiar los cuadros de texto y los checkboxes
+            self.dockwidget.txtRinicial.setText("")
+            self.dockwidget.txtRfinal.setText("")
+            self.dockwidget.txtRIntervalo.setText("")
+            self.dockwidget.checkLl.setChecked(False)
+            self.dockwidget.checkEnne.setChecked(False)
+            self.dockwidget.checkRr.setChecked(False)       
+        except Exception as error:
+            QMessageBox.critical(self.iface.mainWindow(), "¡Oops!",f"Ocurrió un error al limpiar los campos. \nMotivo: \n{error}.\n Se escribe en el registro.")
+            self.logger.error(f'{datetime.now().strftime(self.timeformat)} Error al limpiar los campos: {error}')
+       
+    def btnIdentificar20_accion(self):
+        
+        try:
             
-            #Si el usuario ingresa letras en los cuadros de texto para inicio, fin e intervalo se alerta a este
-            elif (self.dockwidget.txtRinicial_2.text().isnumeric() == False and self.dockwidget.txtRinicial_2.text() != '') or (self.dockwidget.txtRfinal_2.text().isnumeric == False and self.dockwidget.txtRfinal_2.text() != '') or (self.dockwidget.txtRIntervalo_2.text().isnumeric() == False and self.dockwidget.txtRIntervalo_2.text() != ''):
-                QMessageBox.warning(self.iface.mainWindow(), "Aviso","Por favor, ingrese sólo valores para inicio, final e intervalo.")
-            
-            #Si no se ha ingresado algún o ninún valor de inicio, fin e intervalo del rango se alerta al usuario
-            elif self.dockwidget.txtRinicial_2.text() == "" and self.dockwidget.txtRfinal_2.text() == "" and self.dockwidget.txtRIntervalo_2.text() == "" and (self.dockwidget.checkSinIntervalo.isChecked() or self.flagSinIntervalo[int(self.dockwidget.cveSector.currentText())-1] == True):
-                QMessageBox.information(self.iface.mainWindow(), "Aviso",f"Se marcó la casilla «Sin Intervalo», se ignorarán los valores de inicio, fin e intervalo para el sector {self.dockwidget.cveSector.currentText()}.")
+            if self.conectado == 1:
+                if self.controlMostrar == 1:
+                    
+                    vl = iface.activeLayer()
+                    ids = vl.selectedFeatureIds()
+                    
+                    #Si se selecciona solo un registro se muestra la información del registro
+                    if len(ids) == 1:
+                        #limpiar datos en combo mediante consulta
+                        self.dockwidget.idVialidad.clear()
 
-                if (int(self.dockwidget.cveSector.currentText()) == 1):
-                    self.Sector1 = ['']
-                if (int(self.dockwidget.cveSector.currentText()) == 2):
-                    self.Sector2 = ['']
-                if (int(self.dockwidget.cveSector.currentText()) == 3):
-                    self.Sector3 = ['']
-    
-            #Si no se han ingresado todos los datos se alerta al usuario
-            elif self.dockwidget.txtRinicial_2.text() == "" or self.dockwidget.txtRfinal_2.text() == "" or self.dockwidget.txtRIntervalo_2.text() == "" and (self.dockwidget.checkSinIntervalo.isChecked() == False or self.flagSinIntervalo[int(self.dockwidget.cveSector.currentText())-1] == False):
-                QMessageBox.warning(self.iface.mainWindow(), "Aviso",f"Por favor, ingrese todos los datos de inicio, final e intervalo del rango para el sector {self.dockwidget.cveSector.currentText()}.")
+                        #Abrir base
+                        usr = self.dockwidget.txtUsuario.text()
+                        pwd = self.dockwidget.txtClave.text()
+                        
+                        #localhost
+                        conn = psycopg2.connect(database=self.baseDatos, user=usr, password=pwd, host=self.servidor, port="5432")
+                    
+                        with conn:
+
+                            qry_c = "SELECT via.id, via.nombre, ROUND(ST_Distance(numext.geom,via.geom)::numeric,2) as distancia FROM bged.numeros_exteriores numext, bged.vialidad via WHERE numext.id = %s AND ST_DWithin(numext.geom,via.geom,20) ORDER BY distancia ASC;"
+                            data_c = (self.campo01, )
+                            with conn.cursor() as curs:
+
+                                curs.execute(qry_c, data_c)              
+                                rows = curs.fetchall() #one row
+
+                                for row in rows:
+
+                                    idname = f'{row[0]} : {row[1].title()} a {row[2]} m.'
+                                    self.dockwidget.idVialidad.addItem(idname)
+
+                        conn.close()
+                    else:
+                        QMessageBox.warning(self.iface.mainWindow(), "Verifique","Debe seleccionar solo un registro.")
+                else:
+                    QMessageBox.warning(self.iface.mainWindow(), "Aviso","No ha usado el botón «Mostrar». No hay Ids para identificar vialidades.")     
+            else:
+                QMessageBox.warning(self.iface.mainWindow(), "Aviso","No ha iniciado sesión. Imposible ejecutar la acción.")      
+        except Exception as error:
+            conn.close()
+            QMessageBox.critical(self.iface.mainWindow(), "¡Oops!",f"Ocurrió un error al identificar las vialidades. \nMotivo: \n{error}.\n Se escribe en el registro.")
+            self.logger.error(f'{datetime.now().strftime(self.timeformat)} Error al identificar las vialidades a 20 m: {error}')
+            
+    def btnIdentificar60_accion(self):
+        
+        try:
+            if self.conectado == 1:
+                if self.controlMostrar == 1:
+                    
+                    vl = iface.activeLayer()
+                    ids = vl.selectedFeatureIds()
+                    
+                    #Si se selecciona solo un registro se muestra la información del registro
+                    if len(ids) == 1:
+                        #limpiar datos en combo mediante consulta
+                        self.dockwidget.idVialidad.clear()
+                        
+                        #Abrir base
+                        usr = self.dockwidget.txtUsuario.text()
+                        pwd = self.dockwidget.txtClave.text()
+                        
+                        #localhost
+                        conn = psycopg2.connect(database=self.baseDatos, user=usr, password=pwd, host=self.servidor, port="5432")
+                    
+                        with conn:
+
+                            qry_c = "SELECT via.id, via.nombre, ROUND(ST_Distance(numext.geom,via.geom)::numeric,2) as distancia FROM bged.numeros_exteriores numext, bged.vialidad via WHERE numext.id = %s AND ST_DWithin(numext.geom,via.geom,60) ORDER BY distancia ASC;"
+                            data_c = (self.campo01, )
+                            with conn.cursor() as curs:
+
+                                curs.execute(qry_c, data_c)        
+                                rows = curs.fetchall() #one row
+
+                                for row in rows:
+
+                                    idname = f'{row[0]} : {row[1].title()} a {row[2]} m.'
+                                    self.dockwidget.idVialidad.addItem(idname)
+
+                        conn.close()
+                    else:
+                        QMessageBox.warning(self.iface.mainWindow(), "Verifique","Debe seleccionar solo un registro.")
+                else:
+                    QMessageBox.warning(self.iface.mainWindow(), "Aviso","No ha usado el botón «Mostrar». No hay Ids para identificar vialidades.")  
+            else:
+                QMessageBox.warning(self.iface.mainWindow(), "Aviso","No ha iniciado sesión. Imposible ejecutar la acción.")     
+        except Exception as error:
+            conn.close()
+            QMessageBox.critical(self.iface.mainWindow(), "¡Oops!",f"Ocurrió un error al identificar las vialidades. \nMotivo: \n{error}.\n Se escribe en el registro.")
+            self.logger.error(f'{datetime.now().strftime(self.timeformat)} Error al identificar las vialidades a 60 m: {error}')
+
+    def btndistUsuario_accion(self):
+        
+        try:
+            if self.conectado == 1:
+                if self.controlMostrar == 1:
+                    
+                    vl = iface.activeLayer()
+                    ids = vl.selectedFeatureIds()
+                    
+                    #Si se selecciona solo un registro se muestra la información del registro
+                    if len(ids) == 1:
+                        #Abrir base
+                        usr = self.dockwidget.txtUsuario.text()
+                        pwd = self.dockwidget.txtClave.text()
+                        distUsuario = self.dockwidget.distUsuario.text()
+
+                        #localhost
+                        #remote Samge bged 
+                        if distUsuario == '':
+                            QMessageBox.warning(self.iface.mainWindow(),"Alerta","No se ha ingresado una distancia, por favor, ingrese una. \nConsidere que esta debe ser mayor que 60m.")
+
+                        elif distUsuario.isnumeric() == False:
+                            QMessageBox.warning(self.iface.mainWindow(),"Alerta","Eso no es un valor, por favor, ingrese uno.\nConsidere que el valor de distancia debe ser mayor que 60m.")
+                        
+                        elif float(distUsuario) <= 60:
+                            QMessageBox.warning(self.iface.mainWindow(),"Alerta","La distancia ingresada es igual o menor que 60m.")
+                        
+                        elif len(distUsuario) >= 2 and float(distUsuario) > 60:
+
+                            conn = psycopg2.connect(database=self.baseDatos, user=usr, password=pwd, host=self.servidor, port="5432")
+
+                            with conn:
+
+                                qry_c = "SELECT via.id, via.nombre, ROUND(ST_Distance(numext.geom,via.geom)::numeric,2) as distancia FROM bged.numeros_exteriores numext, bged.vialidad via WHERE numext.id = %s AND ST_DWithin(numext.geom,via.geom,%s) ORDER BY distancia ASC;"
+                                data_c = (self.campo01,distUsuario,)
+                                with conn.cursor() as curs:
+
+                                    curs.execute(qry_c, data_c)
+                                    rows = curs.fetchall() #one row
+                                    if len(rows) == 0:
+                                        QMessageBox.warning(self.iface.mainWindow(),"Aviso","La distancia no arrojó ningún resultado. Por favor, intente con una mayor o verifique que la cartografía esté actualizada.")
+                                    else:
+                                        for row in rows:
+                    
+                                            idname = f'{row[0]} : {row[1].title()} a {row[2]} m.'
+                                            self.dockwidget.idVialidad.addItem(idname)
+                            conn.close()
+                    else:
+                        QMessageBox.warning(self.iface.mainWindow(), "Verifique","Debe seleccionar solo un registro.")
+                else:
+                    QMessageBox.warning(self.iface.mainWindow(), "Aviso","No ha usado el botón «Mostrar». No hay Ids para identificar vialidades.")  
+            else:
+                QMessageBox.warning(self.iface.mainWindow(), "Aviso","No ha iniciado sesión. Imposible ejecutar la acción.")      
+        except Exception as error:
+            conn.close()
+            QMessageBox.critical(self.iface.mainWindow(), "¡Oops!",f"Ocurrió un error al identificar las vialidades. \nMotivo: \n{error}.\n Se escribe en el registro.")
+            self.logger.error(f'{datetime.now().strftime(self.timeformat)} Error al identificar las vialidades con la distancia ingresada: {error}')
+
+    def cveSector_changed(self):
+        
+        try:
+            #Función para el cambio de sector en el combobox
+            #Carga los datos en pantalla según lo que se tenga guardado en memoria
+            self.dockwidget.txtNombreSector.setText(self.SectorNombre[int(self.dockwidget.cveSector.currentText())-1])
+            self.dockwidget.txtRinicial_2.setText(self.SectorRInicial[int(self.dockwidget.cveSector.currentText())-1])
+            self.dockwidget.txtRfinal_2.setText(self.SectorRFinal[int(self.dockwidget.cveSector.currentText())-1])
+            self.dockwidget.txtRIntervalo_2.setText(self.SectorRIntervalo[int(self.dockwidget.cveSector.currentText())-1])
+            self.dockwidget.checkSinIntervalo.setChecked(self.flagSinIntervalo[int(self.dockwidget.cveSector.currentText())-1])
+
+            #Carga el contenido de la cadena generada
+            if (int(self.dockwidget.cveSector.currentText()) == 1):
+                self.dockwidget.textEdit.setText(str(self.Sector1))
+            if (int(self.dockwidget.cveSector.currentText()) == 2):
+                self.dockwidget.textEdit.setText(str(self.Sector2))
+            if (int(self.dockwidget.cveSector.currentText()) == 3):
+                self.dockwidget.textEdit.setText(str(self.Sector3))
+                
+        except Exception as error:
+            QMessageBox.critical(self.iface.mainWindow(), "¡Oops!",f"Ocurrió un error al cambiar el campo. \nMotivo: \n{error}.\n Se escribe en el registro.")
+            self.logger.error(f'{datetime.now().strftime(self.timeformat)} Error al cambiar de sector: {error}')
+            
+    def btnAsignarSector_accion(self):
+        
+        try:
+            intervalos = ""
+            puntoInicio = 0
+            
+            #verifica que se haya asignado un sector sin intervalo sólo dos veces.
+            if self.flagSinIntervalo.count(True) == 2 and self.control ==2:
+                self.flagSinIntervalo[int(self.dockwidget.cveSector.currentText())-1] = False
+                self.dockwidget.checkSinIntervalo.setChecked(False)
+                QMessageBox.warning(self.iface.mainWindow(),'Aviso',f'Ya se han seleccionado {self.flagSinIntervalo.count(True)} campos «Sin Intervalo».\nUtilice el botón «Limpiar» para este campo, ingrese un intervalo y comience nuevamente.')
+            #Si se marca el checkbox cambia el valor de la bandera
+            if self.dockwidget.checkSinIntervalo.isChecked() and self.flagSinIntervalo.count(True) <= 2:
+                self.control+=1
+                #Agrega el valor "True" a flagSinIntervalo del sector seleccionado siempre y cuando no haya más de dos sectores seleccionados           
+                self.flagSinIntervalo[int(self.dockwidget.cveSector.currentText())-1] = True
+                #Se alerta que ya se han seleccionado dos sectores y no es posible seleccionar un tercero   
+                QMessageBox.information(self.iface.mainWindow(),'Aviso',f'Ya se han seleccionado {self.flagSinIntervalo.count(True)} campos «Sin Intervalo», no podrá seleccionar más de 2.\nSi desea insertar una cadena sin intervalos puede hacerlo manualmente.')
+                
+            #Verifica que se haya ingresado texto en la sección "Nombre de Sector"
+            #Se ingresó texto, lo guarda en la lista con SectorNombre[SectorActual-1], SectorActual-1 para empezar desde la primera posición
+            if self.dockwidget.txtNombreSector.text() != "":
+                self.SectorNombre[int(self.dockwidget.cveSector.currentText())-1] = self.dockwidget.txtNombreSector.text()
+                
+                #Si se ingresaron todos los datos de inicio, final e intervalo del rango se guargan en la lista de cada rango, en la posición del sector actual menos uno para empezar desde la primera posición
+                if self.dockwidget.txtRinicial_2.text() != "" and self.dockwidget.txtRinicial_2.text().isnumeric() and self.dockwidget.txtRfinal_2.text() != "" and self.dockwidget.txtRfinal_2.text().isnumeric and self.dockwidget.txtRIntervalo_2.text() != "" and self.dockwidget.txtRIntervalo_2.text().isnumeric():
+
+                    self.SectorRInicial[int(self.dockwidget.cveSector.currentText())-1] = self.dockwidget.txtRinicial_2.text()
+                    self.SectorRFinal[int(self.dockwidget.cveSector.currentText())-1] = self.dockwidget.txtRfinal_2.text()
+                    self.SectorRIntervalo[int(self.dockwidget.cveSector.currentText())-1] = self.dockwidget.txtRIntervalo_2.text()
+
+                    #Se crea la cadena de numeros con los valores ingresados por el usuario
+                    for x in range(int(self.dockwidget.txtRinicial_2.text()), int(self.dockwidget.txtRfinal_2.text())+1, int(self.dockwidget.txtRIntervalo_2.text())):
+                        
+                        #Si no existe cadena de números exteriores en el cuadro de texto, se crea
+                        if puntoInicio == 0:
+                            intervalos = intervalos + str(x)
+                            puntoInicio = 1
+
+                            #Dependiendo el sector se agrega el valor
+                            if (int(self.dockwidget.cveSector.currentText()) == 1):
+                                self.Sector1.append(str(x))
+                            if (int(self.dockwidget.cveSector.currentText()) == 2):
+                                self.Sector2.append(str(x))
+                            if (int(self.dockwidget.cveSector.currentText()) == 3):
+                                self.Sector3.append(str(x))
+                        
+                        #Si existe una cadena de números exteriores se crea y se pega al final de la existente según sea el sector
+                        else:
+                            intervalos = intervalos + "," + str(x)
+                            appendString = "," + str(x)
+
+                            if (int(self.dockwidget.cveSector.currentText()) == 1):
+                                self.Sector1.append(appendString)
+                            if (int(self.dockwidget.cveSector.currentText()) == 2):
+                                self.Sector2.append(appendString)
+                            if (int(self.dockwidget.cveSector.currentText()) == 3):
+                                self.Sector3.append(appendString)
+
+                    #Dependiendo el sector en turno, se agregan los datos a la pantalla
+                    if (int(self.dockwidget.cveSector.currentText()) == 1):
+                        self.dockwidget.textEdit.setText(str(self.Sector1))
+                    if (int(self.dockwidget.cveSector.currentText()) == 2):
+                        self.dockwidget.textEdit.setText(str(self.Sector2))
+                    if (int(self.dockwidget.cveSector.currentText()) == 3):
+                        self.dockwidget.textEdit.setText(str(self.Sector3))
+                
+                #Si el usuario ingresa letras en los cuadros de texto para inicio, fin e intervalo se alerta a este
+                elif (self.dockwidget.txtRinicial_2.text().isnumeric() == False and self.dockwidget.txtRinicial_2.text() != '') or (self.dockwidget.txtRfinal_2.text().isnumeric == False and self.dockwidget.txtRfinal_2.text() != '') or (self.dockwidget.txtRIntervalo_2.text().isnumeric() == False and self.dockwidget.txtRIntervalo_2.text() != ''):
+                    QMessageBox.warning(self.iface.mainWindow(), "Aviso","Por favor, ingrese sólo valores para inicio, final e intervalo.")
+                
+                #Si no se ha ingresado algún o ninún valor de inicio, fin e intervalo del rango se alerta al usuario
+                elif self.dockwidget.txtRinicial_2.text() == "" and self.dockwidget.txtRfinal_2.text() == "" and self.dockwidget.txtRIntervalo_2.text() == "" and (self.dockwidget.checkSinIntervalo.isChecked() or self.flagSinIntervalo[int(self.dockwidget.cveSector.currentText())-1] == True):
+                    QMessageBox.information(self.iface.mainWindow(), "Aviso",f"Se marcó la casilla «Sin Intervalo», se ignorarán los valores de inicio, fin e intervalo para el campo {self.dockwidget.cveSector.currentText()}.")
+
+                    if (int(self.dockwidget.cveSector.currentText()) == 1):
+                        self.Sector1 = ['']
+                    if (int(self.dockwidget.cveSector.currentText()) == 2):
+                        self.Sector2 = ['']
+                    if (int(self.dockwidget.cveSector.currentText()) == 3):
+                        self.Sector3 = ['']
+        
+                #Si no se han ingresado todos los datos se alerta al usuario
+                elif self.dockwidget.txtRinicial_2.text() == "" or self.dockwidget.txtRfinal_2.text() == "" or self.dockwidget.txtRIntervalo_2.text() == "" and (self.dockwidget.checkSinIntervalo.isChecked() == False or self.flagSinIntervalo[int(self.dockwidget.cveSector.currentText())-1] == False):
+                    QMessageBox.warning(self.iface.mainWindow(), "Aviso",f"Por favor, ingrese todos los datos de inicio, final e intervalo del rango para el campo {self.dockwidget.cveSector.currentText()}.")
+                    return
+                
+            #Si no se ingesó texto en el Nombre del Sector se alerta el usuario
+            else:
+                QMessageBox.warning(self.iface.mainWindow(), "Aviso",f"No ha ingresado ningún nombre para el campo {self.dockwidget.cveSector.currentText()}.")
                 return
             
-        #Si no se ingesó texto en el Nombre del Sector se alerta el usuario
-        else:
-            QMessageBox.warning(self.iface.mainWindow(), "Aviso",f"No ha ingresado ningún nombre para el sector {self.dockwidget.cveSector.currentText()}.")
-            return
+        except Exception as error:
+            QMessageBox.critical(self.iface.mainWindow(), "¡Oops!",f"Ocurrió un error al asignar el campo. \nMotivo: \n{error}.\n Se escribe en el registro.")
+            self.logger.error(f'{datetime.now().strftime(self.timeformat)} Error al asignar el campo: {error}')
     
     def btnCrearCadenaUH_accion(self): 
 
-        intervalos = ""
+        try:
+            intervalos = ""
+            self.controlCadenaUH = 1
+            
+            #Verifica que se tengan datos en los tres sectores y que el checkbox no esté marcado, si se cumple, avanza
+            if self.SectorNombre[0] != "" and self.SectorNombre[1] != "" and self.SectorNombre[2] != "":
+                for i in range(len(self.Sector1)):
+                    for j in range(len(self.Sector2)):
+                        for k in range(len(self.Sector3)):
+                            intervalos = f"{intervalos}{self.SectorNombre[0]} {self.Sector1[i].replace(',', '')} {self.SectorNombre[1]} {self.Sector2[j].replace(',', '')} {self.SectorNombre[2]} {self.Sector3[k].replace(',', '')},"
+                    
+            #Si sólo se tinen los datos del primer sector se ejecuta esta parte
+            if (self.SectorNombre[0] != "" and self.SectorNombre[1] == "" and self.SectorNombre[2] == ""):
+                for i in range(len(self.Sector1)):
+                    intervalos = f"{intervalos}{self.SectorNombre[0]} {self.Sector1[i].replace(',', '')},"
 
-        #Verifica que se tengan datos en los tres sectores y que el checkbox no esté marcado, si se cumple, avanza
-        if self.SectorNombre[0] != "" and self.SectorNombre[1] != "" and self.SectorNombre[2] != "":
-            for i in range(len(self.Sector1)):
+            #Si sólo se tinen los datos del segundo sector se ejecuta esta parte
+            if (self.SectorNombre[0] == "" and self.SectorNombre[1] != "" and self.SectorNombre[2] == ""):
+                for j in range(len(self.Sector2)):
+                    intervalos = f"{intervalos}{self.SectorNombre[1]} {self.Sector2[j].replace(',', '')},"
+
+            #Si sólo se tinen los datos del trecer sector se ejecuta esta parte
+            if (self.SectorNombre[0] == "" and self.SectorNombre[1] == "" and self.SectorNombre[2] != ""):
+                for k in range(len(self.Sector3)):
+                    intervalos = f"{intervalos}{self.SectorNombre[2]} {self.Sector3[k].replace(',', '')},"
+
+            #Si sólo se tinen los datos del primer y segundo sector se ejecuta esta parte
+            if (self.SectorNombre[0] != "" and self.SectorNombre[1] != "" and self.SectorNombre[2] == ""):
+                for i in range(len(self.Sector1)):
+                    for j in range(len(self.Sector2)):
+                        intervalos = f"{intervalos}{self.SectorNombre[0]} {self.Sector1[i].replace(',', '')} {self.SectorNombre[1]} {self.Sector2[j].replace(',', '')},"
+    
+            #Si sólo se tinen los datos del primer y tercer se ejecuta esta parte
+            if (self.SectorNombre[0] == "" and self.SectorNombre[1] != "" and self.SectorNombre[2] != ""):
                 for j in range(len(self.Sector2)):
                     for k in range(len(self.Sector3)):
-                        intervalos = f"{intervalos}{self.SectorNombre[0]} {self.Sector1[i].replace(',', '')} {self.SectorNombre[1]} {self.Sector2[j].replace(',', '')} {self.SectorNombre[2]} {self.Sector3[k].replace(',', '')},"
-                
-        #Si sólo se tinen los datos del primer sector se ejecuta esta parte
-        if (self.SectorNombre[0] != "" and self.SectorNombre[1] == "" and self.SectorNombre[2] == ""):
-            for i in range(len(self.Sector1)):
-                intervalos = f"{intervalos}{self.SectorNombre[0]} {self.Sector1[i].replace(',', '')},"
+                        intervalos = f"{intervalos}{self.SectorNombre[1]} {self.Sector2[j].replace(',', '')} {self.SectorNombre[2]} {self.Sector3[k].replace(',', '')},"
 
-        #Si sólo se tinen los datos del segundo sector se ejecuta esta parte
-        if (self.SectorNombre[0] == "" and self.SectorNombre[1] != "" and self.SectorNombre[2] == ""):
-            for j in range(len(self.Sector2)):
-                intervalos = f"{intervalos}{self.SectorNombre[1]} {self.Sector2[j].replace(',', '')},"
+            #Si sólo se tinen los datos del segundo y terver sector se ejecuta esta parte
+            if (self.SectorNombre[0] != "" and self.SectorNombre[1] == "" and self.SectorNombre[2] != ""):
+                for i in range(len(self.Sector1)):
+                    for k in range(len(self.Sector3)):
+                        intervalos = f"{intervalos}{self.SectorNombre[0]} {self.Sector1[i].replace(',', '')} {self.SectorNombre[2]} {self.Sector3[k].replace(',', '')},"
 
-        #Si sólo se tinen los datos del trecer sector se ejecuta esta parte
-        if (self.SectorNombre[0] == "" and self.SectorNombre[1] == "" and self.SectorNombre[2] != ""):
-            for k in range(len(self.Sector3)):
-                intervalos = f"{intervalos}{self.SectorNombre[2]} {self.Sector3[k].replace(',', '')},"
-
-        #Si sólo se tinen los datos del primer y segundo sector se ejecuta esta parte
-        if (self.SectorNombre[0] != "" and self.SectorNombre[1] != "" and self.SectorNombre[2] == ""):
-            for i in range(len(self.Sector1)):
-                for j in range(len(self.Sector2)):
-                    intervalos = f"{intervalos}{self.SectorNombre[0]} {self.Sector1[i].replace(',', '')} {self.SectorNombre[1]} {self.Sector2[j].replace(',', '')},"
- 
-        #Si sólo se tinen los datos del primer y tercer se ejecuta esta parte
-        if (self.SectorNombre[0] == "" and self.SectorNombre[1] != "" and self.SectorNombre[2] != ""):
-            for j in range(len(self.Sector2)):
-                for k in range(len(self.Sector3)):
-                    intervalos = f"{intervalos}{self.SectorNombre[1]} {self.Sector2[j].replace(',', '')} {self.SectorNombre[2]} {self.Sector3[k].replace(',', '')},"
-
-        #Si sólo se tinen los datos del segundo y terver sector se ejecuta esta parte
-        if (self.SectorNombre[0] != "" and self.SectorNombre[1] == "" and self.SectorNombre[2] != ""):
-            for i in range(len(self.Sector1)):
-                for k in range(len(self.Sector3)):
-                    intervalos = f"{intervalos}{self.SectorNombre[0]} {self.Sector1[i].replace(',', '')} {self.SectorNombre[2]} {self.Sector3[k].replace(',', '')},"
-
-        #Si no se ha ingresado ningún dato en nigún sector, se alerta al usuario
-        if (self.SectorNombre[0] == "" and self.SectorNombre[1] == "" and self.SectorNombre[2] == ""):
-            QMessageBox.warning(self.iface.mainWindow(), "Aviso","No se ha ingresado ningún dato en ningún sector, por favor, capture al menos uno.")
-                            
-        #Quita la coma del final de la cadena
-        self.dockwidget.textEdit.setText(intervalos.rstrip(',').replace('  ',' '))
+            #Si no se ha ingresado ningún dato en nigún sector, se alerta al usuario
+            if (self.SectorNombre[0] == "" and self.SectorNombre[1] == "" and self.SectorNombre[2] == ""):
+                QMessageBox.warning(self.iface.mainWindow(), "Aviso","No se ha ingresado ningún dato en ningún campo, por favor, capture al menos uno.")
+                                
+            #Quita la coma del final de la cadena
+            self.dockwidget.textEdit.setText(intervalos.rstrip(',').replace('  ',' '))
+            
+        except Exception as error:
+            QMessageBox.critical(self.iface.mainWindow(), "¡Oops!",f"Ocurrió un error al crear la cadena UH. \nMotivo: \n{error}.\n Se escribe en el registro.")
+            self.logger.error(f'{datetime.now().strftime(self.timeformat)} Error al crear la cadena UH: {error}')
 
     def btnEliminarSector_accion(self):
         
-        #Elimina los datos ingresados según el sector seleccionado
-        if (int(self.dockwidget.cveSector.currentText()) == 1):
-            self.Sector1.clear()
-            self.SectorRInicial[0]=""
-            self.SectorRFinal[0]=""
-            self.SectorRIntervalo[0]=""
-        if (int(self.dockwidget.cveSector.currentText()) == 2):
-            self.Sector2.clear()
-            self.SectorRInicial[1]=""
-            self.SectorRFinal[1]=""
-            self.SectorRIntervalo[1]=""
-        if (int(self.dockwidget.cveSector.currentText()) == 3):
-            self.Sector3.clear()
-            self.SectorRInicial[2]=""
-            self.SectorRFinal[2]=""
-            self.SectorRIntervalo[2]=""  
-        self.control = 0         
-        self.SectorNombre[int(self.dockwidget.cveSector.currentText())-1] = ""      
-        self.flagSinIntervalo[int(self.dockwidget.cveSector.currentText())-1] = False
+        try:        
+            #Elimina los datos ingresados según el sector seleccionado
+            if (int(self.dockwidget.cveSector.currentText()) == 1):
+                self.Sector1.clear()
+                self.SectorRInicial[0]=""
+                self.SectorRFinal[0]=""
+                self.SectorRIntervalo[0]=""
+            if (int(self.dockwidget.cveSector.currentText()) == 2):
+                self.Sector2.clear()
+                self.SectorRInicial[1]=""
+                self.SectorRFinal[1]=""
+                self.SectorRIntervalo[1]=""
+            if (int(self.dockwidget.cveSector.currentText()) == 3):
+                self.Sector3.clear()
+                self.SectorRInicial[2]=""
+                self.SectorRFinal[2]=""
+                self.SectorRIntervalo[2]=""  
+            self.control = 0         
+            self.SectorNombre[int(self.dockwidget.cveSector.currentText())-1] = ""      
+            self.flagSinIntervalo[int(self.dockwidget.cveSector.currentText())-1] = False
+            
+            #Elimina los datos de las cajas de texto de Nombre, Inicio, Final e Intervalo
+            self.dockwidget.txtNombreSector.setText("")
+            self.dockwidget.txtRinicial_2.setText("")
+            self.dockwidget.txtRfinal_2.setText("")
+            self.dockwidget.txtRIntervalo_2.setText("")
+            self.dockwidget.checkSinIntervalo.setChecked(False)  
         
-        #Elimina los datos de las cajas de texto de Nombre, Inicio, Final e Intervalo
-        self.dockwidget.txtNombreSector.setText("")
-        self.dockwidget.txtRinicial_2.setText("")
-        self.dockwidget.txtRfinal_2.setText("")
-        self.dockwidget.txtRIntervalo_2.setText("")
-        self.dockwidget.checkSinIntervalo.setChecked(False)       
+        except Exception as error:
+            QMessageBox.critical(self.iface.mainWindow(), "¡Oops!",f"Ocurrió un error al limpiar el campo. \nMotivo: \n{error}.\n Se escribe en el registro.")     
+            self.logger.error(f'{datetime.now().strftime(self.timeformat)} Error al eliminar los datos del campo: {error}')
 
     def btnAgregarLiteralesEspeciales(self):
         
-        #Verifica si no se selección alguna opción, de ser cierto, alerta al usuario
-        if self.dockwidget.checkLl.isChecked() == False and self.dockwidget.checkEnne.isChecked() == False and self.dockwidget.checkRr.isChecked() == False: 
-            QMessageBox.warning(self.iface.mainWindow(), "Aviso","No se ha seleccionado ninguna literal especial, por favor, seleccione al menos una.")
+        try:
+            #Verifica si no se selección alguna opción, de ser cierto, alerta al usuario
+            if self.dockwidget.checkLl.isChecked() == False and self.dockwidget.checkEnne.isChecked() == False and self.dockwidget.checkRr.isChecked() == False: 
+                QMessageBox.warning(self.iface.mainWindow(), "Aviso","No se ha seleccionado ninguna literal especial, por favor, seleccione al menos una.")
 
-        #Si se selecciona la LL, se inserta en la cadena generada
-        if self.dockwidget.checkLl.isChecked():
-            if 'LL' in self.dockwidget.textEdit.toPlainText():
-                QMessageBox.information(self.iface.mainWindow(), "Aviso","Ya se ha insertado la literal especial «LL».")
-            else:
-                self.dockwidget.textEdit.setText(insertarLetras(self.dockwidget.textEdit.toPlainText(),'L','LL'))
+            #Si se selecciona la LL, se inserta en la cadena generada
+            if self.dockwidget.checkLl.isChecked():
+                if 'LL' in self.dockwidget.textEdit.toPlainText():
+                    QMessageBox.information(self.iface.mainWindow(), "Aviso","Ya se ha insertado la literal especial «LL».")
+                else:
+                    self.dockwidget.textEdit.setText(insertarLetras(self.dockwidget.textEdit.toPlainText(),'L','LL'))
 
-        #Si se selecciona la Ñ, se inserta en la cadena generada
-        if self.dockwidget.checkEnne.isChecked():
-            if 'Ñ' in self.dockwidget.textEdit.toPlainText():
-                QMessageBox.information(self.iface.mainWindow(), "Aviso","Ya se ha insertado la literal especial «Ñ».")
-            else:
-                self.dockwidget.textEdit.setText(insertarLetras(self.dockwidget.textEdit.toPlainText(),'N','Ñ'))
+            #Si se selecciona la Ñ, se inserta en la cadena generada
+            if self.dockwidget.checkEnne.isChecked():
+                if 'Ñ' in self.dockwidget.textEdit.toPlainText():
+                    QMessageBox.information(self.iface.mainWindow(), "Aviso","Ya se ha insertado la literal especial «Ñ».")
+                else:
+                    self.dockwidget.textEdit.setText(insertarLetras(self.dockwidget.textEdit.toPlainText(),'N','Ñ'))
 
-        #Si se selecciona la R, se inserta en la cadena generada
-        if self.dockwidget.checkRr.isChecked():
-            if 'RR' in self.dockwidget.textEdit.toPlainText():
-                QMessageBox.information(self.iface.mainWindow(), "Aviso","Ya se ha insertado la literal especial «RR».")
-            else:
-                self.dockwidget.textEdit.setText(insertarLetras(self.dockwidget.textEdit.toPlainText(),'R','RR'))
-
+            #Si se selecciona la R, se inserta en la cadena generada
+            if self.dockwidget.checkRr.isChecked():
+                if 'RR' in self.dockwidget.textEdit.toPlainText():
+                    QMessageBox.information(self.iface.mainWindow(), "Aviso","Ya se ha insertado la literal especial «RR».")
+                else:
+                    self.dockwidget.textEdit.setText(insertarLetras(self.dockwidget.textEdit.toPlainText(),'R','RR'))
+                    
+        except Exception as error:
+            QMessageBox.critical(self.iface.mainWindow(), "¡Oops!",f"Ocurrió un error al agregar las literales especiales. \nMotivo: \n{error}.\n Se escribe en el registro.")
+            self.logger.error(f'{datetime.now().strftime(self.timeformat)} Error al insertar las literales especiales: {error}')
 
 #Función que inserta las literales seleccionadas por el usuario
 def insertarLetras(numExt: str,letraBuscada: str,letraInsertada: str):
