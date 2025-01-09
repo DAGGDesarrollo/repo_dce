@@ -13,7 +13,7 @@ Números Exteriores - INE
         copyright            : (C) 2023 by INE, Direccion de Cartografia Electoral, 
                                 Luis Enrique Cortés
         email                : enrique.cortes@ine.mx
-        version              : 1.0.0
+        version              : 1.1.0
  ***************************************************************************/
 
 /***************************************************************************
@@ -448,7 +448,6 @@ class numeros_exteriores:
                     self.dockwidget.idVialidad.clear()
                     self.dockwidget.idManzana.clear()
 
-
                     self.dockwidget.txtRinicial.setText("")
                     self.dockwidget.txtRfinal.setText("")
                     self.dockwidget.txtRIntervalo.setText("")
@@ -659,7 +658,6 @@ class numeros_exteriores:
                     myRenderer.setSymbol(mySymbol1)
                     vlayerSEC.triggerRepaint()
                     QtTest.QTest.qWait(1000)
-                    #E83845
                 
                     #Muestra el 40% de avance
                     prog.setValue(40)
@@ -701,7 +699,6 @@ class numeros_exteriores:
                     myRenderer.setSymbol(mySymbol1)
                     vlayerM.triggerRepaint()
                     QtTest.QTest.qWait(1500)
-                    #E83845
 
                     #Muestra el 60% de avance
                     prog.setValue(60) 
@@ -969,7 +966,6 @@ class numeros_exteriores:
                         #Ajusta el valor al 100% para concluir la barra de progreso
                         conn.close()
                         
-
                     elif len(ids) == 0: 
                         QMessageBox.warning(self.iface.mainWindow(), "Verifique","No seleccionó ningún registro.")	
                     else:
