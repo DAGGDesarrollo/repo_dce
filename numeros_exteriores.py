@@ -26,13 +26,18 @@ Números Exteriores - INE
  ***************************************************************************/
 """
 
-from qgis.PyQt.QtCore import QSettings, QTranslator,qVersion, Qt, QCoreApplication, QVariant
+from qgis.PyQt.QtCore import QSettings 
+from qgis.PyQt.QtCore import QTranslator 
+from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtCore import QCoreApplication
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtGui import QColor
-from qgis.PyQt.QtWidgets import QAction, QMessageBox, QProgressBar, QSizePolicy, QWidget, QApplication
+from qgis.PyQt.QtWidgets import QAction
+from qgis.PyQt.QtWidgets import QMessageBox
 from qgis.core import *
 from qgis.core import QgsProject
-from qgis.core import QgsVectorLayer, QgsDataSourceUri
+from qgis.core import QgsVectorLayer
+from qgis.core import QgsDataSourceUri
 from qgis.utils import *
 from PyQt5 import QtTest
 from PyQt5.QtWidgets import *
@@ -59,8 +64,7 @@ import psycopg2
 import psycopg2.extras
 from PyQt5.QtWidgets import QProgressDialog
 
-from qgis.core import QgsApplication;
-from qgis.gui import QgsMapCanvas;
+
 
 
 class numeros_exteriores:
