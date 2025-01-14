@@ -330,7 +330,7 @@ class numeros_exteriores:
             self.iface.addDockWidget(Qt.RightDockWidgetArea, self.dockwidget)
             self.dockwidget.show()
 
-            if self.dockwidget.cveEntidad.count() == 0 :
+            if self.dockwidget.cveEntidad.count() == 0:
 
                 for entidad in range(1,33):
                     self.dockwidget.cveEntidad.addItem(str(entidad).zfill(2))
@@ -698,7 +698,8 @@ class numeros_exteriores:
                 time.sleep(1)
                 #Borrar capas si hubo cambio de entidad
                 municipioActual = str(self.dockwidget.cveMunicipio.currentText().split(" :",1)[0])
-                if self.dockwidget.cveEntidad.currentText() != self.ultimaEntidad  or self.ultimoMunicipio != municipioActual:
+                if (self.dockwidget.cveEntidad.currentText() != self.ultimaEntidad  or 
+                    self.ultimoMunicipio != municipioActual):
                     #borrar capas
                     # Get list of vector layers
                     layers = list(QgsProject.instance().mapLayers().values())
@@ -1072,7 +1073,7 @@ class numeros_exteriores:
                             (
                                 f"No ha seleccionado la capa NumerosExteriores. "
                                 f"Imposible mostrar. \nLa capa seleccionada actual es {capaactiva}. "
-                            )
+                                )
                             )
                         return
 
@@ -1424,7 +1425,8 @@ class numeros_exteriores:
             self.logger.error(
                 (
                     f'{datetime.now().strftime(self.timeformat)} '
-                    f'Error al invertir el orden de la cadena: {error}')
+                    f'Error al invertir el orden de la cadena: {error}'
+                    )
                 )
       
     def btnGuardar(self):
@@ -1463,7 +1465,8 @@ class numeros_exteriores:
                     IdNumeroVialidad = self.dockwidget.idVialidad.currentText()
             
                 if IdNumeroManzana == "":
-                    if (Id_manzana_actual and not Id_manzana_actual.isspace()) and not Id_manzana_actual == "None":
+                    if ((Id_manzana_actual and not Id_manzana_actual.isspace()) and not 
+                        Id_manzana_actual == "None"):
                         # the string is non-empty
                         QMessageBox.information(
                             self.iface.mainWindow(), 
@@ -1492,7 +1495,8 @@ class numeros_exteriores:
                             )
                         )
                 if IdNumeroVialidad == "":
-                    if (Id_vialidad_actual and not Id_vialidad_actual.isspace()) and not Id_vialidad_actual == "None":
+                    if ((Id_vialidad_actual and not Id_vialidad_actual.isspace()) and not 
+                        Id_vialidad_actual == "None"):
                         # the string is non-empty
                         QMessageBox.information(
                             self.iface.mainWindow(), 
@@ -1624,7 +1628,8 @@ class numeros_exteriores:
             txtRInicial = self.dockwidget.txtRinicial.text()
             txtRfinal = self.dockwidget.txtRfinal.text()
             txtRIntervalo = self.dockwidget.txtRIntervalo.text()
-            if (txtRInicial.isnumeric() == True and txtRfinal.isnumeric() == True and txtRIntervalo.isnumeric()):
+            if ((txtRInicial.isnumeric() == True and txtRfinal.isnumeric() == True and 
+                 txtRIntervalo.isnumeric())):
                 for x in range(int(txtRInicial), int(txtRfinal)+1, int(txtRIntervalo)):
                     if puntoInicio == 0:
                         intervalos = intervalos + str(x)
@@ -1662,7 +1667,7 @@ class numeros_exteriores:
                     (
                         f"Si desea crea una cadena de números exteriores con letras consecutivas, "
                         f"por favor, ingrese letra de inicio y fin en orden alfabético."
-                      )
+                        )
                     )
             #Alerta sobre la necesidad de usar una letra en el segundo valor del intervalo
             elif(txtRInicial.isnumeric() == True and txtRfinal.isnumeric() == False):
@@ -1844,7 +1849,7 @@ class numeros_exteriores:
                                 f"WHERE numext.id = %s AND ST_DWithin(numext.geom,via.geom,20) "
                                 f"ORDER BY distancia ASC;"
                                 )
-                            data_c = (self.campo01, )
+                            data_c = (self.campo01,)
                             with conn.cursor() as curs:
 
                                 curs.execute(qry_c, data_c)              
@@ -1998,7 +2003,8 @@ class numeros_exteriores:
                                 "Alerta",
                                 (
                                     f"No se ha ingresado una distancia, por favor, ingrese una. \n"
-                                    f"Considere que esta debe ser mayor que 60m.")
+                                    f"Considere que esta debe ser mayor que 60m."
+                                    )
                                 )
 
                         elif distUsuario.isnumeric() == False:
@@ -2168,7 +2174,8 @@ class numeros_exteriores:
                 #Agrega el valor "True" a flagSinIntervalo del sector seleccionado siempre y 
                 # cuando no haya más de dos sectores seleccionados           
                 self.flagSinIntervalo[int(cveSector)-1] = True
-                #Se alerta que ya se han seleccionado dos sectores y no es posible seleccionar un tercero   
+                #Se alerta que ya se han seleccionado dos sectores y no es posible seleccionar 
+                # un tercero   
                 QMessageBox.information(
                     self.iface.mainWindow(),
                     'Aviso',
@@ -2187,7 +2194,9 @@ class numeros_exteriores:
                 #Si se ingresaron todos los datos de inicio, final e intervalo del rango se guargan
                 # en la lista de cada rango, en la posición del sector actual menos uno para 
                 # empezar desde la primera posición
-                if txtRInicial_2 != "" and txtRInicial_2.isnumeric() and txtRFinal_2 != "" and txtRFinal_2.isnumeric and txtRIntervalo_2 != "" and txtRIntervalo_2.isnumeric():
+                if (txtRInicial_2 != "" and txtRInicial_2.isnumeric() and 
+                    txtRFinal_2 != "" and txtRFinal_2.isnumeric and 
+                    txtRIntervalo_2 != "" and txtRIntervalo_2.isnumeric()):
 
                     self.SectorRInicial[int(cveSector)-1] = txtRInicial_2
                     self.SectorRFinal[int(cveSector)-1] = txtRFinal_2
@@ -2209,7 +2218,8 @@ class numeros_exteriores:
                             if (int(cveSector) == 3):
                                 self.Sector3.append(str(x))
                         
-                        #Si existe una cadena de números exteriores se crea y se pega al final de la existente según sea el sector
+                        #Si existe una cadena de números exteriores se crea y se pega al final de 
+                        # la existente según sea el sector
                         else:
                             intervalos = intervalos + "," + str(x)
                             appendString = "," + str(x)
@@ -2229,15 +2239,20 @@ class numeros_exteriores:
                     if (int(cveSector) == 3):
                         self.dockwidget.textEdit.setText(str(self.Sector3))
                 
-                #Si el usuario ingresa letras en los cuadros de texto para inicio, fin e intervalo se alerta a este
-                elif (txtRInicial_2.isnumeric() == False and txtRInicial_2 != '') or (txtRFinal_2.isnumeric == False and txtRFinal_2 != '') or (txtRIntervalo_2.isnumeric() == False and txtRIntervalo_2 != ''):
+                #Si el usuario ingresa letras en los cuadros de texto para inicio, fin e intervalo 
+                # se alerta a este
+                elif ((txtRInicial_2.isnumeric() == False and txtRInicial_2 != '') or 
+                      (txtRFinal_2.isnumeric == False and txtRFinal_2 != '') or 
+                      (txtRIntervalo_2.isnumeric() == False and txtRIntervalo_2 != '')):
                     QMessageBox.warning(
                         self.iface.mainWindow(), 
                         "Aviso",
                         "Por favor, ingrese sólo valores para inicio, final e intervalo.")
                 
-                #Si no se ha ingresado algún o ninún valor de inicio, fin e intervalo del rango se alerta al usuario
-                elif txtRInicial_2 == "" and txtRFinal_2 == "" and txtRIntervalo_2 == "" and (sinIntervalo_checked or self.flagSinIntervalo[int(cveSector)-1] == True):
+                #Si no se ha ingresado algún o ninún valor de inicio, fin e intervalo del rango se 
+                # alerta al usuario
+                elif (txtRInicial_2 == "" and txtRFinal_2 == "" and txtRIntervalo_2 == "" and 
+                      (sinIntervalo_checked or self.flagSinIntervalo[int(cveSector)-1] == True)):
                     QMessageBox.information(
                         self.iface.mainWindow(), 
                         "Aviso",
@@ -2255,7 +2270,9 @@ class numeros_exteriores:
                         self.Sector3 = ['']
         
                 #Si no se han ingresado todos los datos se alerta al usuario
-                elif txtRInicial_2 == "" or txtRFinal_2 == "" or txtRIntervalo_2 == "" and (sinIntervalo_checked == False or self.flagSinIntervalo[int(cveSector)-1] == False):
+                elif (txtRInicial_2 == "" or txtRFinal_2 == "" or txtRIntervalo_2 == "" and 
+                      (sinIntervalo_checked == False or 
+                       self.flagSinIntervalo[int(cveSector)-1] == False)):
                     QMessageBox.warning(
                         self.iface.mainWindow(), 
                         "Aviso",
@@ -2417,7 +2434,8 @@ class numeros_exteriores:
             self.logger.error(
                 (
                     f'{datetime.now().strftime(self.timeformat)} '
-                    f'Error al eliminar los datos del campo: {error}')
+                    f'Error al eliminar los datos del campo: {error}'
+                    )
                 )
 
     def btnAgregarLiteralesEspeciales(self):
