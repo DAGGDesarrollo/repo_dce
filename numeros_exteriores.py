@@ -1534,7 +1534,7 @@ class numeros_exteriores:
                 
                 #Si se usa la función Cadena UH permite concatener los números exteriores 
                 # existentes con los creados o los sobrescribe
-                if  self.controlCadenaUH == 1 and self.cadena_existente != "":
+                if self.controlCadenaUH == 1 and self.cadena_existente != "":
                     buttonReply = QMessageBox.question(
                         self.iface.mainWindow(), 
                         'Atención', 
@@ -2517,6 +2517,7 @@ def insertarLetras(numExt: str,letraBuscada: str,letraInsertada: str):
     for position,i in enumerate(lista):
         if letraBuscada in i:
             numero = re.findall(r'\d+',i)
-            if i.count(letraBuscada) == 1: lista.insert(position + 1,f'{numero[0]}{letraInsertada}')  
+            if i.count(letraBuscada) == 1: 
+                lista.insert(position + 1,f'{numero[0]}{letraInsertada}')  
     nueva_lista = ','.join(lista)
     return nueva_lista
