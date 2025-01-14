@@ -233,9 +233,9 @@ class numeros_exteriores:
         icon_path = ':/plugins/numeros_exteriores/icon.png'
         self.add_action(
             icon_path,
-            text=self.tr(u'Números Exteriores'),
-            callback=self.run,
-            parent=self.iface.mainWindow())
+            text = self.tr(u'Números Exteriores'),
+            callback = self.run,
+            parent = self.iface.mainWindow())
 
     #--------------------------------------------------------------------------
     #Sección para conectar el código con los botones de acción con la interfaz gráfica
@@ -426,12 +426,13 @@ class numeros_exteriores:
             
             #localhost
             #remote Samge bged 
-            conn = psycopg2.connect(database=self.baseDatos, 
-                                    user=usr, 
-                                    password=pwd, 
-                                    host=self.servidor, 
-                                    port="5432"
-                                    )
+            conn = psycopg2.connect(
+                database = self.baseDatos, 
+                user = usr, 
+                password = pwd, 
+                host = self.servidor, 
+                port = "5432"
+                )
         
             with conn:
 
@@ -610,7 +611,7 @@ class numeros_exteriores:
                 f'{datetime.now().strftime(self.timeformat)} Error al cerrar la conexión: {error}'
                 )
 
-    def on_cveMunicipio_changed(self, value):      
+    def on_cveMunicipio_changed(self):      
         
         self.dockwidget.cveSeccion.clear()   
        
@@ -628,11 +629,11 @@ class numeros_exteriores:
             # set host name, port, database name, username and password
             uri.setConnection(self.servidor, "5432", self.baseDatos, usr, pwd)
             
-            conn = psycopg2.connect(database=self.baseDatos, 
-                                    user=usr, 
-                                    password=pwd, 
-                                    host=self.servidor, 
-                                    port="5432")
+            conn = psycopg2.connect(database = self.baseDatos, 
+                                    user = usr, 
+                                    password = pwd, 
+                                    host = self.servidor, 
+                                    port = "5432")
             with conn:
 
                 qry_c = "SELECT municipio, seccion from bged.seccion where municipio = %s order by seccion asc;"
@@ -1099,11 +1100,11 @@ class numeros_exteriores:
                         #localhost
                         #remote Samge bged 
                         conn = psycopg2.connect(
-                            database=self.baseDatos, 
-                            user=usr, 
-                            password=pwd, 
-                            host=self.servidor, 
-                            port="5432"
+                            database = self.baseDatos, 
+                            user = usr, 
+                            password = pwd, 
+                            host = self.servidor, 
+                            port = "5432"
                             )
                         
                         with conn:
@@ -1219,11 +1220,11 @@ class numeros_exteriores:
                         pwd = self.dockwidget.txtClave.text()
 
                         conn = psycopg2.connect(
-                            database=self.baseDatos, 
-                            user=usr, 
-                            password=pwd, 
-                            host=self.servidor, 
-                            port="5432"
+                            database = self.baseDatos, 
+                            user = usr, 
+                            password = pwd, 
+                            host = self.servidor, 
+                            port = "5432"
                             ) 
                         #Configura la barra de progreso 
                         prog = QProgressDialog(
@@ -1438,11 +1439,11 @@ class numeros_exteriores:
             
                 #localhost
                 conn = psycopg2.connect(
-                    database=self.baseDatos, 
-                    user=usr, 
-                    password=pwd, 
-                    host=self.servidor, 
-                    port="5432"
+                    database = self.baseDatos, 
+                    user = usr, 
+                    password = pwd, 
+                    host = self.servidor, 
+                    port = "5432"
                     )
         
                 #Grabar a Postgres
@@ -1833,11 +1834,11 @@ class numeros_exteriores:
                         
                         #localhost
                         conn = psycopg2.connect(
-                            database=self.baseDatos, 
-                            user=usr, 
-                            password=pwd, 
-                            host=self.servidor, 
-                            port="5432"
+                            database = self.baseDatos, 
+                            user = usr, 
+                            password = pwd, 
+                            host = self.servidor, 
+                            port = "5432"
                             )
                     
                         with conn:
@@ -1916,11 +1917,11 @@ class numeros_exteriores:
                         
                         #localhost
                         conn = psycopg2.connect(
-                            database=self.baseDatos, 
-                            user=usr, 
-                            password=pwd, 
-                            host=self.servidor, 
-                            port="5432"
+                            database = self.baseDatos, 
+                            user = usr, 
+                            password = pwd, 
+                            host = self.servidor, 
+                            port = "5432"
                             )
                     
                         with conn:
@@ -2027,11 +2028,11 @@ class numeros_exteriores:
                         elif len(distUsuario) >= 2 and float(distUsuario) > 60:
 
                             conn = psycopg2.connect(
-                                database=self.baseDatos, 
-                                user=usr, 
-                                password=pwd, 
-                                host=self.servidor, 
-                                port="5432"
+                                database = self.baseDatos, 
+                                user = usr, 
+                                password = pwd, 
+                                host = self.servidor, 
+                                port = "5432"
                                 )
 
                             with conn:
@@ -2170,7 +2171,7 @@ class numeros_exteriores:
                     )
             #Si se marca el checkbox cambia el valor de la bandera
             if sinIntervalo_checked and self.flagSinIntervalo.count(True) <= 2:
-                self.control+=1
+                self.control += 1
                 #Agrega el valor "True" a flagSinIntervalo del sector seleccionado siempre y 
                 # cuando no haya más de dos sectores seleccionados           
                 self.flagSinIntervalo[int(cveSector)-1] = True
@@ -2398,19 +2399,19 @@ class numeros_exteriores:
             #Elimina los datos ingresados según el sector seleccionado
             if (int(self.dockwidget.cveSector.currentText()) == 1):
                 self.Sector1.clear()
-                self.SectorRInicial[0]=""
-                self.SectorRFinal[0]=""
-                self.SectorRIntervalo[0]=""
+                self.SectorRInicial[0] = ""
+                self.SectorRFinal[0] = ""
+                self.SectorRIntervalo[0] = ""
             if (int(self.dockwidget.cveSector.currentText()) == 2):
                 self.Sector2.clear()
-                self.SectorRInicial[1]=""
-                self.SectorRFinal[1]=""
-                self.SectorRIntervalo[1]=""
+                self.SectorRInicial[1] = ""
+                self.SectorRFinal[1] = ""
+                self.SectorRIntervalo[1] = ""
             if (int(self.dockwidget.cveSector.currentText()) == 3):
                 self.Sector3.clear()
-                self.SectorRInicial[2]=""
-                self.SectorRFinal[2]=""
-                self.SectorRIntervalo[2]=""  
+                self.SectorRInicial[2] = ""
+                self.SectorRFinal[2] = ""
+                self.SectorRIntervalo[2] = ""  
             self.control = 0         
             self.SectorNombre[int(self.dockwidget.cveSector.currentText())-1] = ""      
             self.flagSinIntervalo[int(self.dockwidget.cveSector.currentText())-1] = False
@@ -2510,6 +2511,7 @@ class numeros_exteriores:
                     )
                 )
 
+
 #Función que inserta las literales seleccionadas por el usuario
 def insertarLetras(numExt: str,letraBuscada: str,letraInsertada: str):
     lista = numExt.split(',')
@@ -2518,6 +2520,6 @@ def insertarLetras(numExt: str,letraBuscada: str,letraInsertada: str):
         if letraBuscada in i:
             numero = re.findall(r'\d+',i)
             if i.count(letraBuscada) == 1: 
-                lista.insert(position + 1,f'{numero[0]}{letraInsertada}')  
+                lista.insert(position + 1, f'{numero[0]}{letraInsertada}')  
     nueva_lista = ','.join(lista)
     return nueva_lista
