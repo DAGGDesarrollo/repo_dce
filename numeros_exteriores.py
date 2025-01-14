@@ -66,7 +66,6 @@ from PyQt5.QtWidgets import QProgressDialog
 
 
 
-
 class numeros_exteriores:
     """QGIS Plugin Implementation."""
 
@@ -1411,7 +1410,7 @@ class numeros_exteriores:
         
         try:    
             cadena = self.dockwidget.textEdit.toPlainText()
-            invertida = ','.join((cadena.split(",")[::-1]))
+            invertida = ','.join((cadena.split(",")[:: -1]))
             self.dockwidget.textEdit.setText(invertida)
             
         except Exception as error:
@@ -1759,8 +1758,8 @@ class numeros_exteriores:
                     self.dockwidget.textEdit.setText(cadena1 + "," + intervalos.replace(" ",""))
                 #Se crea la función en la posición del cursor
                 else:
-                    if(cadena1[posicion-1]=="," or posicion == 0):
-                        cadena1 = f"{cadena1[0:posicion]}*{cadena1[posicion:]}"
+                    if(cadena1[posicion - 1]=="," or posicion == 0):
+                        cadena1 = f"{cadena1[0:posicion]}*{cadena1[posicion :]}"
                         cadena2 = cadena1.replace("*",f"{intervalos},").replace(" ","")
                         self.dockwidget.textEdit.setText(cadena2)
                     else:
@@ -2106,19 +2105,19 @@ class numeros_exteriores:
             #Función para el cambio de sector en el combobox
             #Carga los datos en pantalla según lo que se tenga guardado en memoria
             self.dockwidget.txtNombreSector.setText(
-                self.SectorNombre[int(self.dockwidget.cveSector.currentText())-1]
+                self.SectorNombre[int(self.dockwidget.cveSector.currentText()) - 1]
                 )
             self.dockwidget.txtRinicial_2.setText(
-                self.SectorRInicial[int(self.dockwidget.cveSector.currentText())-1]
+                self.SectorRInicial[int(self.dockwidget.cveSector.currentText()) - 1]
                 )
             self.dockwidget.txtRfinal_2.setText(
-                self.SectorRFinal[int(self.dockwidget.cveSector.currentText())-1]
+                self.SectorRFinal[int(self.dockwidget.cveSector.currentText()) - 1]
                 )
             self.dockwidget.txtRIntervalo_2.setText(
-                self.SectorRIntervalo[int(self.dockwidget.cveSector.currentText())-1]
+                self.SectorRIntervalo[int(self.dockwidget.cveSector.currentText()) - 1]
                 )
             self.dockwidget.checkSinIntervalo.setChecked(
-                self.flagSinIntervalo[int(self.dockwidget.cveSector.currentText())-1]
+                self.flagSinIntervalo[int(self.dockwidget.cveSector.currentText()) - 1]
                 )
 
             #Carga el contenido de la cadena generada
@@ -2158,7 +2157,7 @@ class numeros_exteriores:
 
             #verifica que se haya asignado un sector sin intervalo sólo dos veces.
             if self.flagSinIntervalo.count(True) == 2 and self.control ==2:
-                self.flagSinIntervalo[int(cveSector)-1] = False
+                self.flagSinIntervalo[int(cveSector) - 1] = False
                 self.dockwidget.checkSinIntervalo.setChecked(False)
                 QMessageBox.warning(
                     self.iface.mainWindow(),
@@ -2191,7 +2190,7 @@ class numeros_exteriores:
             #Se ingresó texto, lo guarda en la lista con SectorNombre[SectorActual-1], 
             # SectorActual-1 para empezar desde la primera posición
             if self.dockwidget.txtNombreSector.text() != "":
-                self.SectorNombre[int(cveSector)-1] = self.dockwidget.txtNombreSector.text()
+                self.SectorNombre[int(cveSector) - 1] = self.dockwidget.txtNombreSector.text()
                 #Si se ingresaron todos los datos de inicio, final e intervalo del rango se guargan
                 # en la lista de cada rango, en la posición del sector actual menos uno para 
                 # empezar desde la primera posición
@@ -2199,9 +2198,9 @@ class numeros_exteriores:
                     txtRFinal_2 != "" and txtRFinal_2.isnumeric and 
                     txtRIntervalo_2 != "" and txtRIntervalo_2.isnumeric()):
 
-                    self.SectorRInicial[int(cveSector)-1] = txtRInicial_2
-                    self.SectorRFinal[int(cveSector)-1] = txtRFinal_2
-                    self.SectorRIntervalo[int(cveSector)-1] = txtRIntervalo_2
+                    self.SectorRInicial[int(cveSector) - 1] = txtRInicial_2
+                    self.SectorRFinal[int(cveSector) - 1] = txtRFinal_2
+                    self.SectorRIntervalo[int(cveSector) - 1] = txtRIntervalo_2
 
                     #Se crea la cadena de numeros con los valores ingresados por el usuario
                     for x in range((int(txtRInicial_2)), int(txtRFinal_2)+1, int(txtRIntervalo_2)):
@@ -2253,7 +2252,7 @@ class numeros_exteriores:
                 #Si no se ha ingresado algún o ninún valor de inicio, fin e intervalo del rango se 
                 # alerta al usuario
                 elif (txtRInicial_2 == "" and txtRFinal_2 == "" and txtRIntervalo_2 == "" and 
-                      (sinIntervalo_checked or self.flagSinIntervalo[int(cveSector)-1] == True)):
+                      (sinIntervalo_checked or self.flagSinIntervalo[int(cveSector) - 1] == True)):
                     QMessageBox.information(
                         self.iface.mainWindow(), 
                         "Aviso",
@@ -2273,7 +2272,7 @@ class numeros_exteriores:
                 #Si no se han ingresado todos los datos se alerta al usuario
                 elif (txtRInicial_2 == "" or txtRFinal_2 == "" or txtRIntervalo_2 == "" and 
                       (sinIntervalo_checked == False or 
-                       self.flagSinIntervalo[int(cveSector)-1] == False)):
+                       self.flagSinIntervalo[int(cveSector) - 1] == False)):
                     QMessageBox.warning(
                         self.iface.mainWindow(), 
                         "Aviso",
@@ -2413,8 +2412,8 @@ class numeros_exteriores:
                 self.SectorRFinal[2] = ""
                 self.SectorRIntervalo[2] = ""  
             self.control = 0         
-            self.SectorNombre[int(self.dockwidget.cveSector.currentText())-1] = ""      
-            self.flagSinIntervalo[int(self.dockwidget.cveSector.currentText())-1] = False
+            self.SectorNombre[int(self.dockwidget.cveSector.currentText()) - 1] = ""      
+            self.flagSinIntervalo[int(self.dockwidget.cveSector.currentText()) - 1] = False
             
             #Elimina los datos de las cajas de texto de Nombre, Inicio, Final e Intervalo
             self.dockwidget.txtNombreSector.setText("")
