@@ -1666,7 +1666,7 @@
            </font>
           </property>
           <property name="toolTip">
-           <string>Ingrese el interalo deseado, siempre es numérico</string>
+           <string>Ingrese el intervalo deseado, siempre es numérico</string>
           </property>
           <property name="text">
            <string/>
@@ -1924,7 +1924,7 @@
            </font>
           </property>
           <property name="toolTip">
-           <string>Elimine los datos que ingresó a los campos de esta sección. Repita para cada sector</string>
+           <string>Elimine los datos que ingresó a los campos de esta cadena. Repita para cada cadena</string>
           </property>
           <property name="text">
            <string>Limpiar</string>
