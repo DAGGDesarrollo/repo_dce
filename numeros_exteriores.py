@@ -10,8 +10,7 @@ Números Exteriores - INE
                               -------------------
         begin                : 2023-04-25
         git sha              : $Format:%H$
-        copyright            : (C) 2023 by INE, Direccion de Cartografia Electoral, 
-                                Luis Enrique Cortés
+        copyright            : (C) 2023 by INE, DCE, SDSGE, DAGG 
         email                : enrique.cortes@ine.mx
         version              : 1.1.0
  ***************************************************************************/
@@ -232,9 +231,9 @@ class numeros_exteriores:
         icon_path = ':/plugins/numeros_exteriores/icon.png'
         self.add_action(
             icon_path,
-            text = self.tr(u'Números Exteriores'),
-            callback = self.run,
-            parent = self.iface.mainWindow())
+            text=self.tr(u'Números Exteriores'),
+            callback=self.run,
+            parent=self.iface.mainWindow())
 
     #--------------------------------------------------------------------------
     #Sección para conectar el código con los botones de acción con la interfaz gráfica
@@ -426,11 +425,11 @@ class numeros_exteriores:
             #localhost
             #remote Samge bged 
             conn = psycopg2.connect(
-                database = self.baseDatos, 
-                user = usr, 
-                password = pwd, 
-                host = self.servidor, 
-                port = "5432"
+                database=self.baseDatos, 
+                user=usr, 
+                password=pwd, 
+                host=self.servidor, 
+                port="5432"
                 )
         
             with conn:
@@ -628,15 +627,17 @@ class numeros_exteriores:
             # set host name, port, database name, username and password
             uri.setConnection(self.servidor, "5432", self.baseDatos, usr, pwd)
             
-            conn = psycopg2.connect(database = self.baseDatos, 
-                                    user = usr, 
-                                    password = pwd, 
-                                    host = self.servidor, 
-                                    port = "5432")
+            conn = psycopg2.connect(
+                database=self.baseDatos, 
+                user=usr, 
+                password=pwd, 
+                host=self.servidor, 
+                port="5432"
+                )
             with conn:
 
                 qry_c = "SELECT municipio, seccion from bged.seccion where municipio = %s order by seccion asc;"
-                data_c = (numeroMunicipio, )
+                data_c = (numeroMunicipio,)
 
                 with conn.cursor() as curs:
 
@@ -1099,11 +1100,11 @@ class numeros_exteriores:
                         #localhost
                         #remote Samge bged 
                         conn = psycopg2.connect(
-                            database = self.baseDatos, 
-                            user = usr, 
-                            password = pwd, 
-                            host = self.servidor, 
-                            port = "5432"
+                            database=self.baseDatos, 
+                            user=usr, 
+                            password=pwd, 
+                            host=self.servidor, 
+                            port="5432"
                             )
                         
                         with conn:
@@ -1219,11 +1220,11 @@ class numeros_exteriores:
                         pwd = self.dockwidget.txtClave.text()
 
                         conn = psycopg2.connect(
-                            database = self.baseDatos, 
-                            user = usr, 
-                            password = pwd, 
-                            host = self.servidor, 
-                            port = "5432"
+                            database=self.baseDatos, 
+                            user=usr, 
+                            password=pwd, 
+                            host=self.servidor, 
+                            port="5432"
                             ) 
                         #Configura la barra de progreso 
                         prog = QProgressDialog(
@@ -1438,11 +1439,11 @@ class numeros_exteriores:
             
                 #localhost
                 conn = psycopg2.connect(
-                    database = self.baseDatos, 
-                    user = usr, 
-                    password = pwd, 
-                    host = self.servidor, 
-                    port = "5432"
+                    database=self.baseDatos, 
+                    user=usr, 
+                    password=pwd, 
+                    host=self.servidor, 
+                    port="5432"
                     )
         
                 #Grabar a Postgres
@@ -1528,6 +1529,18 @@ class numeros_exteriores:
                         "Debe ingresar el dato de Número Exterior para guardar los cambios."
                         )
                     return
+
+                if '|' in numeroExterior:
+                    count = numeroExterior.count('|')
+                    if count % 2 != 0:
+                        QMessageBox.warning(
+                            self.iface.mainWindow(), 
+                            "Aviso",
+                            (
+                                f"Hay un número impar de '|', por favor verifique e intente de nuevo."
+                                )
+                            )
+                        return
 
                 IdNumeroManzana = IdNumeroManzana.strip()
                 IdNumeroVialidad = IdNumeroVialidad.strip()
@@ -1833,11 +1846,11 @@ class numeros_exteriores:
                         
                         #localhost
                         conn = psycopg2.connect(
-                            database = self.baseDatos, 
-                            user = usr, 
-                            password = pwd, 
-                            host = self.servidor, 
-                            port = "5432"
+                            database=self.baseDatos, 
+                            user=usr, 
+                            password=pwd, 
+                            host=self.servidor, 
+                            port="5432"
                             )
                     
                         with conn:
@@ -1916,11 +1929,11 @@ class numeros_exteriores:
                         
                         #localhost
                         conn = psycopg2.connect(
-                            database = self.baseDatos, 
-                            user = usr, 
-                            password = pwd, 
-                            host = self.servidor, 
-                            port = "5432"
+                            database=self.baseDatos, 
+                            user=usr, 
+                            password=pwd, 
+                            host=self.servidor, 
+                            port="5432"
                             )
                     
                         with conn:
@@ -2027,11 +2040,11 @@ class numeros_exteriores:
                         elif len(distUsuario) >= 2 and float(distUsuario) > 60:
 
                             conn = psycopg2.connect(
-                                database = self.baseDatos, 
-                                user = usr, 
-                                password = pwd, 
-                                host = self.servidor, 
-                                port = "5432"
+                                database=self.baseDatos, 
+                                user=usr, 
+                                password=pwd, 
+                                host=self.servidor, 
+                                port="5432"
                                 )
 
                             with conn:
