@@ -1530,6 +1530,7 @@ class numeros_exteriores:
                         )
                     return
 
+                #Verifica que el número de '|' sea par
                 if '|' in numeroExterior:
                     count = numeroExterior.count('|')
                     if count % 2 != 0:
@@ -1537,10 +1538,88 @@ class numeros_exteriores:
                             self.iface.mainWindow(), 
                             "Aviso",
                             (
-                                f"Hay un número impar de '|', por favor verifique e intente de nuevo."
+                                f"Hay un número impar de '|', por favor agregue el de apertura o cierre, verifique el formato e intente de nuevo."
                                 )
                             )
                         return
+                #Verifica que el número de '"' sea par
+                if '"' in numeroExterior:
+                    count = numeroExterior.count('"')
+                    if count % 2 != 0:
+                        QMessageBox.warning(
+                            self.iface.mainWindow(), 
+                            "Aviso",
+                            (
+                                f"Hay un número impar de '\"', por favor agregue el de apertura o cierre, verifique el formato e intente de nuevo."
+                                )
+                            )
+                        return
+                    
+                #Verifica que exista un paréntesis de cierre para cada uno de apertura
+                if '(' in numeroExterior or ')' in numeroExterior:
+                    countOpen = numeroExterior.count('(')
+                    countClose = numeroExterior.count(')')
+                    if countOpen != countClose:
+                        QMessageBox.warning(
+                            self.iface.mainWindow(), 
+                            "Aviso",
+                            (
+                                f"Hay un número impar de '()', por favor agregue el de apertura o cierre, verifique el formato e intente de nuevo."
+                                )
+                            )
+                        return
+                    else:
+                        flag =  False
+                        numeroExteriorValida = numeroExterior
+                        cuentaParentesis = numeroExteriorValida.count('(')
+
+                        for i in range(0,cuentaParentesis):
+                            abre = numeroExteriorValida.find('(')
+                            cierra = numeroExteriorValida.find(')')
+                            if abre > cierra:
+                                numeroExteriorValida = numeroExteriorValida[abre+1:]
+                                flag = True
+                            else:
+                                numeroExteriorValida = numeroExteriorValida[cierra+1:]
+                                flag = False
+
+                        if flag:
+                            QMessageBox.warning(
+                                self.iface.mainWindow(), 
+                                "Aviso",
+                                (
+                                    f"Los '()' están colocados en el orden incorrecto, verifique el formato e intente de nuevo."
+                                    )
+                                )
+                            return
+                
+                #Verifica que la cadena no tenga acentos
+                # á, é, í, ó, ú, Á, É, Í, Ó, Ú
+                acentos = ['á','é','í','ó','ú','Á','É','Í','Ó','Ú']
+                for acento in acentos:
+                    if acento in numeroExterior:
+                        QMessageBox.warning(
+                            self.iface.mainWindow(), 
+                            "Aviso",
+                            (
+                                f"La cadena no debe contener acentos. "
+                                f"Por favor, verifique el formato e intente de nuevo."
+                                )
+                            )
+                        return
+
+                #Verifica que la cadena contenga solo los caracteres permitidos
+                permitidos = re.compile(r'^[0-9a-zA-ZÑñüÜ,\-\s\|\"\(\)*\',.\/°\\]*$')
+                if not permitidos.match(numeroExterior):
+                    QMessageBox.warning(
+                        self.iface.mainWindow(), 
+                        "Aviso",
+                        (
+                            f"La cadena contiene caracteres no permitidos. "
+                            f"Por favor, verifique el formato e intente de nuevo."
+                            )
+                        )
+                    return
 
                 IdNumeroManzana = IdNumeroManzana.strip()
                 IdNumeroVialidad = IdNumeroVialidad.strip()
